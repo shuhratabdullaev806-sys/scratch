@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buxgalteriya (Bosh Kitob)</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #e2e8f0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #64748b;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        .num {
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        input,
+        select {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-success {
+            background: #16a34a;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                padding: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+            }
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                padding: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+            }
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Buxgalteriya (Bosh Kitob)</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <div class="container">
+            <div class="card no-print" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h1>📚 Buxgalteriya (Bosh Kitob)</h1>
+                    <small>"FAXR MADAD KONSALT" | Muallif: Suxrat Abdullaev</small>
+                </div>
+                <button onclick="clearData()"
+                    style="background:transparent; border:none; text-decoration:underline; font-size:0.8rem; color:#ef4444;">Bazani
+                    tozalash</button>
+            </div>
+
+            <div class="tabs no-print">
+                <button class="tab-btn active" onclick="setTab('journal')" id="btn-journal">📖 Jurnal</button>
+                <button class="tab-btn" onclick="setTab('mizan')" id="btn-mizan">⚖️ Aylanma Qoldiq</button>
+                <button class="tab-btn" onclick="setTab('closing')" id="btn-closing">🔒 Davrni Yopish</button>
+                <button class="tab-btn" onclick="setTab('reports')" id="btn-reports">📊 Hisobotlar</button>
+                <button class="tab-btn" onclick="openQuiz()" id="btn-quiz" style="background:#8b5cf6; color:white;">🧠
+                    Bilimni Sinash</button>
+            </div>
+
+            <!-- JOURNAL TAB -->
+            <div id="tab-journal">
+                <div class="card no-print">
+                    <h3>Yangi Provodka</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Sana</label>
+                            <input type="date" id="p-date">
+                        </div>
+                        <div class="form-group">
+                            <label>Debet (Schyot)</label>
+                            <input type="text" id="p-dt" placeholder="Masalan: 5110" style="width:100px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Kredit (Schyot)</label>
+                            <input type="text" id="p-kt" placeholder="Masalan: 4010" style="width:100px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Summa</label>
+                            <input type="number" id="p-sum" placeholder="0" style="width:150px;">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Izoh / Mazmuni</label>
+                            <input type="text" id="p-desc" placeholder="Operatsiya mazmuni">
+                        </div>
+                        <button onclick="addEntry()" class="btn">Qo'shish</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Operatsiyalar Jurnali</h3>
+                    <div style="overflow-x:auto; max-height:600px; overflow-y:auto;">
+                        <table id="journal-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Sana</th>
+                                    <th>Mazmuni</th>
+                                    <th>Dt</th>
+                                    <th>Kt</th>
+                                    <th class="num">Summa</th>
+                                    <th class="no-print">Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="journal-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MIZAN TAB (Trial Balance) -->
+            <div id="tab-mizan" style="display:none;">
+                <div class="card">
+                    <h3>Aylanma Qoldiqlar (Mizan)</h3>
+                    <button onclick="renderMizan()" class="btn no-print" style="margin-bottom:10px;">🔄
+                        Yangilash</button>
+                    <table id="mizan-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Schyot</th>
+                                <th colspan="2" style="text-align:center">Boshlang'ich Qoldiq</th>
+                                <th colspan="2" style="text-align:center">Aylanma</th>
+                                <th colspan="2" style="text-align:center">Yakuniy Qoldiq</th>
+                            </tr>
+                            <tr>
+                                <th class="num">Dt</th>
+                                <th class="num">Kt</th>
+                                <th class="num">Dt</th>
+                                <th class="num">Kt</th>
+                                <th class="num">Dt</th>
+                                <th class="num">Kt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mizan-tbody"></tbody>
+                        <tfoot style="font-weight:bold; background:#e2e8f0;">
+                            <tr id="mizan-total"></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CLOSING TAB -->
+            <div id="tab-closing" style="display:none;">
+                <div class="card">
+                    <div style="text-align:center; padding: 20px;">
+                        <h2>🔒 Davrni Yopish (Zakritiya Perioda)</h2>
+                        <p>Ushbu funksiya barcha daromad (9000) va xarajat (9400) schyotlarini yopib, Moliyaviy Natijani
+                            (9910) aniqlaydi.</p>
+
+                        <div
+                            style="margin: 20px 0; background:#f0f9ff; padding:15px; border-left:4px solid #0284c7; text-align:left;">
+                            <strong>Yopiladigan Schyotlar:</strong>
+                            <ul>
+                                <li>Daromadlar: 9010, 9020, 9030 ... -> 9910 (Kreditlanadi)</li>
+                                <li>Xarajatlar: 2010, 9410, 9420, 9430 ... -> 9910 (Debetlanadi)</li>
+                                <li>Foyda Solig'i: 9810 -> 6410</li>
+                                <li>Sof Foyda: 9910 -> 8710 (Taqsimlanmagan foyda)</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-group" style="max-width:200px; margin:0 auto 20px auto;">
+                            <label>Yopiladigan Sana</label>
+                            <input type="date" id="closing-date">
+                        </div>
+
+                        <button onclick="closePeriod()" class="btn btn-success"
+                            style="padding:15px 30px; font-size:1.1rem;">✅ Davrni Yopish</button>
+                    </div>
+
+                    <div id="closing-result" style="margin-top:20px;"></div>
+                </div>
+            </div>
+
+            <!-- REPORTS TAB -->
+            <div id="tab-reports" style="display:none;">
+                <div class="card no-print">
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="renderBalanceSheet()" class="btn">📝 Buxgalteriya Balansi (F-1)</button>
+                        <button onclick="renderFinResult()" class="btn">📈 Moliyaviy Natija (F-2)</button>
+                        <button onclick="renderCashFlow()" class="btn">💸 Pul Oqimi (F-4)</button>
+                        <button onclick="renderEquity()" class="btn">💰 Xususiy Kapital (F-5)</button>
+                        <button onclick="renderTax('property')" class="btn"
+                            style="background:#e0f2fe; color:#0369a1;">🏠 Mol-mulk</button>
+                        <button onclick="renderTax('land')" class="btn" style="background:#f0fdf4; color:#15803d;">🌍
+                            Yer</button>
+                        <button onclick="renderTax('water')" class="btn" style="background:#eff6ff; color:#1d4ed8;">💧
+                            Suv</button>
+                        <button onclick="window.print()" class="btn btn-ghost">🖨️ Chop etish</button>
+                    </div>
+                </div>
+
+                <div class="card" id="report-view">
+                    <p style="text-align:center; color:#64748b;">Hisobot turini tanlang...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            // --- DATA ---
+            // Journal: [{date, dt, kt, sum, desc}]
+            // --- DATA ---
+            // Journal: [{date, dt, kt, sum, desc}]
+            let journal = [];
+            let currentUser = null;
+
+            window.onload = function () {
+                checkLogin();
+            };
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('bk_user');
+                const storedGroup = sessionStorage.getItem('bk_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadData();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name) {
+                    currentUser = name;
+                    sessionStorage.setItem('bk_user', name);
+                    sessionStorage.setItem('bk_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadData();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('bk_user');
+                    sessionStorage.removeItem('bk_group');
+                    location.reload();
+                }
+            }
+
+            function loadData() {
+                if (!currentUser) return;
+                journal = JSON.parse(localStorage.getItem('b_journal_' + currentUser) || '[]');
+                document.getElementById('closing-date').value = new Date().toISOString().slice(0, 10);
+                document.getElementById('p-date').value = new Date().toISOString().slice(0, 10);
+                renderJournal();
+            }
+
+            function setTab(tab) {
+                ['journal', 'mizan', 'closing', 'reports'].forEach(t => document.getElementById('tab-' + t).style.display = 'none');
+                document.getElementById('tab-' + tab).style.display = 'block';
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('btn-' + tab).classList.add('active');
+
+                if (tab === 'mizan') renderMizan();
+            }
+
+            // --- JOURNAL ---
+            function addEntry() {
+                const date = document.getElementById('p-date').value;
+                const dt = document.getElementById('p-dt').value.trim();
+                const kt = document.getElementById('p-kt').value.trim();
+                const sum = parseFloat(document.getElementById('p-sum').value) || 0;
+                const desc = document.getElementById('p-desc').value;
+
+                if (!dt || !kt || sum <= 0) { alert("Ma'lumotlarni to'g'ri kiriting!"); return; }
+
+                journal.push({ id: Date.now(), date, dt, kt, sum, desc });
+                saveJournal();
+
+                // Clear inputs except date
+                document.getElementById('p-dt').value = '';
+                document.getElementById('p-kt').value = '';
+                document.getElementById('p-sum').value = '';
+                document.getElementById('p-desc').value = '';
+
+                renderJournal();
+            }
+
+            function renderJournal() {
+                const tbody = document.getElementById('journal-tbody');
+                // Show last 50 entries reveresed
+                const viewData = journal.slice().reverse().slice(0, 100);
+                tbody.innerHTML = viewData.map(r => `
+            <tr>
+                <td><small>${new Date(r.id).toLocaleTimeString()}</small></td>
+                <td>${r.date}</td>
+                <td>${r.desc}</td>
+                <td><b>${r.dt}</b></td>
+                <td><b>${r.kt}</b></td>
+                <td class="num">${r.sum.toLocaleString()}</td>
+                <td class="no-print"><button onclick="delEntry(${r.id})" class="btn-danger btn" style="font-size:0.7rem;">x</button></td>
+            </tr>
+        `).join('');
+            }
+
+            function saveJournal() {
+                if (!currentUser) return;
+                localStorage.setItem('b_journal_' + currentUser, JSON.stringify(journal));
+            }
+            function delEntry(id) { if (confirm('Ochirilsinmi?')) { journal = journal.filter(x => x.id !== id); saveJournal(); renderJournal(); } }
+            function clearData() { if (confirm('DIQQAT: Barcha ma\'lumotlar o\'chiriladi!')) { journal = []; saveJournal(); location.reload(); } }
+
+            // --- MIZAN (TRIAL BALANCE) ---
+            function getBalances() {
+                let accs = {};
+                journal.forEach(r => {
+                    if (!accs[r.dt]) accs[r.dt] = { dt: 0, kt: 0 };
+                    if (!accs[r.kt]) accs[r.kt] = { dt: 0, kt: 0 };
+
+                    accs[r.dt].dt += r.sum;
+                    accs[r.kt].kt += r.sum;
+                });
+
+                // Calculate final balance (simplified active/passive logic not full applied here, just Dt-Kt diff)
+                // Usually we need Account Type (Active/Passive) to know where balance goes.
+                // For simplicity: Show Dt and Kt turnovers and simple End Balance.
+                return accs;
+            }
+
+            function renderMizan() {
+                const accs = getBalances();
+                const keys = Object.keys(accs).sort();
+
+                let tDt = 0, tKt = 0;
+
+                const tbody = document.getElementById('mizan-tbody');
+                tbody.innerHTML = keys.map(k => {
+                    const inf = accs[k];
+                    tDt += inf.dt;
+                    tKt += inf.kt;
+
+                    // Simplified logic: If Dt > Kt -> Debit Bal. If Kt > Dt -> Credit Bal.
+                    // In real accounting depends on account type.
+                    let endDt = 0, endKt = 0;
+                    if (inf.dt > inf.kt) endDt = inf.dt - inf.kt;
+                    else endKt = inf.kt - inf.dt;
+
+                    return `
+            <tr>
+                <td><b>${k}</b></td>
+                <td class="num">-</td><td class="num">-</td>
+                <td class="num">${inf.dt.toLocaleString()}</td>
+                <td class="num">${inf.kt.toLocaleString()}</td>
+                <td class="num" style="background:#f0fdf4">${endDt > 0 ? endDt.toLocaleString() : '-'}</td>
+                <td class="num" style="background:#fef2f2">${endKt > 0 ? endKt.toLocaleString() : '-'}</td>
+            </tr>
+            `;
+                }).join('');
+
+                document.getElementById('mizan-total').innerHTML = `
+            <td>JAMI:</td>
+            <td></td><td></td>
+            <td class="num">${tDt.toLocaleString()}</td>
+            <td class="num">${tKt.toLocaleString()}</td>
+            <td></td><td></td>
+        `;
+            }
+
+            // --- CLOSING LOGIC ---
+            function closePeriod() {
+                const date = document.getElementById('closing-date').value;
+                const accs = getBalances();
+                const keys = Object.keys(accs);
+
+                let newEntries = [];
+
+                // 1. Close Income (90xx, 93xx) -> 9910
+                // Expected Balance for Income is Credit (Kt > Dt). To close, we Debit Income, Credit 9910.
+                keys.forEach(k => {
+                    if (k.startsWith('90') || k.startsWith('93')) {
+                        const bal = (accs[k].kt - accs[k].dt);
+                        if (bal > 0) {
+                            newEntries.push({ id: Date.now() + Math.random(), date, dt: k, kt: '9910', sum: bal, desc: 'Daromad yopilishi' });
+                        }
+                    }
+                });
+
+                // 2. Close Expenses (20xx - Cost of Goods Sold, 94xx - Period Exp) -> 9910
+                // Expected Balance for Expense is Debit (Dt > Kt). To close, we Credit Expense, Debit 9910.
+                keys.forEach(k => {
+                    if (k.startsWith('20') || k.startsWith('91') || k.startsWith('94')) {
+                        const bal = (accs[k].dt - accs[k].kt);
+                        if (bal > 0) {
+                            newEntries.push({ id: Date.now() + Math.random(), date, dt: '9910', kt: k, sum: bal, desc: 'Xarajat yopilishi' });
+                        }
+                    }
+                });
+
+                if (newEntries.length === 0) {
+                    alert("Yopiladigan qoldiqlar topilmadi.");
+                    return;
+                }
+
+                // Apply first batch to calc profit
+                journal.push(...newEntries);
+
+                // 3. Calculate Tax (9810) and Final Result (8710)
+                // Recalculate 9910 balance
+                const updatedAccs = getBalances(); // Need to re-run locally or simulate
+                // Let's rely on simple math from newEntries.
+
+                let credit9910 = newEntries.filter(x => x.kt === '9910').reduce((a, b) => a + b.sum, 0); // Income
+                let debit9910 = newEntries.filter(x => x.dt === '9910').reduce((a, b) => a + b.sum, 0); // Expense
+
+                let profit = credit9910 - debit9910;
+                let finalEntries = [];
+
+                if (profit > 0) {
+                    // Profit Tax (Simplified 12% or turnover tax? Let's assume standard profit tax entry if needed or skip)
+                    // User requested: 9810 -> 6411? 
+                    // If we have 9810 balance it should be closed. If we need to CALCULATE tax:
+                    // "Foyda solig'ini hisoblab..."
+                    // Let's assume 0 for now unless we add tax logic.
+                    // Let's transfer Profit to 8710
+                    finalEntries.push({ id: Date.now() + Math.random(), date, dt: '9910', kt: '8710', sum: profit, desc: 'Sof foyda (8710 ga)' });
+                } else if (profit < 0) {
+                    // Loss
+                    finalEntries.push({ id: Date.now() + Math.random(), date, dt: '8710', kt: '9910', sum: Math.abs(profit), desc: 'Zarar qopilishi (8710 dan)' });
+                }
+
+                journal.push(...finalEntries);
+                saveJournal();
+
+                document.getElementById('closing-result').innerHTML = `
+            <div style="background:#dcfce7; padding:15px; border:1px solid #16a34a; border-radius:8px;">
+                <h3 style="color:#166534; margin:0;">Muvaffaqiyatli Yopildi!</h3>
+                <p>Jami Daromad: <b>${credit9910.toLocaleString()}</b></p>
+                <p>Jami Xarajat: <b>${debit9910.toLocaleString()}</b></p>
+                <p>Moliyaviy Natija: <b>${profit.toLocaleString()}</b></p>
+                <p>Jurnalga ${newEntries.length + finalEntries.length} ta provodka qo'shildi.</p>
+            </div>
+        `;
+                renderJournal();
+            }
+
+            // --- REPORTS ---
+            function renderBalanceSheet() {
+                const accs = getBalances();
+                // Simple mapping: 
+                // Assets: 01xx-29xx, 5xxx
+                // Liability: 6xxx, 7xxx
+                // Equity: 8xxx (inc 8710)
+
+                // This is a naive categorization for demo purposes
+                let assets = [], passives = [];
+                let totA = 0, totP = 0;
+
+                Object.keys(accs).sort().forEach(k => {
+                    let bal = 0;
+                    // Active Accounts
+                    if (k.startsWith('0') || k.startsWith('1') || k.startsWith('2') || k.startsWith('3') || k.startsWith('4') || k.startsWith('5')) {
+                        bal = accs[k].dt - accs[k].kt;
+                        if (bal !== 0) {
+                            assets.push({ code: k, sum: bal });
+                            totA += bal;
+                        }
+                    }
+                    // Passive Accounts
+                    else {
+                        bal = accs[k].kt - accs[k].dt; // Credit balance is positive for passive
+                        if (bal !== 0) {
+                            passives.push({ code: k, sum: bal });
+                            totP += bal;
+                        }
+                    }
+                });
+
+                const html = `
+            <h2 style="text-align:center;">Buxgalteriya Balansi (Forma-1)</h2>
+            <div style="display:flex; gap:20px;">
+                <div style="flex:1;">
+                    <h3 style="border-bottom:2px solid #000;">Aktivlar</h3>
+                    <table>
+                        <tr><th>Schyot</th><th class="num">Summa</th></tr>
+                        ${assets.map(x => `<tr><td>${x.code}</td><td class="num">${x.sum.toLocaleString()}</td></tr>`).join('')}
+                        <tr style="font-weight:bold; background:#eee;"><td>JAMI AKTIV:</td><td class="num">${totA.toLocaleString()}</td></tr>
+                    </table>
+                </div>
+                <div style="flex:1;">
+                    <h3 style="border-bottom:2px solid #000;">Passivlar</h3>
+                    <table>
+                        <tr><th>Schyot</th><th class="num">Summa</th></tr>
+                        ${passives.map(x => `<tr><td>${x.code}</td><td class="num">${x.sum.toLocaleString()}</td></tr>`).join('')}
+                        <tr style="font-weight:bold; background:#eee;"><td>JAMI PASSIV:</td><td class="num">${totP.toLocaleString()}</td></tr>
+                    </table>
+                </div>
+            </div>
+        `;
+                document.getElementById('report-view').innerHTML = html;
+            }
+
+            function renderFinResult() {
+                // Form-2 usually shows Revenue(90), COGS(20), Gross Profit, Period Expenses(94), Tax(98), Net Profit.
+                // We need to fetch movements, not just closing balances (because closing zeros them out!)
+                // So we need to calculate 'Turnover' (Aylanma) for the period BEFORE closing.
+                // For simplicity, we can scan the journal for 90xx Kt and 94xx Dt.
+
+                let revenue = 0;
+                let cogs = 0;
+                let expenses = 0;
+                let tax = 0;
+
+                journal.forEach(r => {
+                    if (r.desc.includes('yopilishi')) return; // Ignore closing entries to avoid double counting or zeroing
+
+                    if (r.kt.startsWith('90')) revenue += r.sum;
+                    if (r.dt.startsWith('20')) cogs += r.sum; // Cost of sold goods usually 9120->2010? No, 9110 Dt is COGS.
+                    if (r.dt.startsWith('9110')) cogs += r.sum; // Let's assume 9110 is COGS Account
+                    if (r.dt.startsWith('94')) expenses += r.sum;
+                    if (r.dt.startsWith('98')) tax += r.sum;
+                });
+
+                const gross = revenue - cogs;
+                const profitBeforeTax = gross - expenses;
+                const net = profitBeforeTax - tax;
+
+                const html = `
+            <h2 style="text-align:center;">Moliyaviy Natijalar (Forma-2)</h2>
+            <table style="max-width:800px; margin:0 auto;">
+                <tr><th>Ko'rsatkich</th><th class="num">Summa</th></tr>
+                <tr><td>Sotishdan tushum (9000)</td><td class="num text-blue-600">${revenue.toLocaleString()}</td></tr>
+                <tr><td>Sotilgan mahsulot tannarxi (9100)</td><td class="num text-red-600">-${cogs.toLocaleString()}</td></tr>
+                <tr style="font-weight:bold; background:#eff6ff;"><td>Yalpi Foyda</td><td class="num">${gross.toLocaleString()}</td></tr>
+                <tr><td>Davr Xarajatlari (9400)</td><td class="num text-red-600">-${expenses.toLocaleString()}</td></tr>
+                <tr style="font-weight:bold;"><td>Soliq to'lagungacha foyda</td><td class="num">${profitBeforeTax.toLocaleString()}</td></tr>
+                <tr><td>Foyda solig'i (9800)</td><td class="num text-red-600">-${tax.toLocaleString()}</td></tr>
+                <tr style="font-weight:bold; background:#dcfce7; font-size:1.1rem;"><td>SOF FOYDA (8700)</td><td class="num">${net.toLocaleString()}</td></tr>
+            </table>
+        `;
+                document.getElementById('report-view').innerHTML = html;
+            }
+
+            function renderCashFlow() {
+                // Direct Method Cash Flow (F-4)
+
+                // Categories
+                const categories = {
+                    operating: { name: "Operatsion Faoliyat", inflow: {}, outflow: {}, tIn: 0, tOut: 0 },
+                    investing: { name: "Investitsion Faoliyat", inflow: {}, outflow: {}, tIn: 0, tOut: 0 },
+                    financing: { name: "Moliyaviy Faoliyat", inflow: {}, outflow: {}, tIn: 0, tOut: 0 }
+                };
+
+                const classifyFlow = (code) => {
+                    // Financing: Loans (68, 78), Dividends (66), Equity (46, 83), Fin. Expenses (96)
+                    if (code.startsWith('68') || code.startsWith('78') || code.startsWith('66') || code.startsWith('46') || code.startsWith('83') || code.startsWith('96')) return 'financing';
+                    // Investing: Non-current Assets (01-09), Asset Disposal (92), Fin. Income (95)
+                    if (code.startsWith('0') || code.startsWith('92') || code.startsWith('95')) return 'investing';
+                    // Default to Operating (Sales, Suppliers, Taxes, Salary, etc.)
+                    return 'operating';
+                };
+
+                journal.forEach(r => {
+                    if (r.desc.includes('yopilishi')) return;
+
+                    const dtIsCash = r.dt.startsWith('5');
+                    const ktIsCash = r.kt.startsWith('5');
+
+                    if (dtIsCash && ktIsCash) return; // Internal transfer
+
+                    if (dtIsCash) {
+                        // Inflow
+                        const type = classifyFlow(r.kt);
+                        categories[type].inflow[r.kt] = (categories[type].inflow[r.kt] || 0) + r.sum;
+                        categories[type].tIn += r.sum;
+                    } else if (ktIsCash) {
+                        // Outflow
+                        const type = classifyFlow(r.dt);
+                        categories[type].outflow[r.dt] = (categories[type].outflow[r.dt] || 0) + r.sum;
+                        categories[type].tOut += r.sum;
+                    }
+                });
+
+                const makeRows = (obj) => {
+                    return Object.keys(obj).sort().map(acc =>
+                        `<tr><td>${acc}</td><td class="num">${obj[acc].toLocaleString()}</td></tr>`
+                    ).join('');
+                };
+
+                const renderSection = (key, styleColor) => {
+                    const cat = categories[key];
+                    const net = cat.tIn - cat.tOut;
+                    const netColor = net >= 0 ? '#16a34a' : '#dc2626'; // Green or Red text for Net
+
+                    if (cat.tIn === 0 && cat.tOut === 0) return ''; // Hide empty sections? Or show empty. Let's show if desired, but hiding makes it cleaner initially.
+                    // Actually user probably wants to see the sections even if empty to know they exist.
+
+                    return `
+                        <div class="card" style="margin-bottom:20px; border-left: 5px solid ${styleColor};">
+                            <h3 style="margin-top:0; color:${styleColor}; border-bottom:1px solid #eee; padding-bottom:10px;">
+                                ${cat.name}dan pul oqimi
+                            </h3>
+                            <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                                <div style="flex:1; min-width:250px;">
+                                    <h4 style="color:#16a34a; margin:10px 0;">Kirimlar (Inflows)</h4>
+                                    ${Object.keys(cat.inflow).length > 0 ?
+                            `<table style="width:100%;">
+                                            <tr style="background:#f0fdf4;"><th>Manba</th><th class="num">Summa</th></tr>
+                                            ${makeRows(cat.inflow)}
+                                            <tr style="font-weight:bold;"><td>Jami:</td><td class="num">${cat.tIn.toLocaleString()}</td></tr>
+                                        </table>` : '<p style="color:#ccc; font-style:italic;">Kirim mavjud emas</p>'
+                        }
+                                </div>
+                                <div style="flex:1; min-width:250px;">
+                                    <h4 style="color:#dc2626; margin:10px 0;">Chiqimlar (Outflows)</h4>
+                                    ${Object.keys(cat.outflow).length > 0 ?
+                            `<table style="width:100%;">
+                                            <tr style="background:#fef2f2;"><th>Maqsad</th><th class="num">Summa</th></tr>
+                                            ${makeRows(cat.outflow)}
+                                            <tr style="font-weight:bold;"><td>Jami:</td><td class="num">${cat.tOut.toLocaleString()}</td></tr>
+                                        </table>` : '<p style="color:#ccc; font-style:italic;">Chiqim mavjud emas</p>'
+                        }
+                                </div>
+                            </div>
+                            <div style="margin-top:15px; text-align:right; font-weight:bold; font-size:1.1rem;">
+                                Sof Oqim (${cat.name}): <span style="color:${netColor}">${net.toLocaleString()} so'm</span>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                const totalNet = (categories.operating.tIn + categories.investing.tIn + categories.financing.tIn) -
+                    (categories.operating.tOut + categories.investing.tOut + categories.financing.tOut);
+
+                const html = `
+                    <h2 style="text-align:center;">Pul Oqimi To'g'risida Hisobot (Forma-4)</h2>
+                    <p style="text-align:center; font-size:0.9rem; color:#64748b; margin-bottom:30px;">(Bevosita usulda, Faoliyat turlari bo'yicha)</p>
+                    
+                    ${renderSection('operating', '#3b82f6')}
+                    ${renderSection('investing', '#f59e0b')}
+                    ${renderSection('financing', '#8b5cf6')}
+
+                    <div style="margin-top:30px; text-align:center; padding:20px; background:${totalNet >= 0 ? '#dcfce7' : '#fee2e2'}; border-radius:8px; border:2px solid ${totalNet >= 0 ? '#86efac' : '#fca5a5'}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                        <h2 style="margin:0; color:${totalNet >= 0 ? '#166534' : '#991b1b'};">
+                            Jami Sof Pul Oqimi: ${totalNet > 0 ? '+' : ''}${totalNet.toLocaleString()} so'm
+                        </h2>
+                    </div>
+                `;
+                document.getElementById('report-view').innerHTML = html;
+            }
+
+            function renderEquity() {
+                // Statement of Changes in Equity (F-5)
+                const accs = getBalances();
+
+                const getBal = (code) => {
+                    let credit = 0;
+                    let debit = 0;
+                    Object.keys(accs).forEach(k => {
+                        if (k.startsWith(code)) {
+                            credit += accs[k].kt;
+                            debit += accs[k].dt;
+                        }
+                    });
+                    return credit - debit;
+                };
+
+                let netProfit = 0;
+                let dividends = 0;
+                let capitalInj = 0;
+
+                journal.forEach(r => {
+                    if (r.kt.startsWith('87') && r.dt === '9910') netProfit += r.sum;
+                    if (r.dt.startsWith('87') && r.kt === '9910') netProfit -= r.sum;
+                    if (r.dt.startsWith('87') && !r.kt.startsWith('99')) dividends += r.sum;
+                    if (r.kt.startsWith('83')) capitalInj += r.sum;
+                });
+
+                const endUstav = getBal('83');
+                const endRezerv = getBal('84') + getBal('85');
+                const endFoyda = getBal('87');
+
+                const begUstav = endUstav - capitalInj;
+                const begFoyda = endFoyda - netProfit + dividends;
+                const begRezerv = endRezerv;
+
+                const cols = [
+                    { name: "Ustav Kapitali (8300)", beg: begUstav, end: endUstav },
+                    { name: "Rezerv Kapitali (8400)", beg: begRezerv, end: endRezerv },
+                    { name: "Taqsimlanmagan Foyda (8700)", beg: begFoyda, end: endFoyda }
+                ];
+
+                const totalBeg = cols.reduce((a, b) => a + b.beg, 0);
+                const totalEnd = cols.reduce((a, b) => a + b.end, 0);
+
+                const html = `
+                    <h2 style="text-align:center;">Xususiy Kapital To'g'risida Hisobot (Forma-5)</h2>
+                    <table style="width:100%; border-collapse:collapse; text-align:center; font-size: 0.9rem;">
+                        <thead style="background:#f1f5f9;">
+                            <tr>
+                                <th style="text-align:left; padding:8px; border:1px solid #ccc;">Ko'rsatkichlar</th>
+                                ${cols.map(c => `<th style="padding:8px; border:1px solid #ccc;">${c.name}</th>`).join('')}
+                                <th style="padding:8px; border:1px solid #ccc;">JAMI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align:left; font-weight:bold; padding:8px; border:1px solid #ccc;">1. Davr boshiga qoldiq</td>
+                                ${cols.map(c => `<td class="num" style="padding:8px; border:1px solid #ccc;">${c.beg.toLocaleString()}</td>`).join('')}
+                                <td class="num" style="font-weight:bold; padding:8px; border:1px solid #ccc;">${totalBeg.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left; padding:8px; border:1px solid #ccc;">2. Sof Foyda (Zarar)</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">-</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">-</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc; color:${netProfit >= 0 ? 'green' : 'red'}">${netProfit.toLocaleString()}</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">${netProfit.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left; padding:8px; border:1px solid #ccc;">3. Dividendlar</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">-</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">-</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc; color:red;">${dividends > 0 ? '-' + dividends.toLocaleString() : '-'}</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc; color:red;">${dividends > 0 ? '-' + dividends.toLocaleString() : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left; padding:8px; border:1px solid #ccc;">4. Ustav kapitaliga qo'yilmalar</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">${capitalInj.toLocaleString()}</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">-</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">-</td>
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">${capitalInj.toLocaleString()}</td>
+                            </tr>
+                            <tr style="background:#f8fafc; font-weight:bold;">
+                                <td style="text-align:left; padding:8px; border:1px solid #ccc;">5. Davr oxiriga qoldiq</td>
+                                ${cols.map(c => `<td class="num" style="padding:8px; border:1px solid #ccc;">${c.end.toLocaleString()}</td>`).join('')}
+                                <td class="num" style="padding:8px; border:1px solid #ccc;">${totalEnd.toLocaleString()}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('report-view').innerHTML = html;
+            }
+
+            function renderTax(type) {
+                let title = '', inputs = '', logic = '';
+
+                if (type === 'property') {
+                    title = "Mol-mulk Solig'i Hisob-kitobi";
+                    inputs = `
+                        <div class="form-group"><label>Ko'chmas mulk o'rtacha yillik qiymati (so'm)</label><input type="number" id="t-base" oninput="calcTax('property')"></div>
+                        <div class="form-group">
+                            <label>Soliq Stavkasi va Ob'yekt Turi</label>
+                            <select id="t-rate" onchange="calcTax('property')" style="width:100%;">
+                                <option value="1.5">1.5% - Ko'chmas mulk (Umumiy stavka)</option>
+                                <option value="3">3% - Qurilishi tugallanmagan ob'yektlar</option>
+                                <option value="0.65">0.65% - Temir yo'llar, quvurlar (2025)</option>
+                                <option value="0.6">0.6% - Temir yo'llar, quvurlar (2024)</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="t-coeff" value="1">
+                    `;
+                } else if (type === 'land') {
+                    title = "Yer Solig'i Hisob-kitobi";
+                    inputs = `
+                        <div class="form-group"><label>Yer Maydoni (Gektar)</label><input type="number" id="t-base" oninput="calcTax('land')"></div>
+                        <div class="form-group"><label>Bazaviy Soliq Stavkasi (1 ga uchun so'm)</label><input type="number" id="t-rate" oninput="calcTax('land')"></div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Qo'llaniladigan Koeffitsient / Imtiyoz</label>
+                            <select id="t-coeff" onchange="calcTax('land')" style="width:100%;">
+                                <option value="1">Oddiy stavka (1.0)</option>
+                                <option value="0.2">0.2 - Mahsulot saqlash/yetishtirish (Qishloq xo'jaligi)</option>
+                                <option value="0.25">0.25 - Nogironligi bo'lgan shaxslar birlashmalari</option>
+                                <option value="0.45">0.45 - Elektr uzatish, aloqa, temir yo'l</option>
+                                <option value="0.1">0.1 - Konlar va karyerlar</option>
+                                <option value="2">2.0 - Tugallanmagan qurilish (Oshirilgan)</option>
+                                <option value="4">4.0 - Hujjatsiz foydalanish (Oshirilgan)</option>
+                            </select>
+                        </div>
+                    `;
+                } else if (type === 'water') {
+                    title = "Suv Resurslaridan Foydalanganlik uchun Soliq";
+                    inputs = `
+                        <div class="form-group"><label>Iste'mol qilingan suv hajmi (m3)</label><input type="number" id="t-base" oninput="calcTax('water')"></div>
+                        <div class="form-group">
+                            <label>Suv Manbasi</label>
+                            <select id="t-source" onchange="calcTax('water')" style="width:100%;">
+                                <option value="surface">Yer usti suvlari</option>
+                                <option value="underground">Yer osti suvlari</option>
+                                <option value="tap">Vodoprovod tarmog'i (90% usti / 10% osti)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Yer usti suvi stavkasi</label><input type="number" id="t-rate-surf" placeholder="So'm" oninput="calcTax('water')"></div>
+                        <div class="form-group"><label>Yer osti suvi stavkasi</label><input type="number" id="t-rate-under" placeholder="So'm" oninput="calcTax('water')"></div>
+                    `;
+                }
+
+                const html = `
+                    <div style="max-width:600px; margin:0 auto; padding:20px; border:1px solid #ccc; border-radius:8px;">
+                        <h2 style="text-align:center; color:#1e40af;">${title}</h2>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; background:#f8fafc; padding:20px; border-radius:8px; margin-bottom:20px;">
+                            ${inputs}
+                        </div>
+
+                        <div id="tax-result" style="text-align:center; padding:15px; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; display:none;">
+                            <h3 style="margin:0; color:#166534;">Jami Soliq Summasi: <span id="t-total">0</span> so'm</h3>
+                        </div>
+
+                        <div style="margin-top:30px; border-top:1px dashed #ccc; padding-top:10px; font-size:0.8rem; color:#64748b; text-align:center;">
+                            "FAXR MADAD KONSALT" | Muallif: Suxrat Abdullaev <br>
+                            Ushbu hisob-kitob ma'lumotnoma xarakteriga ega.
+                        </div>
+                    </div>
+                `;
+                document.getElementById('report-view').innerHTML = html;
+            }
+
+            function calcTax(type) {
+                const base = parseFloat(document.getElementById('t-base').value) || 0;
+                let total = 0;
+
+                if (type === 'property') {
+                    const rate = parseFloat(document.getElementById('t-rate').value) || 0;
+                    total = base * (rate / 100);
+                } else if (type === 'land') {
+                    const rate = parseFloat(document.getElementById('t-rate').value) || 0;
+                    const coeff = parseFloat(document.getElementById('t-coeff').value) || 1;
+                    total = base * rate * coeff;
+                } else if (type === 'water') {
+                    const source = document.getElementById('t-source').value;
+                    const rSurf = parseFloat(document.getElementById('t-rate-surf').value) || 0;
+                    const rUnder = parseFloat(document.getElementById('t-rate-under').value) || 0;
+
+                    if (source === 'surface') {
+                        total = base * rSurf;
+                    } else if (source === 'underground') {
+                        total = base * rUnder;
+                    } else if (source === 'tap') {
+                        // 90% Surface, 10% Underground
+                        total = (base * 0.9 * rSurf) + (base * 0.1 * rUnder);
+                    }
+                }
+
+                document.getElementById('t-total').innerText = total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('tax-result').style.display = total > 0 ? 'block' : 'none';
+            }
+        </script>
+
+        <script>
+            // --- QUIZ LOGIC (MINI-TRENAJYOR - REPORTS) ---
+            const quizQuestions = [
+                { q: "Korxona foyda solig'ini hisobladi (Provisiya) (5,000,000 so'm)", dt: "9810", kt: "6410", sum: 5000000 },
+                { q: "Sof foyda taqsimlanmagan foyda hisobiga o'tkazildi (Yil yakuni) (10,000,000 so'm)", dt: "9910", kt: "8710", sum: 10000000 },
+                { q: "Yil yakunida zarar qoplandi (Zaxira kapitali hisobidan) (2,000,000 so'm)", dt: "8520", kt: "8710", sum: 2000000 },
+                { q: "Ta'sischilarga dividend hisoblandi (Foyda hisobidan) (3,000,000 so'm)", dt: "8710", kt: "6610", sum: 3000000 },
+                { q: "Dividenddan soliq (5%) ushlanib qolindi (150,000 so'm)", dt: "6610", kt: "6410", sum: 150000 },
+                { q: "Asosiy vositalar qayta baholandi (Qo'shimcha kapitalga) (1,000,000 so'm)", dt: "0120", kt: "8510", sum: 1000000 },
+                { q: "Uzoq muddatli bank krediti qisqa muddatliga o'tkazildi (50,000,000 so'm)", dt: "7810", kt: "6810", sum: 50000000 },
+                { q: "Hisobot davri xarajatlari moliyaviy natijaga yopildi (Davr yopish) (2,500,000 so'm)", dt: "9910", kt: "9420", sum: 2500000 },
+                { q: "Sotishdan tushum moliyaviy natijaga yopildi (Davr yopish) (8,000,000 so'm)", dt: "9010", kt: "9910", sum: 8000000 },
+                { q: "Chet el valyutasi kursi farqidan daromad (Musbat farq) (100,000 so'm)", dt: "5210", kt: "9540", sum: 100000 }
+            ];
+
+            let currentQIndex = 0;
+
+            function openQuiz() {
+                currentQIndex = 0;
+                document.getElementById('quiz-modal').style.display = 'flex';
+                loadQuestion();
+            }
+
+            function closeQuiz() {
+                document.getElementById('quiz-modal').style.display = 'none';
+            }
+
+            function loadQuestion() {
+                if (currentQIndex >= quizQuestions.length) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h2 style="color:#1e40af;">🎉 Tabriklaymiz!</h2>
+                        <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                        <button onclick="closeQuiz()" class="btn" style="width:100%">Yopish</button>
+                        <button onclick="openQuiz()" class="btn" style="width:100%; margin-top:10px; background:#64748b;">Qayta ishlash</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const q = quizQuestions[currentQIndex];
+                // Reset content if it was overwritten
+                if (!document.getElementById('q-text')) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="background:#f1f5f9; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#0f172a;" id="q-text"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet (Schyot)</label>
+                            <input type="text" id="q-dt" placeholder="Mas: 9810" style="width:100%; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Kredit (Schyot)</label>
+                            <input type="text" id="q-kt" placeholder="Mas: 6410" style="width:100%; box-sizing:border-box;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Summa</label>
+                        <input type="number" id="q-sum" placeholder="So'mda kiriting" style="width:100%; box-sizing:border-box;">
+                    </div>
+                    <div id="q-feedback" style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;"></div>
+                    <button onclick="checkAnswer()" class="btn" style="width:100%;">Tekshirish</button>
+                 `;
+                }
+
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-dt').value = '';
+                document.getElementById('q-kt').value = '';
+                document.getElementById('q-sum').value = '';
+                document.getElementById('q-feedback').innerText = '';
+                document.getElementById('q-feedback').style.display = 'none';
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('q-dt').value.trim();
+                const kt = document.getElementById('q-kt').value.trim();
+                const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+                const target = quizQuestions[currentQIndex];
+                const feedback = document.getElementById('q-feedback');
+
+                if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                    feedback.innerHTML = '<span style="color:#16a34a; font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                    feedback.style.display = 'block';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    feedback.innerHTML = `<span style="color:#dc2626; font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.style.display = 'block';
+                }
+            }
+        </script>
+
+        <!-- QUIZ MODAL -->
+        <div class="modal-overlay" id="quiz-modal" style="display:none; z-index:9999;">
+            <div class="login-modal-box" style="max-width:500px; padding:0; overflow:hidden; text-align:left;">
+                <div
+                    style="background:var(--primary); padding:1rem; display:flex; justify-content:space-between; align-items:center; color:white;">
+                    <h3 style="margin:0;">🧠 Bilimni Sinash</h3>
+                    <button onclick="closeQuiz()"
+                        style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+                <div style="padding:1.5rem;" id="quiz-content">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

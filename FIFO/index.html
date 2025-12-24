@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ombor Tizimi (FIFO)</title>
+    <style>
+        :root {
+            /* GREEN THEME VARIABLES */
+            --primary-color: #10b981;
+            /* Emerald 500 */
+            --primary-dark: #047857;
+            /* Emerald 700 */
+            --bg-color: #ecfdf5;
+            /* Emerald 50 */
+            --card-bg: #ffffff;
+            --text-color: #064e3b;
+            /* Emerald 900 */
+            --border-color: #d1fae5;
+            /* Emerald 100 */
+            --accent-color: #34d399;
+            /* Emerald 400 */
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Forms Section */
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .readonly-field {
+            background-color: #f0fdf4;
+            color: var(--primary-dark);
+            font-weight: bold;
+            cursor: not-allowed;
+            border-color: #bbf7d0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .print-btn {
+            background-color: #3b82f6;
+            /* Blue for print/action buttons inside cards */
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        /* Inventory Table */
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .inventory-table th,
+        .inventory-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .inventory-table th {
+            background-color: #d1fae5;
+            /* Green 100 */
+            color: var(--primary-dark);
+        }
+
+        .inventory-table tr:hover {
+            background-color: #f0fdf4;
+        }
+
+        .num-col {
+            text-align: right !important;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+        }
+
+        /* History List */
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-kirim {
+            background-color: #10b981;
+        }
+
+        /* Green */
+        .badge-chiqim {
+            background-color: #f59e0b;
+        }
+
+        /* Amber */
+
+        /* Print Overlay */
+        #print-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #print-area-wrapper {
+            background: white;
+            padding: 40px;
+            width: 210mm;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #print-area,
+            #print-area * {
+                visibility: visible;
+            }
+
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Official Form Styles (M-4 & M-11 & Reports) */
+        .m-form {
+            font-family: 'Times New Roman', serif;
+            color: black;
+            border: 2px solid black;
+            padding: 20px;
+        }
+
+        .m-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .m-header-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .m-header-table td {
+            padding: 5px;
+        }
+
+        .m-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .m-data-table th,
+        .m-data-table td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .m-footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- LOGIN MODAL -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="login-modal-box">
+            <h2>🔐 Ombor Tizimi (FIFO)</h2>
+            <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+            <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+            <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+            <button onclick="loginUser()">Boshlash</button>
+        </div>
+    </div>
+
+    <!-- USER DISPLAY -->
+    <div class="user-info no-print" id="user-display" style="cursor: default;">
+        <span id="current-user-info">...</span>
+        <span style="cursor:pointer; margin-left:10px; color:red;" onclick="logout()" title="Chiqish">❌</span>
+    </div>
+
+    <header class="no-print">
+        <h1>🏭 Ombor Tizimi (FIFO) — "FAXR MADAD KONSALT" </h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Materiallar hisobi (FIFO usuli) | Muallif: Suxrat Abdullaev</p>
+    </header>
+
+    <div class="container no-print">
+        <!-- OVERVIEW: INVENTORY -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2 style="margin:0; color:var(--primary-dark)">📦 Ombor Qoldig'i (FIFO)</h2>
+                <div style="display:flex; gap:10px;"><button onclick="exportToExcel()" class="print-btn"
+                        style="background-color: #10b981;">📊 Excel</button><button onclick="printInventoryReport()"
+                        class="print-btn">🖨️ Chop Etish</button></div>
+            </div>
+            <div style="margin-bottom: 1rem; position: relative;"><input type="text" id="search-input"
+                    onkeyup="filterInventory()" placeholder="🔍 Material nomini qidiring..."
+                    style="padding-left: 1rem; width: 100%; max-width: 400px; border: 2px solid var(--border-color); border-radius: 2rem;">
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="inventory-table" id="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Material Nomi</th>
+                            <th>O'lchov birligi</th>
+                            <th class="num-col">Miqdor (Soni)</th>
+                            <th class="num-col">O'rtacha Narx (Hisobiy)</th>
+                            <th class="num-col">Jami Qiymat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body">
+                        < !-- JS fills this -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        < !-- OPERATIONS & HISTORY -->
+            <div class="main-layout">
+                < !-- Forms -->
+                    <div class="card">
+                        <div class="tabs" style="margin-bottom: 1rem;"><button class="tab-btn active"
+                                onclick="switchTab('kirim')">▼ Kirim (M-4)</button><button class="tab-btn"
+                                onclick="switchTab('chiqim')">▲ Chiqim (M-11)</button></div>
+                        < !-- Kirim Form (M-4) -->
+                            <form id="kirim-form">
+                                <div class="form-group"><label>Sana</label><input type="date" id="k-date" required>
+                                </div>
+                                <div class="form-group"><label>Material Nomi (Katalogni tanlang yoki yangi
+                                        kiriting)</label><input type="text" id="k-name" list="materials-list"
+                                        placeholder="Masalan: Sement" required autocomplete="off"><datalist
+                                        id="materials-list"></datalist></div>
+                                <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                    <div><label>Miqdor</label><input type="number" id="k-qty" placeholder="0" min="0.01"
+                                            step="0.01" required></div>
+                                    <div><label>Birlik</label><select id="k-unit">
+                                            <option value="kg">kg</option>
+                                            <option value="dona">dona</option>
+                                            <option value="litr">litr</option>
+                                            <option value="metr">metr</option>
+                                            <option value="qop">qop</option>
+                                            <option value="tonna">tonna</option>
+                                        </select></div>
+                                </div>
+                                <div class="form-group"><label>Jami Narxi (so'm)</label>
+                                    <input type="number" id="k-total-price" placeholder="Umumiy summa" min="0"
+                                        step="0.01" required>
+                                </div>
+                                <div class="form-group"> <label>Yetkazib beruvchi (6010)</label> <input type="text"
+                                        id="k-supplier" placeholder="Korxona nomi" required>
+                                </div>
+                                <div
+                                    style="background:#f0fdf4; padding:10px; border-radius:5px; font-size:0.9rem; margin-bottom:10px; color:#166534; border:1px solid #bbf7d0;">
+                                    <strong>Provodka:</strong> Dt 1010 (Materiallar) - Kt 6010 (Mol yetkazib
+                                    beruvchilar)
+                                </div>
+                                <div style="display:flex; gap:10px;"> <button type="submit" id="btn-kirim-submit"
+                                        class="submit-btn" style="background-color: #10b981;">Omborga Kirim
+                                        Qilish</button>
+                                    <button type="button" id="btn-kirim-cancel" class="submit-btn"
+                                        style="background-color: #6b7280; display:none;" onclick="cancelEdit()">Bekor
+                                        qilish</button>
+                                </div>
+                            </form>
+                            < !-- Chiqim Form (M-11) -->
+                                <form id="chiqim-form" style="display:none;">
+                                    <div class="form-group"> <label>Sana</label> <input type="date" id="ch-date"
+                                            required> </div>
+                                    <div class="form-group"> <label>Materialni Tanlang</label> <select id="ch-name"
+                                            required onchange="updateChiqimInfo()">
+                                            <option value="">Tanlang...</option>
+                                            < !-- Filled by JS -->
+                                        </select> </div>
+                                    <div id="stock-info" style="font-size:0.9rem; color:#666; margin-bottom:10px;">
+                                    </div>
+                                    <div class="form-group"> <label>Chiqim Miqdori</label> <input type="number"
+                                            id="ch-qty" placeholder="0" min="0.01" step="0.01" required> </div>
+                                    <div class="form-group"> <label>Qayerga (2010)</label> <input type="text"
+                                            id="ch-target" value="Asosiy Ishlab chiqarish (Sex)" placeholder="Sex nomi"
+                                            required> </div>
+                                    <div
+                                        style="background:#fff7ed; padding:10px; border-radius:5px; font-size:0.9rem; margin-bottom:10px; color:#9a3412; border:1px solid #fed7aa;">
+                                        <strong>Provodka:</strong> Dt 2010 (Ishlab chiqarish) - Kt 1010
+                                        (Ombor)<br> <small>Narx "FIFO" usulida hisoblanadi (Birinchi kirgan
+                                            - birinchi chiqadi).</small>
+                                    </div>
+                                    <div style="display:flex; gap:10px;"> <button type="submit" id="btn-chiqim-submit"
+                                            class="submit-btn" style="background-color: #f59e0b;">Ishlab Chiqarishga
+                                            Berish</button> <button type="button" id="btn-chiqim-cancel"
+                                            class="submit-btn" style="background-color: #6b7280; display:none;"
+                                            onclick="cancelEdit()">Bekor qilish</button> </div>
+                                </form>
+                    </div>
+                    < !-- History -->
+                        <div class="card">
+                            <h3 style="margin-top:0;">📜 Hujjatlar Tarixi</h3>
+                            <ul id="history-list" class="history-list">
+                                < !-- JS fills -->
+                            </ul>
+                        </div>
+            </div>
+            < !-- Print Overlay -->
+                <div id="print-overlay" class="no-print">
+                    <div id="print-area-wrapper">
+                        <div style="text-align: right; margin-bottom: 1rem;"> <button onclick="window.print()"
+                                class="submit-btn"
+                                style="width:auto; display:inline-block; margin:0; padding:10px 20px;">🖨️
+                                Chop etish</button> <button onclick="closePrint()" class="submit-btn"
+                                style="width:auto; display:inline-block; margin:0; background-color:#6b7280; padding:10px 20px;">Yopish</button>
+                        </div>
+                        <div id="print-area"></div>
+                    </div>
+                </div>
+    </div>
+    <footer class="no-print"
+        style="text-align: center; padding: 2rem; color: #64748b; font-size: 0.9rem; margin-top: auto;">
+        <div style="font-weight: bold;">"FAXR MADAD KONSALT" </div>
+        <div>Loyiha muallifi: Suxrat Abdullaev</div>
+        <div style="font-size: 0.8rem; margin-top: 5px;">&copy; 2025 Barcha huquqlar himoyalangan</div>
+    </footer>
+    <script> // State management
+
+        // Data Structure:
+        // materials = {
+        //   "Cement": {
+        //      unit: "kg",
+        //      batches: [ {id, date, qty, unitCost, originalQty}, ... ],
+        //      qty: 100, // Total currently
+        //      totalPrice: 50000 // Total Value currently
+        //   }
+        // }
+        // let materials = JSON.parse(localStorage.getItem('ombor_materials') || '{}');
+        // let history = JSON.parse(localStorage.getItem('ombor_history') || '[]');
+        let materials = {}
+
+            ;
+        let history = [];
+        let currentUser = null;
+        let editingId = null; // Track what we are editing
+
+        function migrateToFIFO() {
+            let changed = false;
+
+            Object.keys(materials).forEach(key => {
+
+                // If old structure (no batches array)
+                if (!materials[key].batches) {
+                    const m = materials[key];
+                    // Create a single initial batch from existing data
+                    const price = m.qty > 0 ? (m.totalPrice / m.qty) : 0;
+
+                    m.batches = [{
+                        id: 'migrated_' + Date.now() + Math.random(),
+                        date: new Date().toISOString().split('T')[0],
+                        qty: m.qty,
+                        originalQty: m.qty,
+                        unitCost: price
+                    }
+
+                    ];
+                    // Ensure totals are clean
+                    m.totalPrice = m.qty * price;
+                    changed = true;
+                }
+            });
+            if (changed) saveData();
+        }
+
+        window.onload = function () {
+            checkLogin();
+        }
+
+            ;
+
+        // --- LOGIN SYSTEM ---
+        function checkLogin() {
+            const storedUser = sessionStorage.getItem('fifo_user');
+            const storedGroup = sessionStorage.getItem('fifo_group');
+
+            if (storedUser && storedGroup) {
+                currentUser = storedUser;
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('user-display').style.display = 'block';
+                updateDisplay(storedUser, storedGroup);
+                loadData();
+            }
+
+            else {
+                document.getElementById('login-modal').style.display = 'flex';
+            }
+        }
+
+        function loginUser() {
+            const name = document.getElementById('username-input').value.trim();
+            const group = document.getElementById('group-input').value.trim();
+
+            if (name && group) {
+                currentUser = name;
+                sessionStorage.setItem('fifo_user', name);
+                sessionStorage.setItem('fifo_group', group);
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('user-display').style.display = 'block';
+                updateDisplay(name, group);
+                loadData();
+            }
+
+            else {
+                alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+            }
+        }
+
+        function updateDisplay(name, group) {
+            document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>$ {
+                    name
+                }
+
+                </b> | Guruh: <b>$ {
+                    group
+                }
+
+                </b>`;
+        }
+
+        function logout() {
+            if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                sessionStorage.removeItem('fifo_user');
+                sessionStorage.removeItem('fifo_group');
+                location.reload();
+            }
+        }
+
+        function loadData() {
+            if (!currentUser) return;
+            materials = JSON.parse(localStorage.getItem('ombor_materials_fifo_' + currentUser) || '{}');
+            history = JSON.parse(localStorage.getItem('ombor_history_fifo_' + currentUser) || '[]');
+
+            migrateToFIFO(); // Ensure data structure is correct
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('k-date').value = today;
+            document.getElementById('ch-date').value = today;
+            renderAll();
+        }
+
+        function renderAll() {
+            renderInventory();
+            renderHistory();
+            updateMaterialLists();
+        }
+
+        function switchTab(tab) {
+            cancelEdit(); // Auto cancel if switching
+
+            if (tab === 'kirim') {
+                document.getElementById('kirim-form').style.display = 'block';
+                document.getElementById('chiqim-form').style.display = 'none';
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+            }
+
+            else {
+                document.getElementById('kirim-form').style.display = 'none';
+                document.getElementById('chiqim-form').style.display = 'block';
+                document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                updateChiqimInfo();
+            }
+        }
+
+        // --- KIRIM LOGIC (M-4) ---
+        document.getElementById('kirim-form').onsubmit = function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('k-name').value.trim();
+            const qty = parseFloat(document.getElementById('k-qty').value);
+            const unit = document.getElementById('k-unit').value;
+            const totalPrice = parseFloat(document.getElementById('k-total-price').value);
+            const supplier = document.getElementById('k-supplier').value;
+            const date = document.getElementById('k-date').value;
+
+            if (!name) return alert('Material nomini kiriting!');
+
+            // If editing, logic is: Revert old tx -> Create new tx
+            // But here we just want to replace the values in history? 
+            // NO. For inventory/finance, it's safer to:
+            // 1. If editing, we previously "Reverted" the stock effects when clicking "Edit".
+            // 2. Now we just process as new, but keep the old ID if we want (or new ID).
+            // Let's keep old ID to maintain history link? 
+            // Actually simplest: When Edit is clicked, we REVERT stock changes immediately in memory (and save), remove from history.
+            // Then user fills form and "Submits" as if new (but we restore the ID?).
+
+            // My Approach: When "Edit" is pressed: 
+            // 1. Reverse the transaction effects on Inventory.
+            // 2. Populate form.
+            // 3. Set `editingId`.
+            // 4. On Submit: Use `editingId` if exists, then clear it.
+
+            // Checking if editing, ensuring we don't double submit? 
+            // (The Revert happened when they clicked Edit).
+
+            // Calculate Unit Cost for this specific batch
+            const unitCost = qty > 0 ? (totalPrice / qty) : 0;
+
+            // Initialize if new material
+            if (!materials[name]) {
+                materials[name] = {
+                    qty: 0, unit: unit, totalPrice: 0, batches: []
+                }
+
+                    ;
+            }
+
+            // Create Batch
+            const batchId = editingId || Date.now(); // Reuse ID if editing to keep link? Or just use new. Let's reuse ID for "Batch ID" if it was Kirim.
+
+            // Actually for Kirim, transaction ID was the batch ID.
+            const newBatch = {
+                id: batchId,
+                date: date,
+                qty: qty,
+                originalQty: qty,
+                unitCost: unitCost
+            }
+
+                ;
+
+            // Update State
+            materials[name].batches.push(newBatch);
+            materials[name].qty += qty;
+            materials[name].totalPrice += totalPrice;
+            materials[name].unit = unit; // Update unit just in case
+
+            // Save Transaction
+            const record = {
+                id: batchId, // Use batch ID as transaction ID for Kirim
+                type: 'Kirim (M-4)',
+                date: date,
+                name: name,
+                qty: qty,
+                unit: unit,
+                price: totalPrice,
+                party: supplier,
+                debet: '1010',
+                kredit: '6010',
+                batchId: batchId // Link to specific batch
+            }
+
+                ;
+
+            // If editing, we replace the old history item position? 
+            // Or just push top?
+            // If we removed it during "Edit" start, we just push top.
+            // Let's assume we removed it from history in `editTransaction`.
+
+            // Insert at correct place or just top? Top is fine as it's "modified/new".
+            // But if we want to keep chronological order, we might need to sort history later.
+            history.unshift(record);
+            saveData();
+
+            this.reset();
+            document.getElementById('k-date').value = date;
+            cancelEdit(); // Reset UI state
+            alert("Mahsulot qabul qilindi (FIFO partiyasi yaratildi)");
+        }
+
+            ;
+
+        // --- CHIQIM LOGIC (M-11) FIFO ---
+        document.getElementById('chiqim-form').onsubmit = function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('ch-name').value;
+            const qtyToRelease = parseFloat(document.getElementById('ch-qty').value);
+            const target = document.getElementById('ch-target').value;
+            const date = document.getElementById('ch-date').value;
+
+            if (!name || !materials[name]) return alert("Material tanlanmagan!");
+
+            const currentStock = materials[name];
+
+            if (qtyToRelease > currentStock.qty) {
+                return alert(`Omborda yetarli mahsulot yo'q! Mavjud: ${currentStock.qty} ${currentStock.unit}`);
+
+            }
+
+            // FIFO CALCULATION
+            let remaining = qtyToRelease;
+            let totalCost = 0;
+
+            // We need to modify batches, so let's work on the live array
+            // Since we are committing, we can modify directly.
+            // If validation fails later (unlikely), we might have issues, but here checks are done.
+
+            // Log for audit details (optional)
+            let usedBatchesLog = [];
+
+            let i = 0;
+
+            while (remaining > 0 && i < currentStock.batches.length) {
+                let batch = currentStock.batches[i];
+
+                if (batch.qty <= 0) {
+                    i++;
+                    continue; // Should not happen usually if we clean up, but good safety
+                }
+
+                let take = 0;
+
+                if (batch.qty >= remaining) {
+                    // This batch covers the rest
+                    take = remaining;
+                    batch.qty -= take;
+                    // If batch becomes 0, we can remove it or keep it empty. 
+                    // Let's keep it empty for audit? No, usually cleaner to remove or ignore.
+                    // For now, let's keep it but skip in loops if 0.
+                }
+
+                else {
+                    // Take all from this batch
+                    take = batch.qty;
+                    batch.qty = 0;
+                }
+
+                let cost = take * batch.unitCost;
+                totalCost += cost;
+                remaining -= take;
+
+                usedBatchesLog.push({
+                    date: batch.date,
+                    qty: take,
+                    cost: cost,
+                    unitCost: batch.unitCost
+                });
+
+                if (batch.qty === 0) {
+                    // Clean up empty batches to keep array small? 
+                    // Or keep them for history tracking? 
+                    // Let's remove them to keep performance good over time.
+                    currentStock.batches.splice(i, 1);
+                    // Don't increment i because next item shifted to i
+                }
+
+                else {
+                    i++;
+                }
+            }
+
+            // Precision correction for total remaining release
+            if (remaining > 0.0001) {
+                // This shouldn't happen due to check above, but purely floating point safety
+                alert("Xatolik: Hisob-kitobda xatolik yuz berdi (Rounding error).");
+                // Restore logic needed? (Complex)
+                return;
+            }
+
+            // Update Totals
+            currentStock.qty -= qtyToRelease;
+            currentStock.totalPrice -= totalCost;
+
+            if (currentStock.qty < 0.0001) {
+                currentStock.qty = 0;
+                currentStock.totalPrice = 0;
+                currentStock.batches = []; // Clear all
+            }
+
+            const record = {
+                id: editingId || Date.now(),
+                type: 'Chiqim (M-11)',
+                date: date,
+                name: name,
+                qty: qtyToRelease,
+                unit: currentStock.unit,
+                price: totalCost, // Total Actual Cost (FIFO)
+                party: target,
+                debet: '2010',
+                kredit: '1010',
+                details: usedBatchesLog // Save which batches were used
+            }
+
+                ;
+
+            history.unshift(record);
+            saveData();
+
+            this.reset();
+            document.getElementById('ch-date').value = date;
+            document.getElementById('ch-target').value = "Asosiy Ishlab chiqarish (Sex)";
+            updateChiqimInfo();
+            cancelEdit();
+
+            alert(`Chiqim qilindi ! Hisoblangan tannarx: $ {
+                        totalCost.toLocaleString()
+                    }
+
+                    so'm`);
+
+        }
+
+            ;
+
+        function saveData() {
+            if (!currentUser) return;
+            localStorage.setItem('ombor_materials_fifo_' + currentUser, JSON.stringify(materials));
+            localStorage.setItem('ombor_history_fifo_' + currentUser, JSON.stringify(history));
+            renderAll();
+        }
+
+        function updateMaterialLists() {
+            const datalist = document.getElementById('materials-list');
+            datalist.innerHTML = '';
+
+            Object.keys(materials).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                datalist.appendChild(opt);
+            });
+
+            const select = document.getElementById('ch-name');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">Tanlang...</option>';
+
+            Object.keys(materials).forEach(key => {
+                if (materials[key].qty > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.text = key;
+                    select.appendChild(opt);
+                }
+            });
+            select.value = currentVal;
+        }
+
+        function updateChiqimInfo() {
+            const name = document.getElementById('ch-name').value;
+            const infoDiv = document.getElementById('stock-info');
+
+            if (name && materials[name]) {
+                const m = materials[name];
+                // Show next batch price if available
+                let nextPriceText = "";
+
+                if (m.batches.length > 0) {
+                    const nextBatch = m.batches[0];
+
+                    nextPriceText = ` <br> <span style="color:#059669; font-size:0.8rem" >Navbatdagi partiya: $ {
+                                nextBatch.qty.toLocaleString()
+                            }
+
+                            $ {
+                                m.unit
+                            }
+
+                            x $ {
+                                nextBatch.unitCost.toLocaleString()
+                            }
+
+                            so'm (${nextBatch.date})</span>`;
+
+                }
+
+                infoDiv.innerHTML = `Mavjud: <b>$ {
+                            m.qty.toLocaleString()
+                        }
+
+                        $ {
+                            m.unit
+                        }
+
+                        </b> | Jami Qiymat: <b>$ {
+                            m.totalPrice.toLocaleString()
+                        }
+
+                        so'm</b>${nextPriceText}`;
+
+            }
+
+            else {
+                infoDiv.innerHTML = '';
+            }
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inventory-body');
+            tbody.innerHTML = '';
+            let totalValue = 0;
+
+            Object.keys(materials).sort().forEach(name => {
+                const m = materials[name];
+                if (m.qty <= 0 && m.totalPrice <= 0) return;
+
+                const avgPrice = m.qty > 0 ? (m.totalPrice / m.qty) : 0;
+                totalValue += m.totalPrice;
+
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = ` <td><b>$ {
+                                name
+                            }
+
+                            </b></td> <td>$ {
+                                m.unit
+                            }
+
+                            </td> <td class="num-col" >$ {
+                                m.qty.toLocaleString()
+                            }
+
+                            </td> <td class="num-col" title="Average of remaining batches" >$ {
+                                avgPrice.toLocaleString(undefined, {
+                                    minimumFractionDigits: 2, maximumFractionDigits: 2
+                                })
+                        }
+
+                        </td> <td class="num-col" >$ {
+                            m.totalPrice.toLocaleString(undefined, {
+                                minimumFractionDigits: 2, maximumFractionDigits: 2
+                            })
+                    }
+
+                    </td> `;
+                tbody.appendChild(tr);
+            });
+
+            const totalTr = document.createElement('tr');
+            totalTr.style.background = '#f0fdf4';
+            totalTr.style.fontWeight = 'bold';
+
+            totalTr.innerHTML = ` <td colspan="4" style="text-align:right" >JAMI OMBOR QIYMATI:</td> <td class="num-col" >$ {
+                totalValue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2
+                })
+        }
+
+        so'm</td>
+ `;
+            tbody.appendChild(totalTr);
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+
+            history.forEach(item => {
+                const isKirim = item.type.includes('Kirim');
+                const colorClass = isKirim ? 'badge-kirim' : 'badge-chiqim';
+                const li = document.createElement('li');
+                li.className = 'history-item';
+
+                // Format details for tooltip or display
+                let detailsHtml = '';
+                // if (!isKirim && item.details) {
+                //      detailsHtml = `<div style='font-size:0.75rem; color:#888'>Partiya: ${item.details.map(d => d.date).join(', ')}</div>`;
+                // }
+
+                li.innerHTML = ` <div> <div> <span class="badge ${colorClass}" >$ {
+                        item.type
+                    }
+
+                    </span> <span style="font-weight:bold; margin-left:5px;" >$ {
+                        item.name
+                    }
+
+                    </span> </div> <div style="font-size:0.85rem; color:#666; margin-top:4px;" > $ {
+                        item.date
+                    }
+
+                    | $ {
+                        item.qty
+                    }
+
+                    $ {
+                        item.unit
+                    }
+
+                    | Jami: $ {
+                        item.price.toLocaleString()
+                    }
+
+                    so'm
+ </div> $ {
+                        detailsHtml
+                    }
+
+                    </div> </div> <div style="display:flex; gap:5px;" > <button onclick="openPrint(${item.id})" class="print-btn" style="display:inline-block; padding:5px 10px;" >🖨️</button> <button class="print-btn" onclick="editTransaction(${item.id})" style="display:inline-block; padding:5px 10px; background-color:#f59e0b;" >✏️</button> $ {
+                        isKirim ? `< button onclick = "deleteKirim(${item.id})" style = "border:1px solid #fee2e2; background:#fef2f2; color:red; cursor:pointer; padding:5px 10px; border-radius:4px;" title = "Oxirgi partiya bo'lsagina o'chirish mumkin" >🗑️</button > ` : ''
+                    }
+
+                    </div> `;
+                list.appendChild(li);
+            });
+        }
+
+        // --- EDIT LOGIC ---
+        function editTransaction(id) {
+            const index = history.findIndex(h => h.id === id);
+            if (index === -1) return;
+            const tx = history[index];
+
+            if (!confirm(`Ushbu $ {
+                        tx.type
+                    }
+
+                    operatsiyasini tahrirlaysizmi? \nDiqqat: Bu operatsiya ombor qoldig'iga ta' sir qiladi (qaytariladi).`)) return;
+
+            // 1. REVERT STOCK
+            if (tx.type.includes('Kirim')) {
+                // Revert Kirim: Remove specific batch qty/price from material
+                const m = materials[tx.name];
+
+                if (!m) {
+                    alert("Material topilmadi (o'chirilgan bo'lishi mumkin)"); return;
+                }
+
+                // Find batch by ID (since Kirim ID = Batch ID)
+                // If ID is not strictly batch ID, we try to match.
+                // In our code: id IS batchId.
+                const batchIdx = m.batches.findIndex(b => b.id == tx.batchId || b.id == tx.id);
+
+                if (batchIdx !== -1) {
+                    const b = m.batches[batchIdx];
+
+                    // Check if untouched?
+                    if (b.qty !== b.originalQty) {
+                        // Some of this batch was used!
+                        if (!confirm("Diqqat! Ushbu partiyadan qisman foydalanilgan. Tahrirlash ombor hisobini chalkashtirishi mumkin. Davom etasizmi?")) return;
+                    }
+
+                    // Remove values
+                    m.qty -= b.qty; // Remove REMAINING qty
+                    // We must deduct the value of remaining qty
+                    m.totalPrice -= (b.qty * b.unitCost);
+
+                    // Remove batch
+                    m.batches.splice(batchIdx, 1);
+                }
+
+                else {
+                    // Batch maybe fully gone or bug?
+                    // Deduct from general totals based on TX record
+                    // This is fallback.
+                    m.qty -= tx.qty;
+                    m.totalPrice -= tx.price;
+                }
+
+                // Switch to Form
+                switchTab('kirim');
+                document.getElementById('k-date').value = tx.date;
+                document.getElementById('k-name').value = tx.name;
+                document.getElementById('k-qty').value = tx.qty; // Original Qty
+                document.getElementById('k-unit').value = tx.unit;
+                document.getElementById('k-total-price').value = tx.price;
+                document.getElementById('k-supplier').value = tx.party;
+                document.getElementById('btn-kirim-submit').innerText = "💾 Saqlash (O'zgartirish)";
+                document.getElementById('btn-kirim-cancel').style.display = 'inline-block';
+
+            }
+
+            else {
+                // Revert Chiqim: Add back the used batches!
+                // We have `tx.details` which logs {date, qty, cost, unitCost}
+                const m = materials[tx.name];
+
+                if (!m) {
+
+                    // Create if missing?
+                    materials[tx.name] = {
+                        qty: 0, unit: tx.unit, totalPrice: 0, batches: []
+                    }
+
+                        ;
+                }
+
+                if (tx.details && Array.isArray(tx.details)) {
+                    tx.details.forEach(d => {
+
+                        // Create a restored batch
+                        materials[tx.name].batches.push({
+                            id: 'restored_' + Date.now() + Math.random(),
+                            date: d.date,
+                            qty: d.qty,
+                            originalQty: d.qty, // Treat as separate chunk
+                            unitCost: d.unitCost
+                        });
+                        materials[tx.name].qty += d.qty;
+                        materials[tx.name].totalPrice += (d.qty * d.unitCost);
+                    });
+
+                    // Sort batches by date to maintain FIFO order roughly
+                    materials[tx.name].batches.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                }
+
+                else {
+
+                    // Fallback if no details (legacy?)
+                    // Just add back as single batch
+                    materials[tx.name].batches.push({
+                        id: 'restored_legacy_' + Date.now(),
+                        date: tx.date,
+                        qty: tx.qty,
+                        originalQty: tx.qty,
+                        unitCost: tx.price / tx.qty
+                    });
+                    materials[tx.name].qty += tx.qty;
+                    materials[tx.name].totalPrice += tx.price;
+                }
+
+                // Switch to Form
+                switchTab('chiqim');
+                updateMaterialLists();
+                document.getElementById('ch-date').value = tx.date;
+                document.getElementById('ch-name').value = tx.name;
+
+                // Wait for select render?
+                setTimeout(() => {
+                    document.getElementById('ch-name').value = tx.name;
+                    updateChiqimInfo();
+                }
+
+                    , 100);
+
+                document.getElementById('ch-qty').value = tx.qty;
+                document.getElementById('ch-target').value = tx.party;
+                document.getElementById('btn-chiqim-submit').innerText = "💾 Saqlash (O'zgartirish)";
+                document.getElementById('btn-chiqim-cancel').style.display = 'inline-block';
+            }
+
+            // 2. REMOVE RECORD FROM HISTORY
+            editingId = tx.id;
+            history.splice(index, 1);
+            saveData(); // Save the revert state immediately
+        }
+
+        function cancelEdit() {
+            if (editingId) {
+                // If they cancel, we left the system in "Reverted" state...
+                // Ideally we should reload the page or Re-Save the ORIGINAL transaction to undo the Revert.
+                // But that's complicated.
+                // Simple Alert: "Bekor qilindi. Diqqat: Hujjat tarixdan o'chirildi va omborga qaytarildi. Iltimos qaytadan kiriting."
+                alert("Tahrirlash bekor qilindi. ESLATMA: Eski hujjat bekor qilingan (ombor holati qaytgan). Ma'lumotni qaytadan kiritishingiz kerak.");
+                editingId = null;
+            }
+
+            document.getElementById('kirim-form').reset();
+            document.getElementById('chiqim-form').reset();
+
+            document.getElementById('btn-kirim-submit').innerText = "Omborga Kirim Qilish";
+            document.getElementById('btn-kirim-cancel').style.display = 'none';
+            document.getElementById('btn-chiqim-submit').innerText = "Ishlab Chiqarishga Berish";
+            document.getElementById('btn-chiqim-cancel').style.display = 'none';
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('k-date').value = today;
+            document.getElementById('ch-date').value = today;
+        }
+
+        function deleteKirim(id) {
+            // FIFO Deletion Policy: 
+            // Can only delete if the batch is still intact (not used).
+            // Meaning check if materials[name].batches contains a batch with this ID and originalQty == currentQty.
+            // If yes, remove. If no, deny.
+
+            const index = history.findIndex(x => x.id === id);
+            if (index === -1) return;
+            const item = history[index];
+            if (!item.type.includes('Kirim')) return;
+
+            const m = materials[item.name];
+            if (!m) return alert("Material topilmadi");
+
+            const batchIndex = m.batches.findIndex(b => b.id === (item.batchId || item.id));
+            // Note: old history items might not have batchId.
+
+            if (batchIndex === -1) {
+                return alert("Ushbu partiya topilmadi yoki to'liq ishlatib bo'lingan. O'chirish mumkin emas.");
+            }
+
+            const batch = m.batches[batchIndex];
+
+            if (batch.qty !== batch.originalQty) {
+                return alert(`Ushbu partiyadan allaqachon foydalanilgan ($ {
+                            batch.originalQty - batch.qty
+                        }
+
+                        $ {
+                            m.unit
+                        }
+
+                        ishlatilgan). O'chirish mumkin emas.`);
+
+            }
+
+            if (!confirm("Kirim partiyasini o'chirasizmi? Ombor qoldig'i kamayadi.")) return;
+
+            // Proceed to delete
+            m.qty -= batch.qty;
+            m.totalPrice -= (batch.qty * batch.unitCost);
+            m.batches.splice(batchIndex, 1);
+
+            if (m.qty < 0) m.qty = 0; // Safety
+
+            history.splice(index, 1);
+            saveData();
+        }
+
+        // --- SEARCH & EXPORT FEATURES ---
+        function filterInventory() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toUpperCase();
+            const tr = document.getElementById('inventory-body').getElementsByTagName('tr');
+
+            for (let i = 0; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName("td")[0];
+
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    }
+
+                    else {
+                        if (!tr[i].innerHTML.includes('JAMI OMBOR')) {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+        }
+
+        function exportToExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Material Nomi,O'lchov birligi,Miqdor,O'rtacha Narx (Hisobiy),Jami Qiymat\n";
+
+            Object.keys(materials).sort().forEach(name => {
+                const m = materials[name];
+                if (m.qty <= 0 && m.totalPrice <= 0) return;
+
+                const avgPrice = m.qty > 0 ? (m.totalPrice / m.qty) : 0;
+                const safeName = `"${name.replace(/" /g, '""')
+                    }
+
+                "`;
+
+                const row = [safeName,
+                    m.unit,
+                    m.qty.toFixed(2),
+                    avgPrice.toFixed(2),
+                    m.totalPrice.toFixed(2)].join(",");
+                csvContent += row + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "ombor_fifo_" + new Date().toISOString().slice(0, 10) + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- FORM PRINTING ---
+        function openPrint(id) {
+            const item = history.find(i => i.id === id);
+            if (!item) return;
+
+            const printArea = document.getElementById('print-area');
+
+            if (item.type.includes('Kirim')) {
+
+                // M-4 FORM
+                printArea.innerHTML = ` <div class="m-form" > <div class="m-title" >KIRIM ORDERI № $ {
+                    item.id.toString().slice(-6)
+                }
+
+                <br> (M-4 Shakli)</div> <table class="m-header-table" > <tr> <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT" </td> <td style="text-align:right" ><strong>Tuzilgan sana:</strong> $ {
+                    item.date
+                }
+
+                </td> </tr> <tr> <td><strong>Yetkazib beruvchi:</strong> $ {
+                    item.party
+                }
+
+                </td> <td style="text-align:right" ><strong>Ombor:</strong> Asosiy Ombor</td> </tr> </table> <table class="m-data-table" > <thead> <tr> <th>Material Nomi</th> <th>O'lchov bir.</th>
+ <th>Soni</th> <th>Narxi</th> <th>Summasi</th> <th>Schyot (Dt)</th> <th>Schyot (Kt)</th> </tr> </thead> <tbody> <tr> <td>$ {
+                    item.name
+                }
+
+                </td> <td>$ {
+                    item.unit
+                }
+
+                </td> <td>$ {
+                    item.qty.toLocaleString()
+                }
+
+                </td> <td>$ {
+                    (item.price / item.qty).toLocaleString(undefined, {
+                        maximumFractionDigits: 2
+                    })
+            }
+
+            </td> <td>$ {
+                item.price.toLocaleString()
+            }
+
+            </td> <td>$ {
+                item.debet
+            }
+
+            </td> <td>$ {
+                item.kredit
+            }
+
+            </td> </tr> </tbody> </table> <div class="m-footer" > <div> Qabul qildi (Omborchi): __________________ </div> <div> Topshirdi: __________________ </div> </div> </div> `;
+            }
+
+            else {
+
+                // M-11 FORM (Shows Total release cost)
+                printArea.innerHTML = ` <div class="m-form" > <div class="m-title" >TALABNOMA-YUKXATI № $ {
+                item.id.toString().slice(-6)
+            }
+
+            <br> (M-11 Shakli)</div> <table class="m-header-table" > <tr> <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT" </td> <td style="text-align:right" ><strong>Sana:</strong> $ {
+                item.date
+            }
+
+            </td> </tr> <tr> <td><strong>Yuboruvchi:</strong> Asosiy Ombor</td> <tr> <td><strong>Oluvchi:</strong> $ {
+                item.party
+            }
+
+            </td> <td style="text-align:right" ><strong>Maqsad:</strong> Ishlab chiqarish ehtiyoji uchun</td> </tr> </table> <table class="m-data-table" > <thead> <tr> <th>Material Nomi</th> <th>O'lchov bir.</th>
+ <th>So'raldi</th>
+ <th>Berildi</th> <th>Narxi (O'rtacha/FIFO)</th>
+ <th>Summasi</th> <th>Schyot (Dt)</th> <th>Schyot (Kt)</th> </tr> </thead> <tbody> <tr> <td>$ {
+                    item.name
+                }
+
+                </td> <td>$ {
+                    item.unit
+                }
+
+                </td> <td>$ {
+                    item.qty.toLocaleString()
+                }
+
+                </td> <td>$ {
+                    item.qty.toLocaleString()
+                }
+
+                </td> <td>$ {
+                    (item.price / item.qty).toLocaleString(undefined, {
+                        maximumFractionDigits: 2
+                    })
+            }
+
+            </td> <td>$ {
+                item.price.toLocaleString()
+            }
+
+            </td> <td>$ {
+                item.debet
+            }
+
+            </td> <td>$ {
+                item.kredit
+            }
+
+            </td> </tr> </tbody> </table> <div class="m-footer" > <div> Ruxsat berdi: __________________ </div> <div> Omborchi: __________________ </div> <div> Oldi: __________________ </div> </div> </div> `;
+            }
+
+            document.getElementById('print-overlay').style.display = 'flex';
+        }
+
+        // --- REPORT PRINTING ---
+        function printInventoryReport() {
+            const printArea = document.getElementById('print-area');
+            let rows = '';
+            let totalValue = 0;
+
+            const sortedKeys = Object.keys(materials).sort();
+
+            sortedKeys.forEach(name => {
+                const m = materials[name];
+                if (m.qty <= 0 && m.totalPrice <= 0) return;
+
+                const avg = m.qty > 0 ? m.totalPrice / m.qty : 0;
+                totalValue += m.totalPrice;
+
+                rows += ` <tr> <td>$ {
+                        name
+                    }
+
+                    </td> <td style="text-align:center" >$ {
+                        m.unit
+                    }
+
+                    </td> <td style="text-align:right" >$ {
+                        m.qty.toLocaleString()
+                    }
+
+                    </td> <td style="text-align:right" >$ {
+                        avg.toLocaleString(undefined, {
+                            minimumFractionDigits: 2, maximumFractionDigits: 2
+                        })
+                }
+
+                </td> <td style="text-align:right" >$ {
+                    m.totalPrice.toLocaleString(undefined, {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    })
+            }
+
+            </td> </tr> `;
+            });
+
+            printArea.innerHTML = ` <div class="m-form" > <div class="m-title" >MATERIAL QOLDIQLARI HISOBOTI (1010)<br><small>$ {
+            new Date().toLocaleDateString()
+        }
+
+        </small></div> <table class="m-data-table" > <thead> <tr> <th>Material Nomi</th> <th>Birlik</th> <th>Miqdor</th> <th>O'rtacha Narx (FIFO)</th>
+ <th>Jami Qiymat (so'm)</th>
+ </tr> </thead> <tbody> $ {
+                rows
+            }
+
+            <tr style="font-weight:bold; background:#eee;" > <td colspan="4" style="text-align:right" >JAMI:</td> <td style="text-align:right" >$ {
+                totalValue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2
+                })
+        }
+
+        </td> </tr> </tbody> </table> <div class="m-footer" > <div>Omborchi: __________________</div> <div>Bosh hisobchi: __________________</div> </div> </div> `;
+            document.getElementById('print-overlay').style.display = 'flex';
+        }
+
+        function closePrint() {
+            document.getElementById('print-overlay').style.display = 'none';
+        }
+
+    </script>
+</body>
+
+</html>

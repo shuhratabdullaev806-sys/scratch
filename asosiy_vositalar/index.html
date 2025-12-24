@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asosiy Vositalar (AV) - FAXR MADAD KONSALT</title>
+    <style>
+        :root {
+            /* VIOLET THEME VARIABLES FOR ASSETS */
+            --primary-color: #8b5cf6;
+            /* Violet 500 */
+            --primary-dark: #6d28d9;
+            /* Violet 700 */
+            --bg-color: #f5f3ff;
+            /* Violet 50 */
+            --card-bg: #ffffff;
+            --text-color: #4c1d95;
+            /* Violet 900 */
+            --border-color: #ddd6fe;
+            /* Violet 200 */
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* CARD STYLES */
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .section-title {
+            color: var(--primary-dark);
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* FORMS */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #5b21b6;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #c4b5fd;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #ede9fe;
+            color: var(--primary-dark);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            background: #ddd6fe;
+            color: var(--primary-dark);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
+        }
+
+        /* TABLES */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f5f3ff;
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        tr:hover {
+            background-color: #fafafa;
+        }
+
+        .num-col {
+            text-align: right;
+            font-family: 'Consolas', monospace;
+            font-weight: 600;
+        }
+
+        /* UTILS */
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* PRINT */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .container {
+                margin: 0;
+                padding: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Asosiy Vositalar (Kirish)</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <header class="no-print">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div
+                    style="background:white; color:var(--primary-color); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">
+                    AV</div>
+                <div>
+                    <h1>Asosiy Vositalar</h1>
+                    <div style="font-size:0.8rem; opacity:0.9;">"FAXR MADAD KONSALT"</div>
+                </div>
+            </div>
+            <div>
+                <button onclick="openQuiz()" class="btn btn-secondary btn-sm"
+                    style="background:#4c1d95; color:white; border:none; box-shadow:0 4px 15px rgba(76, 29, 149, 0.4); margin-right:10px;">🧠
+                    Bilimni Sinash</button>
+                <button onclick="window.print()" class="btn btn-secondary btn-sm">🖨️ Chop etish</button>
+            </div>
+        </header>
+
+        <div class="container">
+
+            <!-- DASHBOARD SUMMARY -->
+            <div class="card" style="display:flex; justify-content:space-around; text-align:center;">
+                <div>
+                    <div style="font-size:0.9rem; color:#6b7280;">Jami Boshlang'ich Qiymat (0100)</div>
+                    <div style="font-size:1.5rem; font-weight:bold; color:var(--primary-dark);" id="sum-initial">0</div>
+                </div>
+                <div>
+                    <div style="font-size:0.9rem; color:#6b7280;">Jami Eskirish (0200)</div>
+                    <div style="font-size:1.5rem; font-weight:bold; color:var(--danger-color);" id="sum-deprey">0</div>
+                </div>
+                <div>
+                    <div style="font-size:0.9rem; color:#6b7280;">Qoldiq Qiymat (Balans)</div>
+                    <div style="font-size:1.5rem; font-weight:bold; color:var(--success-color);" id="sum-book">0</div>
+                </div>
+            </div>
+
+            <div class="main-layout">
+
+                <!-- LEFT COLUMN: CONTROLS -->
+                <div>
+                    <div class="card no-print">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="showForm('kirim')">Kirim (Xarid)</button>
+                            <button class="tab-btn" onclick="showForm('eskirish')">Eskirish</button>
+                        </div>
+
+                        <!-- KIRIM FORM -->
+                        <form id="av-kirim-form">
+                            <h3 class="section-title">Yangi AV Kirim Qilish</h3>
+                            <div class="form-group">
+                                <label>Inventar Raqami</label>
+                                <input type="text" id="av-inv" placeholder="0001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nomi</label>
+                                <input type="text" id="av-name" placeholder="Masalan: Kompyuter, Stol..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Guruh (Schyot)</label>
+                                <select id="av-group">
+                                    <option value="0110">0110 - Binolar va inshootlar</option>
+                                    <option value="0120">0120 - Mashina va uskunalar</option>
+                                    <option value="0130">0130 - Mebel va ofis jihozlari</option>
+                                    <option value="0140">0140 - Kompyuter va texnika</option>
+                                    <option value="0150">0150 - Transport vositalari</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Sotib Olish Sanasi</label>
+                                <input type="date" id="av-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Boshlang'ich Qiymat (so'm)</label>
+                                <input type="number" id="av-cost" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Eskirish Normasi (Yillik %)</label>
+                                <input type="number" id="av-rate" placeholder="15" min="0" max="100" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="btn-save">💾 Saqlash</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()" id="btn-cancel"
+                                style="display:none; margin-top:10px; width:100%;">Bekor Qilish</button>
+                        </form>
+
+                        <!-- ESKIRISH FORM -->
+                        <form id="av-calc-form" style="display:none;">
+                            <h3 class="section-title">Eskirishni Hisoblash</h3>
+                            <div style="background:#f0fdf4; padding:15px; border-radius:10px; margin-bottom:15px;">
+                                <p style="margin:0; font-size:0.9rem;">
+                                    Tizim avtomatik ravishda barcha faol AV lar uchun 1 oylik eskirish summasini
+                                    hisoblaydi
+                                    va balans qiymatini kamaytiradi.
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <label>Qaysi oy uchun?</label>
+                                <input type="month" id="calc-month" required>
+                            </div>
+                            <button type="submit" class="btn"
+                                style="background:var(--warning-color); color:white; width:100%;">⚙️ Hisoblash va
+                                Saqlash</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: ASSET LIST -->
+                <div class="card">
+                    <div class="section-title">
+                        <span>Mavjud Asosiy Vositalar(01)</span>
+                        <input type="text" id="search" placeholder="Qidirish..." class="no-print"
+                            style="width:200px; padding:5px;">
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table id="assets-table">
+                            <thead>
+                                <tr>
+                                    <th>Inv №</th>
+                                    <th>Nomi</th>
+                                    <th>Sana</th>
+                                    <th>Schyot (01)</th>
+                                    <th class="num-col">Bosh. Qiymat</th>
+                                    <th class="num-col">Jami Eskirish (02)</th>
+                                    <th class="num-col">Qoldiq</th>
+                                    <th class="no-print">Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assets-body">
+                                <!-- JS Fills -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- HISTORY / LOGS -->
+            <div class="card">
+                <h3 class="section-title">Operatsiyalar Tarixi</h3>
+                <ul id="history-log" style="list-style:none; padding:0; height:200px; overflow-y:auto;"></ul>
+            </div>
+
+        </div>
+
+        <script>
+            // DATA STORE
+            let assets = [];
+            let logs = [];
+            let editingId = null;
+            let currentUser = null;
+
+            // INIT
+            window.onload = function () {
+                checkLogin();
+            };
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('av_user');
+                const storedGroup = sessionStorage.getItem('av_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadData();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('av_user', name);
+                    sessionStorage.setItem('av_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadData();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('av_user');
+                    sessionStorage.removeItem('av_group');
+                    location.reload();
+                }
+            }
+
+            function loadData() {
+                if (!currentUser) return;
+                assets = JSON.parse(localStorage.getItem('av_assets_' + currentUser) || '[]');
+                logs = JSON.parse(localStorage.getItem('av_logs_' + currentUser) || '[]');
+
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('av-date').value = today;
+                document.getElementById('calc-month').value = today.slice(0, 7);
+
+                renderAssets();
+                renderLogs();
+                updateSummary();
+            }
+
+            // NAVIGATION
+            function showForm(type) {
+                cancelEdit();
+                const kirimForm = document.getElementById('av-kirim-form');
+                const calcForm = document.getElementById('av-calc-form');
+                const btns = document.querySelectorAll('.tab-btn');
+
+                if (type === 'kirim') {
+                    kirimForm.style.display = 'block';
+                    calcForm.style.display = 'none';
+                    btns[0].classList.add('active');
+                    btns[1].classList.remove('active');
+                } else {
+                    kirimForm.style.display = 'none';
+                    calcForm.style.display = 'block';
+                    btns[0].classList.remove('active');
+                    btns[1].classList.add('active');
+                }
+            }
+
+            // --- ASSET MANAGEMENT ---
+            document.getElementById('av-kirim-form').onsubmit = function (e) {
+                e.preventDefault();
+
+                const asset = {
+                    id: editingId || Date.now(),
+                    inv: document.getElementById('av-inv').value,
+                    name: document.getElementById('av-name').value,
+                    account: document.getElementById('av-group').value,
+                    date: document.getElementById('av-date').value,
+                    cost: parseFloat(document.getElementById('av-cost').value),
+                    rate: parseFloat(document.getElementById('av-rate').value),
+                    accumulatedDepr: 0, // 0200 count
+                    status: 'Active'
+                };
+
+                // Calculate Accumulated Depr if editing? 
+                // If editing, we preserve old accumulated depr unless we want to reset?
+                // Let's assume editing is for typo correction, so we keep old accumulated value if exists.
+                if (editingId) {
+                    const old = assets.find(a => a.id === editingId);
+                    if (old) asset.accumulatedDepr = old.accumulatedDepr;
+
+                    const idx = assets.findIndex(a => a.id === editingId);
+                    assets[idx] = asset;
+                    addLog(`Tahrirlandi: ${asset.name} (${asset.inv})`);
+                } else {
+                    assets.push(asset);
+                    addLog(`Kirim qilindi: ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm`);
+                }
+
+                saveData();
+                this.reset();
+                document.getElementById('av-date').value = new Date().toISOString().split('T')[0];
+                cancelEdit();
+            };
+
+            function renderAssets() {
+                const tbody = document.getElementById('assets-body');
+                tbody.innerHTML = '';
+
+                let totalInitial = 0;
+                let totalDepr = 0;
+
+                assets.filter(a => a.status === 'Active').forEach(a => {
+                    const bookValue = a.cost - a.accumulatedDepr;
+                    totalInitial += a.cost;
+                    totalDepr += a.accumulatedDepr;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td>${a.inv}</td>
+                    <td><b>${a.name}</b></td>
+                    <td>${a.date}</td>
+                    <td><span class="badge">${a.account}</span></td>
+                    <td class="num-col">${a.cost.toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--danger-color)">${a.accumulatedDepr.toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--success-color)">${bookValue.toLocaleString()}</td>
+                    <td class="no-print">
+                        <button onclick="editAsset(${a.id})" class="btn btn-sm btn-secondary">✏️</button>
+                        <button onclick="deleteAsset(${a.id})" class="btn btn-sm" style="background:#fee2e2; color:red;">🗑️</button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+
+                // Update Summary
+                document.getElementById('sum-initial').innerText = totalInitial.toLocaleString() + " so'm";
+                document.getElementById('sum-deprey').innerText = totalDepr.toLocaleString() + " so'm";
+                document.getElementById('sum-book').innerText = (totalInitial - totalDepr).toLocaleString() + " so'm";
+            }
+
+            // --- EDITING ---
+            function editAsset(id) {
+                const a = assets.find(x => x.id === id);
+                if (!a) return;
+
+                showForm('kirim');
+                editingId = id;
+
+                document.getElementById('av-inv').value = a.inv;
+                document.getElementById('av-name').value = a.name;
+                document.getElementById('av-group').value = a.account;
+                document.getElementById('av-date').value = a.date;
+                document.getElementById('av-cost').value = a.cost;
+                document.getElementById('av-rate').value = a.rate;
+
+                document.getElementById('btn-save').innerText = "💾 O'zgartirish";
+                document.getElementById('btn-cancel').style.display = 'block';
+            }
+
+            function cancelEdit() {
+                editingId = null;
+                document.getElementById('av-kirim-form').reset();
+                document.getElementById('btn-save').innerText = "💾 Saqlash";
+                document.getElementById('btn-cancel').style.display = 'none';
+                document.getElementById('av-date').value = new Date().toISOString().split('T')[0];
+            }
+
+            function deleteAsset(id) {
+                if (!confirm("Haqiqatan o'chirasizmi?")) return;
+                const idx = assets.findIndex(a => a.id === id);
+                if (idx !== -1) {
+                    addLog(`O'chirildi: ${assets[idx].name}`);
+                    assets.splice(idx, 1);
+                    saveData();
+                }
+            }
+
+            // --- DEPRECIATION LOGIC ---
+            document.getElementById('av-calc-form').onsubmit = function (e) {
+                e.preventDefault();
+                const month = document.getElementById('calc-month').value;
+                if (!confirm(`${month} oyi uchun eskirish hisoblansinmi?`)) return;
+
+                let monthTotal = 0;
+                let count = 0;
+
+                assets.forEach(a => {
+                    if (a.status === 'Active') {
+                        // Straight line: (Cost * Rate%) / 12
+                        const monthly = (a.cost * (a.rate / 100)) / 12;
+                        // Check if fully depreciated
+                        if (a.accumulatedDepr < a.cost) {
+                            let actualCharge = monthly;
+                            // Avoid over-depreciation
+                            if (a.accumulatedDepr + monthly > a.cost) {
+                                actualCharge = a.cost - a.accumulatedDepr;
+                            }
+
+                            a.accumulatedDepr += actualCharge;
+                            monthTotal += actualCharge;
+                            count++;
+                        }
+                    }
+                });
+
+                addLog(`Eskirish hisoblandi: ${month} - ${count} ta AV, Jami: ${monthTotal.toLocaleString()} so'm`);
+                saveData();
+                alert(`Muvaffaqiyatli! Jami hisoblangan eskirish: ${monthTotal.toLocaleString()} so'm`);
+            };
+
+            // LOGGING
+            function addLog(msg) {
+                const log = { date: new Date().toLocaleString(), msg: msg };
+                logs.unshift(log);
+                if (logs.length > 50) logs.pop(); // keep limit
+                saveData();
+            }
+
+            function renderLogs() {
+                const ul = document.getElementById('history-log');
+                ul.innerHTML = logs.map(l => `
+                <li style="padding:5px; border-bottom:1px solid #eee; font-size:0.85rem;">
+                    <span style="color:#888">${l.date}</span> - ${l.msg}
+                </li>`).join('');
+            }
+
+            function updateSummary() {
+                // Already handled in renderAssets for live calculation
+            }
+
+            function saveData() {
+                if (!currentUser) return;
+                localStorage.setItem('av_assets_' + currentUser, JSON.stringify(assets));
+                localStorage.setItem('av_logs_' + currentUser, JSON.stringify(logs));
+                renderAssets();
+                renderLogs();
+            }
+
+        </script>
+
+        <script>
+            // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
+            const quizQuestions = [
+                { q: "Korxona yangi bino sotib oldi (1,000,000,000 so'm)", dt: "0110", kt: "6010", sum: 1000000000 },
+                { q: "Uskuna o'rnatish uchun pudratchiga to'lov qilindi (50,000,000 so'm)", dt: "0810", kt: "5110", sum: 50000000 },
+                { q: "Asosiy vositalar (Uskuna) foydalanishga topshirildi (50,000,000 so'm)", dt: "0120", kt: "0810", sum: 50000000 },
+                { q: "Ishlab chiqarish uskunalariga eskirish hisoblandi (2,000,000 so'm)", dt: "2010", kt: "0220", sum: 2000000 },
+                { q: "Ma'muriy bino uchun eskirish hisoblandi (5,000,000 so'm)", dt: "9420", kt: "0210", sum: 5000000 },
+                { q: "Eskirgan kompyuter hisobdan chiqarildi (Boshlang'ich qiymat: 4,000,000 so'm)", dt: "9210", kt: "0140", sum: 4000000 },
+                { q: "Hisobdan chiqarilgan kompyuterning eskirishi (3,500,000 so'm) hisobdan o'chirildi", dt: "0240", kt: "9210", sum: 3500000 },
+                { q: "Ta'sischidan ustav kapitaliga bino qabul qilindi (500,000,000 so'm)", dt: "0110", kt: "4610", sum: 500000000 },
+                { q: "Asosiy vosita (Avtomobil) sotildi (100,000,000 so'm)", dt: "9210", kt: "0150", sum: 100000000 },
+                { q: "Tekshiruvda aniqlangan ortiqcha AV (Kirim) (1,000,000 so'm)", dt: "0130", kt: "9390", sum: 1000000 }
+            ];
+
+            let currentQIndex = 0;
+
+            function openQuiz() {
+                currentQIndex = 0;
+                document.getElementById('quiz-modal').style.display = 'flex';
+                loadQuestion();
+            }
+
+            function closeQuiz() {
+                document.getElementById('quiz-modal').style.display = 'none';
+            }
+
+            function loadQuestion() {
+                if (currentQIndex >= quizQuestions.length) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h2 style="color:#8b5cf6;">🎉 Tabriklaymiz!</h2>
+                        <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                        <button onclick="closeQuiz()" class="btn btn-primary">Yopish</button>
+                        <button onclick="openQuiz()" class="btn btn-secondary" style="margin-top:10px;">Qayta ishlash</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const q = quizQuestions[currentQIndex];
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-dt').value = '';
+                document.getElementById('q-kt').value = '';
+                document.getElementById('q-sum').value = '';
+                document.getElementById('q-feedback').innerText = '';
+                document.getElementById('q-feedback').style.display = 'none';
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('q-dt').value.trim();
+                const kt = document.getElementById('q-kt').value.trim();
+                const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+                const target = quizQuestions[currentQIndex];
+                const feedback = document.getElementById('q-feedback');
+
+                if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                    feedback.innerHTML = '<span style="color:green; font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                    feedback.style.display = 'block';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    feedback.innerHTML = `<span style="color:red; font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.style.display = 'block';
+                }
+            }
+        </script>
+
+        <!-- QUIZ MODAL -->
+        <div class="modal-overlay" id="quiz-modal" style="display:none; z-index:9999;">
+            <div class="modal" style="max-width:500px; text-align:left;" id="quiz-content">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2 style="margin:0; color:#8b5cf6;">🧠 Bilimni Sinash</h2>
+                    <button onclick="closeQuiz()"
+                        style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+
+                <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#1f2937;"
+                    id="q-text">
+                    Savol yuklanmoqda...
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:bold;">Debet (Schyot)</label>
+                        <input type="text" id="q-dt" placeholder="Mas: 0110">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:bold;">Kredit (Schyot)</label>
+                        <input type="text" id="q-kt" placeholder="Mas: 6010">
+                    </div>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="font-size:0.8rem; font-weight:bold;">Summa</label>
+                    <input type="number" id="q-sum" placeholder="So'mda kiriting">
+                </div>
+
+                <div id="q-feedback"
+                    style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;">
+                </div>
+
+                <button onclick="checkAnswer()" class="btn btn-primary"
+                    style="width:100%; justify-content:center;">Tekshirish</button>
+            </div>
+        </div>
+    </body>
+
+</html>

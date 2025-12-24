@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aylanmadan Soliq - Multi-Activity</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --border-color: #d1d5db;
+            --input-bg: #eff6ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 3px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .card-header {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* MONTH SELECTOR */
+        .month-selector {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .month-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .month-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .month-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .month-btn.completed {
+            border-color: #10b981;
+            color: #065f46;
+            background: #d1fae5;
+        }
+
+        .month-btn.active.completed {
+            background: #059669;
+            color: white;
+        }
+
+        /* TABLES */
+        table.report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 0.5rem;
+        }
+
+        th {
+            background: #f3f4f6;
+            text-align: center;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .code-col {
+            text-align: center;
+            font-weight: bold;
+            color: #6b7280;
+            width: 50px;
+        }
+
+        .input-col {
+            padding: 0;
+            background: #f9fafb;
+            position: relative;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0.5rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            background: transparent;
+        }
+
+        input[type="number"] {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .editable {
+            background-color: var(--input-bg);
+            color: var(--primary-color);
+        }
+
+        .editable:focus {
+            background-color: #fff;
+            box-shadow: inset 0 0 0 2px var(--primary-light);
+        }
+
+        .readonly {
+            background-color: #f3f4f6;
+            color: #374151;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background: #1e40af;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .doc-select {
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+
+        /* DASHBOARD */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dash-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .dash-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .dash-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .dash-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Soliq Tizimi</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <header>
+            <div
+                style="font-weight:bold; font-size:1.2rem; display:flex; gap:10px; align-items:center; color:var(--primary-color);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                MY.SOLIQ.UZ (Simulyator)
+            </div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button onclick="openQuiz()" class="btn btn-sm"
+                    style="background:#8b5cf6; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4);">🧠 Bilimni
+                    Sinash</button>
+                <div style="color:gray;">Yil: <span id="current-year">2025</span></div>
+            </div>
+        </header>
+
+        <div class="container">
+
+            <div class="month-selector" id="month-list"></div>
+            <div class="alert-info" id="month-status-msg">Hisobot davrini tanlang.</div>
+
+            <!-- DASHBOARD -->
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <span class="dash-icon">💰</span>
+                    <div class="dash-label">Yil Boshidan Tushum</div>
+                    <div class="dash-value" id="dash-total-rev">0</div>
+                </div>
+                <div class="dash-card">
+                    <span class="dash-icon">🛡️</span>
+                    <div class="dash-label">Yil Boshidan Imtiyoz</div>
+                    <div class="dash-value" id="dash-total-exempt" style="color:#d97706">0</div>
+                </div>
+                <div class="dash-card">
+                    <span class="dash-icon">🏛️</span>
+                    <div class="dash-label">Jami Hisoblangan Soliq</div>
+                    <div class="dash-value" id="dash-total-tax" style="color:#047857">0</div>
+                </div>
+            </div>
+
+            <!-- ACTIVITIES SECTION -->
+            <div class="card">
+                <div class="card-header">
+                    <span>1. Faoliyat Turlari bo'yicha Daromadlar (Ilova)</span>
+                    <button class="btn btn-sm btn-success" onclick="addActivity()">+ Yangi Faoliyat</button>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <table class="report-table" id="activity-table">
+                        <thead>
+                            <tr>
+                                <th style="width:20%">Faoliyat Turi</th>
+                                <th style="width:15%">Stavka</th>
+                                <th>Tushum (Jami)</th>
+                                <th>Imtiyoz (Summa)</th>
+                                <th style="width:20%">Imtiyoz Hujjati</th>
+                                <th>Soliq</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-tbody">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                    <div style="padding:10px; text-align:right; color:#6b7280; font-size:0.85rem;">
+                        * Har bir satr alohida hisoblanadi va pastdagi asosiy hisobotga jamlanadi.
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN REPORT -->
+            <div class="card">
+                <div class="card-header">
+                    <span>2. Aylanmadan Olinadigan Soliq Hisoboti (Asosiy)</span>
+                </div>
+                <div class="card-body" style="padding:0;">
+                    <form id="tax-form" onsubmit="saveReport(event)">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th>Ko'rsatkichlar</th>
+                                    <th style="width:60px">Kod</th>
+                                    <th>Summa (Jami)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Jami Tushum (Barcha faoliyatlardan)</td>
+                                    <td class="code-col">010</td>
+                                    <td class="input-col"><input type="text" id="row-010" class="report-input readonly"
+                                            value="0" readonly></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Soliq solinmaydigan daromadlar</td>
+                                    <td class="code-col">020</td>
+                                    <td class="input-col"><input type="text" id="row-020" class="report-input readonly"
+                                            value="0" readonly></td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Soliq Bazasi (010 - 020)</td>
+                                    <td class="code-col">030</td>
+                                    <td class="input-col"><input type="text" id="row-030" class="report-input readonly"
+                                            value="0" readonly></td>
+                                </tr>
+                                <tr style="background:#fff7ed;">
+                                    <td>4</td>
+                                    <td style="color:#c2410c;"><strong>Jami Hisoblangan Soliq</strong> (Yig'ma)</td>
+                                    <td class="code-col">050</td>
+                                    <td class="input-col"><input type="text" id="row-050" class="report-input readonly"
+                                            style="color:#c2410c;" value="0" readonly></td>
+                                </tr>
+                                <tr style="background:#ecfdf5;">
+                                    <td>5</td>
+                                    <td style="color:#047857;"><strong>Byudjetga To'lanadi</strong> (Jami - Oldingi
+                                        Oylar)
+                                    </td>
+                                    <td class="code-col">060</td>
+                                    <td class="input-col"><input type="text" id="row-060" class="report-input readonly"
+                                            style="color:#047857; font-weight:bold;" value="0" readonly></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="padding:1.5rem; text-align:right; border-top:1px solid #e5e7eb;">
+                            <button type="submit" class="btn" id="submit-btn">Jo'natish</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            const months = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"];
+
+            // DOCUMENTS LIST
+            const docs = [
+                { code: "", name: "Hujjat tanlang..." },
+                { code: "SK-460", name: "SK 460-modda (Umumiy imtiyoz)" },
+                { code: "PQ-300", name: "PQ-300 (Eksportyor)" },
+                { code: "PF-60", name: "PF-60 (IT Park)" },
+                { code: "PQ-123", name: "PQ-123 (Maxsus zona)" }
+            ];
+
+            let reports = {};
+            let currentMonthIdx = 0;
+            let activities = [];
+            let currentUser = null;
+
+            window.onload = function () {
+                checkLogin();
+            };
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('soliq_user');
+                const storedGroup = sessionStorage.getItem('soliq_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadData();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('soliq_user', name);
+                    sessionStorage.setItem('soliq_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadData();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('soliq_user');
+                    sessionStorage.removeItem('soliq_group');
+                    location.reload();
+                }
+            }
+
+            function loadData() {
+                if (!currentUser) return;
+                reports = JSON.parse(localStorage.getItem('soliq_reports_multi_' + currentUser) || '{}');
+                document.getElementById('current-year').innerText = new Date().getFullYear();
+                renderMonths();
+                selectMonth(0);
+                updateDashboard();
+            }
+
+            function renderMonths() {
+                const container = document.getElementById('month-list');
+                container.innerHTML = months.map((m, idx) => {
+                    const isDone = reports[m] ? 'completed' : '';
+                    return `<button class="month-btn ${isDone}" onclick="selectMonth(${idx})" id="btn-${idx}">${idx + 1}. ${m}</button>`;
+                }).join('');
+            }
+
+            function selectMonth(idx) {
+                currentMonthIdx = idx;
+                const monthName = months[idx];
+
+                document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`btn-${idx}`).classList.add('active');
+
+                const existing = reports[monthName];
+
+                if (existing) {
+                    activities = existing.activities || [];
+                    document.getElementById('month-status-msg').innerHTML = `✅ <b>${monthName}</b> hisoboti topshirilgan.`;
+                    document.getElementById('submit-btn').innerText = "Qayta Yuborish";
+                } else {
+                    activities = [{ id: Date.now(), name: "Umumiy Savdo", rate: 4, revenue: 0, exempt: 0, doc: "" }];
+                    document.getElementById('month-status-msg').innerHTML = `📝 <b>${monthName}</b> hisoboti to'ldirilmoqda.`;
+                    document.getElementById('submit-btn').innerText = "Jo'natish";
+                }
+
+                renderActivities();
+                recalcTotal();
+            }
+
+            // --- ACTIVITY LOGIC ---
+            function addActivity() {
+                activities.push({ id: Date.now(), name: "", rate: 4, revenue: 0, exempt: 0, doc: "" });
+                renderActivities();
+            }
+
+            function removeActivity(idx) {
+                if (activities.length > 1) {
+                    if (confirm("O'chirilsinmi?")) {
+                        activities.splice(idx, 1);
+                        renderActivities();
+                        recalcTotal();
+                    }
+                } else {
+                    alert("Kamida bitta faoliyat turi bo'lishi kerak!");
+                }
+            }
+
+            function renderActivities() {
+                const tbody = document.getElementById('activity-tbody');
+                tbody.innerHTML = activities.map((act, idx) => `
+                <tr>
+                    <td class="input-col"><input type="text" class="editable" value="${act.name}" placeholder="Nomi (masalan, Savdo)" oninput="updateAct(${idx}, 'name', this.value)"></td>
+                    <td class="input-col">
+                        <select class="editable" onchange="updateAct(${idx}, 'rate', this.value)">
+                            <option value="4" ${act.rate == 4 ? 'selected' : ''}>4% - Savdo/Xizmat</option>
+                            <option value="2" ${act.rate == 2 ? 'selected' : ''}>2% - Chakana (Chekka)</option>
+                            <option value="1" ${act.rate == 1 ? 'selected' : ''}>1% - 20 ming</option>
+                            <option value="0" ${act.rate == 0 ? 'selected' : ''}>0% - Ijtimoiy</option>
+                        </select>
+                    </td>
+                    <td class="input-col"><input type="number" class="editable" value="${act.revenue}" oninput="updateAct(${idx}, 'revenue', this.value)"></td>
+                    <td class="input-col"><input type="number" class="editable" value="${act.exempt}" oninput="updateAct(${idx}, 'exempt', this.value)"></td>
+                    <td class="input-col">
+                        <select class="editable doc-select" id="doc-${idx}" onchange="updateAct(${idx}, 'doc', this.value)" ${act.exempt > 0 ? '' : 'disabled'}>
+                            ${docs.map(d => `<option value="${d.code}" ${act.doc === d.code ? 'selected' : ''}>${d.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td class="readonly" id="tax-${idx}">${calcRowTax(act).toLocaleString()}</td>
+                    <td style="text-align:center"><button class="btn btn-sm btn-danger" onclick="removeActivity(${idx})">×</button></td>
+                </tr>
+            `).join('');
+
+                recalcTotal();
+            }
+
+            function updateAct(idx, field, val) {
+                if (field === 'revenue' || field === 'exempt' || field === 'rate') val = parseFloat(val) || 0;
+                activities[idx][field] = val;
+
+                // Enable/Disable Doc Select
+                if (field === 'exempt') {
+                    const docSel = document.getElementById(`doc-${idx}`);
+                    if (val > 0) { docSel.disabled = false; docSel.classList.remove('readonly'); }
+                    else { docSel.disabled = true; docSel.value = ""; activities[idx].doc = ""; }
+                }
+
+                document.getElementById(`tax-${idx}`).innerText = calcRowTax(activities[idx]).toLocaleString();
+                recalcTotal();
+            }
+
+            function calcRowTax(act) {
+                const base = Math.max(0, act.revenue - act.exempt);
+                return (base * act.rate) / 100;
+            }
+
+            // --- TOTALS ---
+            function recalcTotal() {
+                let totalRev = 0;
+                let totalExempt = 0;
+                let totalTax = 0;
+
+                activities.forEach(a => {
+                    totalRev += a.revenue;
+                    totalExempt += a.exempt;
+                    totalTax += calcRowTax(a);
+                });
+
+                const base = Math.max(0, totalRev - totalExempt);
+
+                document.getElementById('row-010').value = totalRev.toLocaleString();
+                document.getElementById('row-020').value = totalExempt.toLocaleString();
+                document.getElementById('row-030').value = base.toLocaleString();
+                document.getElementById('row-050').value = totalTax.toLocaleString();
+
+                // Previous Month Logic (Simplified Cumulative on Totals)
+                const prev = getPrevTotals(currentMonthIdx);
+                const toPay = totalTax - prev.tax;
+
+                document.getElementById('row-060').value = toPay.toLocaleString();
+            }
+
+            function getPrevTotals(idx) {
+                // Find last reported month before current
+                for (let i = idx - 1; i >= 0; i--) {
+                    const m = months[i];
+                    if (reports[m]) {
+                        // return the total tax calculated then
+                        // Sum up that report's activities tax
+                        let t = 0;
+                        reports[m].activities.forEach(a => {
+                            t += (Math.max(0, a.revenue - a.exempt) * a.rate) / 100;
+                        });
+                        return { tax: t };
+                    }
+                }
+                return { tax: 0 };
+            }
+
+            function saveReport(e) {
+                e.preventDefault();
+                const monthName = months[currentMonthIdx];
+
+                // Basic Val
+                for (let a of activities) {
+                    if (a.exempt > 0 && !a.doc) {
+                        alert("Diqqat! Imtiyoz (Soliq solinmaydigan daromad) kiritilgan, lekin Hujjat tanlanmagan.");
+                        return;
+                    }
+                }
+
+                reports[monthName] = {
+                    timestamp: new Date().toISOString(),
+                    activities: activities
+                };
+
+                localStorage.setItem('soliq_reports_multi_' + currentUser, JSON.stringify(reports));
+                renderMonths();
+                selectMonth(currentMonthIdx);
+                alert("Hisobot Muvaffaqiyatli Saqlandi! ✅");
+                updateDashboard();
+            }
+
+            function updateDashboard() {
+                let lastIdx = -1;
+                for (let i = months.length - 1; i >= 0; i--) {
+                    if (reports[months[i]]) { lastIdx = i; break; }
+                }
+
+                let dRev = 0, dExempt = 0, dTax = 0;
+
+                if (lastIdx !== -1) {
+                    const r = reports[months[lastIdx]];
+                    // Calc totals from this report (Cumulative)
+                    r.activities.forEach(a => {
+                        dRev += a.revenue;
+                        dExempt += a.exempt;
+                        dTax += (Math.max(0, a.revenue - a.exempt) * a.rate) / 100;
+                    });
+                }
+
+                document.getElementById('dash-total-rev').innerText = dRev.toLocaleString();
+                document.getElementById('dash-total-exempt').innerText = dExempt.toLocaleString();
+                document.getElementById('dash-total-tax').innerText = dTax.toLocaleString();
+            }
+        </script>
+
+        <script>
+            // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
+            const quizQuestions = [
+                { q: "Aylanmadan olinadigan soliq hisoblandi (4%) (1,000,000 so'm)", dt: "9820", kt: "6410", sum: 1000000 },
+                { q: "Korxona hisob raqamidan byudjetga soliq to'landi (500,000 so'm)", dt: "6410", kt: "5110", sum: 500000 },
+                { q: "Xodimlarning ish haqidan daromad solig'i ushlandi (1,200,000 so'm)", dt: "6710", kt: "6410", sum: 1200000 },
+                { q: "Ijtimoiy soliq (12%) hisoblandi (1,000,000 so'm)", dt: "9420", kt: "6520", sum: 1000000 },
+                { q: "Mol-mulk solig'i hisoblandi (200,000 so'm)", dt: "9430", kt: "6410", sum: 200000 },
+                { q: "Yer solig'i hisoblandi (150,000 so'm)", dt: "9430", kt: "6410", sum: 150000 },
+                { q: "Suv resurslaridan foydalanish solig'i hisoblandi (50,000 so'm)", dt: "9430", kt: "6410", sum: 50000 },
+                { q: "QQS (Sotishdan) hisoblandi (12%) (1,200,000 so'm)", dt: "9030", kt: "6410", sum: 1200000 },
+                { q: "Foyda solig'i hisoblandi (Provisiya) (5,000,000 so'm)", dt: "9810", kt: "6410", sum: 5000000 },
+                { q: "Ortiqcha to'langan soliq qaytarildi (100,000 so'm)", dt: "5110", kt: "6410", sum: 100000 }
+            ];
+
+            let currentQIndex = 0;
+
+            function openQuiz() {
+                currentQIndex = 0;
+                document.getElementById('quiz-modal').style.display = 'flex';
+                loadQuestion();
+            }
+
+            function closeQuiz() {
+                document.getElementById('quiz-modal').style.display = 'none';
+            }
+
+            function loadQuestion() {
+                if (currentQIndex >= quizQuestions.length) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h2 style="color:#1e40af;">🎉 Tabriklaymiz!</h2>
+                        <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                        <button onclick="closeQuiz()" class="btn btn-primary">Yopish</button>
+                        <button onclick="openQuiz()" class="btn btn-sm" style="margin-top:10px; background:#6b7280;">Qayta ishlash</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const q = quizQuestions[currentQIndex];
+                if (!document.getElementById('q-text')) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="margin:0; color:#8b5cf6;">🧠 Bilimni Sinash</h2>
+                        <button onclick="closeQuiz()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                    </div>
+                    <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#1f2937;" id="q-text"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold;">Debet (Schyot)</label>
+                            <input type="text" id="q-dt" placeholder="Mas: 9820">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold;">Kredit (Schyot)</label>
+                            <input type="text" id="q-kt" placeholder="Mas: 6410">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-size:0.8rem; font-weight:bold;">Summa</label>
+                        <input type="number" id="q-sum" placeholder="So'mda kiriting">
+                    </div>
+                    <div id="q-feedback" style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;"></div>
+                    <button onclick="checkAnswer()" class="btn btn-primary" style="width:100%; justify-content:center;">Tekshirish</button>
+                 `;
+                }
+
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-dt').value = '';
+                document.getElementById('q-kt').value = '';
+                document.getElementById('q-sum').value = '';
+                document.getElementById('q-feedback').innerText = '';
+                document.getElementById('q-feedback').style.display = 'none';
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('q-dt').value.trim();
+                const kt = document.getElementById('q-kt').value.trim();
+                const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+                const target = quizQuestions[currentQIndex];
+                const feedback = document.getElementById('q-feedback');
+
+                if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                    feedback.innerHTML = '<span style="color:green; font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                    feedback.style.display = 'block';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    feedback.innerHTML = `<span style="color:red; font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.style.display = 'block';
+                }
+            }
+        </script>
+
+        <!-- QUIZ MODAL -->
+        <div class="modal-overlay" id="quiz-modal" style="display:none; z-index:9999;">
+            <div class="modal" style="max-width:500px; text-align:left;" id="quiz-content">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2 style="margin:0; color:#8b5cf6;">🧠 Bilimni Sinash</h2>
+                    <button onclick="closeQuiz()"
+                        style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+
+                <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#1f2937;"
+                    id="q-text">
+                    Savol yuklanmoqda...
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:bold;">Debet (Schyot)</label>
+                        <input type="text" id="q-dt" placeholder="Mas: 9820">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:bold;">Kredit (Schyot)</label>
+                        <input type="text" id="q-kt" placeholder="Mas: 6410">
+                    </div>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="font-size:0.8rem; font-weight:bold;">Summa</label>
+                    <input type="number" id="q-sum" placeholder="So'mda kiriting">
+                </div>
+
+                <div id="q-feedback"
+                    style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;">
+                </div>
+
+                <button onclick="checkAnswer()" class="btn btn-primary"
+                    style="width:100%; justify-content:center;">Tekshirish</button>
+            </div>
+        </div>
+    </body>
+
+</html>

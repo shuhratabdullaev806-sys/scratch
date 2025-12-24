@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ombor Tizimi (AVECO)</title>
+    <style>
+        :root {
+            /* TEAL THEME VARIABLES for AVCO to differentiate from FIFO (Emerald) */
+            --primary-color: #0d9488;
+            /* Teal 600 */
+            --primary-dark: #0f766e;
+            /* Teal 700 */
+            --bg-color: #f0fdfa;
+            /* Teal 50 */
+            --card-bg: #ffffff;
+            --text-color: #134e4a;
+            /* Teal 900 */
+            --border-color: #ccfbf1;
+            /* Teal 100 */
+            --accent-color: #2dd4bf;
+            /* Teal 400 */
+            --danger-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Forms Section */
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .readonly-field {
+            background-color: #f0fdf4;
+            color: var(--primary-dark);
+            font-weight: bold;
+            cursor: not-allowed;
+            border-color: #bbf7d0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .print-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        /* Inventory Table */
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .inventory-table th,
+        .inventory-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .inventory-table th {
+            background-color: #ccfbf1;
+            /* Teal 100 */
+            color: var(--primary-dark);
+        }
+
+        .inventory-table tr:hover {
+            background-color: #f0fdf4;
+        }
+
+        .num-col {
+            text-align: right !important;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+        }
+
+        /* History List */
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-kirim {
+            background-color: #0d9488;
+        }
+
+        /* Teal */
+        .badge-chiqim {
+            background-color: #f59e0b;
+        }
+
+        /* Amber */
+
+        /* Print Overlay */
+        #print-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #print-area-wrapper {
+            background: white;
+            padding: 40px;
+            width: 210mm;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #print-area,
+            #print-area * {
+                visibility: visible;
+            }
+
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Official Form Styles (M-4 & M-11 & Reports) */
+        .m-form {
+            font-family: 'Times New Roman', serif;
+            color: black;
+            border: 2px solid black;
+            padding: 20px;
+        }
+
+        .m-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .m-header-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .m-header-table td {
+            padding: 5px;
+        }
+
+        .m-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .m-data-table th,
+        .m-data-table td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .m-footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Omborga Kirish (AVECO)</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <header class="no-print">
+            <h1>🏭 Ombor Tizimi (AVECO) — "FAXR MADAD KONSALT"</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Materiallar hisobi (O'rtacha Narx - AVECO) | Muallif: Suxrat
+                Abdullaev</p>
+        </header>
+
+        <div class="container no-print">
+
+            <!-- OVERVIEW: INVENTORY -->
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 style="margin:0; color:var(--primary-dark)">📦 Ombor Qoldig'i (AVECO)</h2>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="openQuiz()" class="print-btn" style="background-color: #8b5cf6;">🧠 Bilimni
+                            Sinash</button>
+                        <button onclick="exportToExcel()" class="print-btn" style="background-color: #0d9488;">📊
+                            Excel</button>
+                        <button onclick="printInventoryReport()" class="print-btn">🖨️ Chop Etish</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem; position: relative;">
+                    <input type="text" id="search-input" onkeyup="filterInventory()"
+                        placeholder="🔍 Material nomini qidiring..."
+                        style="padding-left: 1rem; width: 100%; max-width: 400px; border: 2px solid var(--border-color); border-radius: 2rem;">
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="inventory-table" id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Material Nomi</th>
+                                <th>O'lchov birligi</th>
+                                <th class="num-col">Miqdor (Soni)</th>
+                                <th class="num-col">O'rtacha Narx (AVECO)</th>
+                                <th class="num-col">Jami Qiymat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-body">
+                            <!-- JS fills this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- OPERATIONS & HISTORY -->
+            <div class="main-layout">
+                <!-- Forms -->
+                <div class="card">
+                    <div class="tabs" style="margin-bottom: 1rem;">
+                        <button class="tab-btn active" onclick="switchTab('kirim')">▼ Kirim (M-4)</button>
+                        <button class="tab-btn" onclick="switchTab('chiqim')">▲ Chiqim (M-11)</button>
+                    </div>
+
+                    <!-- Kirim Form (M-4) -->
+                    <form id="kirim-form">
+                        <div class="form-group">
+                            <label>Sana</label>
+                            <input type="date" id="k-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Material Nomi (Katalogni tanlang yoki yangi kiriting)</label>
+                            <input type="text" id="k-name" list="materials-list" placeholder="Masalan: Sement" required
+                                autocomplete="off">
+                            <datalist id="materials-list"></datalist>
+                        </div>
+                        <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div>
+                                <label>Miqdor</label>
+                                <input type="number" id="k-qty" placeholder="0" min="0.01" step="0.01" required>
+                            </div>
+                            <div>
+                                <label>Birlik</label>
+                                <select id="k-unit">
+                                    <option value="kg">kg</option>
+                                    <option value="dona">dona</option>
+                                    <option value="litr">litr</option>
+                                    <option value="metr">metr</option>
+                                    <option value="qop">qop</option>
+                                    <option value="tonna">tonna</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Jami Narxi (so'm)</label>
+                            <input type="number" id="k-total-price" placeholder="Umumiy summa" min="0" step="0.01"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Yetkazib beruvchi (6010)</label>
+                            <input type="text" id="k-supplier" placeholder="Korxona nomi" required>
+                        </div>
+
+                        <div
+                            style="background:#f0fdf4; padding:10px; border-radius:5px; font-size:0.9rem; margin-bottom:10px; color:#166534; border:1px solid #bbf7d0;">
+                            <strong>Provodka:</strong> Dt 1010 (Materiallar) - Kt 6010 (Mol yetkazib beruvchilar)
+                        </div>
+
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" id="btn-kirim-submit" class="submit-btn"
+                                style="background-color: #0d9488;">Omborga Kirim Qilish</button>
+                            <button type="button" id="btn-kirim-cancel" class="submit-btn"
+                                style="background-color: #6b7280; display:none;" onclick="cancelEdit()">Bekor
+                                qilish</button>
+                        </div>
+                    </form>
+
+                    <!-- Chiqim Form (M-11) -->
+                    <form id="chiqim-form" style="display:none;">
+                        <div class="form-group">
+                            <label>Sana</label>
+                            <input type="date" id="ch-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Materialni Tanlang</label>
+                            <select id="ch-name" required onchange="updateChiqimInfo()">
+                                <option value="">Tanlang...</option>
+                                <!-- Filled by JS -->
+                            </select>
+                        </div>
+                        <div id="stock-info" style="font-size:0.9rem; color:#666; margin-bottom:10px;"></div>
+
+                        <div class="form-group">
+                            <label>Chiqim Miqdori</label>
+                            <input type="number" id="ch-qty" placeholder="0" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Qayerga (2010)</label>
+                            <input type="text" id="ch-target" value="Asosiy Ishlab chiqarish (Sex)"
+                                placeholder="Sex nomi" required>
+                        </div>
+
+                        <div
+                            style="background:#fff7ed; padding:10px; border-radius:5px; font-size:0.9rem; margin-bottom:10px; color:#9a3412; border:1px solid #fed7aa;">
+                            <strong>Provodka:</strong> Dt 2010 (Ishlab chiqarish) - Kt 1010 (Ombor)<br>
+                            <small>Narx "AVECO" (O'rtacha narx) usulida hisoblanadi.</small>
+                        </div>
+
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" id="btn-chiqim-submit" class="submit-btn"
+                                style="background-color: #f59e0b;">Ishlab Chiqarishga Berish</button>
+                            <button type="button" id="btn-chiqim-cancel" class="submit-btn"
+                                style="background-color: #6b7280; display:none;" onclick="cancelEdit()">Bekor
+                                qilish</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- History -->
+                <div class="card">
+                    <h3 style="margin-top:0;">📜 Hujjatlar Tarixi</h3>
+                    <ul id="history-list" class="history-list">
+                        <!-- JS fills -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Print Overlay -->
+            <div id="print-overlay" class="no-print">
+                <div id="print-area-wrapper">
+                    <div style="text-align: right; margin-bottom: 1rem;">
+                        <button onclick="window.print()" class="submit-btn"
+                            style="width:auto; display:inline-block; margin:0; padding:10px 20px;">🖨️ Chop
+                            etish</button>
+                        <button onclick="closePrint()" class="submit-btn"
+                            style="width:auto; display:inline-block; margin:0; background-color:#6b7280; padding:10px 20px;">Yopish</button>
+                    </div>
+                    <div id="print-area"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="no-print"
+            style="text-align: center; padding: 2rem; color: #64748b; font-size: 0.9rem; margin-top: auto;">
+            <div style="font-weight: bold;">"FAXR MADAD KONSALT"</div>
+            <div>Loyiha muallifi: Suxrat Abdullaev</div>
+            <div style="font-size: 0.8rem; margin-top: 5px;">&copy; 2025 Barcha huquqlar himoyalangan</div>
+        </footer>
+
+        <script>
+            // State management for AVECO
+            let currentUser = null;
+            let materials = {};
+            let history = [];
+            let editingId = null;
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('ombor_aveco_user');
+                const storedGroup = sessionStorage.getItem('ombor_aveco_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadData();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('ombor_aveco_user', name);
+                    sessionStorage.setItem('ombor_aveco_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadData();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('ombor_aveco_user');
+                    sessionStorage.removeItem('ombor_aveco_group');
+                    location.reload();
+                }
+            }
+
+            function loadData() {
+                if (!currentUser) return;
+                materials = JSON.parse(localStorage.getItem('ombor_materials_aveco_' + currentUser) || '{}');
+                history = JSON.parse(localStorage.getItem('ombor_history_aveco_' + currentUser) || '[]');
+
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('k-date').value = today;
+                document.getElementById('ch-date').value = today;
+                renderAll();
+            }
+
+            window.onload = function () {
+                checkLogin();
+            };
+
+            function renderAll() {
+                renderInventory();
+                renderHistory();
+                updateMaterialLists();
+            }
+
+            function switchTab(tab) {
+                cancelEdit();
+                if (tab === 'kirim') {
+                    document.getElementById('kirim-form').style.display = 'block';
+                    document.getElementById('chiqim-form').style.display = 'none';
+                    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                    document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+                } else {
+                    document.getElementById('kirim-form').style.display = 'none';
+                    document.getElementById('chiqim-form').style.display = 'block';
+                    document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+                    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                    updateChiqimInfo();
+                }
+            }
+
+            // --- KIRIM LOGIC (M-4) AVECO ---
+            document.getElementById('kirim-form').onsubmit = function (e) {
+                e.preventDefault();
+
+                const name = document.getElementById('k-name').value.trim();
+                const qty = parseFloat(document.getElementById('k-qty').value);
+                const unit = document.getElementById('k-unit').value;
+                const totalPrice = parseFloat(document.getElementById('k-total-price').value);
+                const supplier = document.getElementById('k-supplier').value;
+                const date = document.getElementById('k-date').value;
+
+                if (!name) return alert('Material nomini kiriting!');
+
+                // Initialize if new material
+                if (!materials[name]) {
+                    materials[name] = { qty: 0, unit: unit, totalPrice: 0 };
+                }
+
+                // Update State (Simple addition for AVECO)
+                materials[name].qty += qty;
+                materials[name].totalPrice += totalPrice;
+                materials[name].unit = unit;
+
+                // Save Transaction
+                const record = {
+                    id: editingId || Date.now(),
+                    type: 'Kirim (M-4)',
+                    date: date,
+                    name: name,
+                    qty: qty,
+                    unit: unit,
+                    price: totalPrice,
+                    party: supplier,
+                    debet: '1010',
+                    kredit: '6010'
+                };
+
+                history.unshift(record);
+                saveData();
+
+                this.reset();
+                document.getElementById('k-date').value = date;
+                cancelEdit();
+                alert("Mahsulot qabul qilindi (AVECO hisoblandi)");
+            };
+
+            // --- CHIQIM LOGIC (M-11) AVECO ---
+            document.getElementById('chiqim-form').onsubmit = function (e) {
+                e.preventDefault();
+
+                const name = document.getElementById('ch-name').value;
+                const qtyToRelease = parseFloat(document.getElementById('ch-qty').value);
+                const target = document.getElementById('ch-target').value;
+                const date = document.getElementById('ch-date').value;
+
+                if (!name || !materials[name]) return alert("Material tanlanmagan!");
+
+                const currentStock = materials[name];
+                if (qtyToRelease > currentStock.qty) {
+                    return alert(`Omborda yetarli mahsulot yo'q! Mavjud: ${currentStock.qty} ${currentStock.unit}`);
+                }
+
+                // AVECO CALCULATION
+                // Average Price = Total Value / Total Qty
+                let avgPrice = 0;
+                if (currentStock.qty > 0) {
+                    avgPrice = currentStock.totalPrice / currentStock.qty;
+                }
+
+                const totalCost = qtyToRelease * avgPrice;
+
+                // Update Totals
+                currentStock.qty -= qtyToRelease;
+                currentStock.totalPrice -= totalCost;
+
+                if (currentStock.qty < 0.0001) {
+                    currentStock.qty = 0;
+                    currentStock.totalPrice = 0;
+                }
+
+                const record = {
+                    id: editingId || Date.now(),
+                    type: 'Chiqim (M-11)',
+                    date: date,
+                    name: name,
+                    qty: qtyToRelease,
+                    unit: currentStock.unit,
+                    price: totalCost, // Total Actual Cost (AVECO)
+                    party: target,
+                    debet: '2010',
+                    kredit: '1010'
+                };
+
+                history.unshift(record);
+                saveData();
+
+                this.reset();
+                document.getElementById('ch-date').value = date;
+                document.getElementById('ch-target').value = "Asosiy Ishlab chiqarish (Sex)";
+                updateChiqimInfo();
+                cancelEdit();
+                alert(`Chiqim qilindi! AVECO Tannarx: ${totalCost.toLocaleString()} so'm`);
+            };
+
+            function saveData() {
+                if (!currentUser) return;
+                localStorage.setItem('ombor_materials_aveco_' + currentUser, JSON.stringify(materials));
+                localStorage.setItem('ombor_history_aveco_' + currentUser, JSON.stringify(history));
+                renderAll();
+            }
+
+            function updateMaterialLists() {
+                const datalist = document.getElementById('materials-list');
+                datalist.innerHTML = '';
+                Object.keys(materials).forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    datalist.appendChild(opt);
+                });
+
+                const select = document.getElementById('ch-name');
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">Tanlang...</option>';
+                Object.keys(materials).forEach(key => {
+                    if (materials[key].qty > 0) {
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.text = key;
+                        select.appendChild(opt);
+                    }
+                });
+                select.value = currentVal;
+            }
+
+            function updateChiqimInfo() {
+                const name = document.getElementById('ch-name').value;
+                const infoDiv = document.getElementById('stock-info');
+                if (name && materials[name]) {
+                    const m = materials[name];
+                    const avg = m.qty > 0 ? (m.totalPrice / m.qty) : 0;
+                    infoDiv.innerHTML = `Mavjud: <b>${m.qty.toLocaleString()} ${m.unit}</b> | O'rtacha Narx: <b>${avg.toLocaleString(undefined, { maximumFractionDigits: 2 })} so'm</b>`;
+                } else {
+                    infoDiv.innerHTML = '';
+                }
+            }
+
+            function renderInventory() {
+                const tbody = document.getElementById('inventory-body');
+                tbody.innerHTML = '';
+                let totalValue = 0;
+
+                Object.keys(materials).sort().forEach(name => {
+                    const m = materials[name];
+                    if (m.qty <= 0 && m.totalPrice <= 0) return;
+
+                    const avgPrice = m.qty > 0 ? (m.totalPrice / m.qty) : 0;
+                    totalValue += m.totalPrice;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                <td><b>${name}</b></td>
+                <td>${m.unit}</td>
+                <td class="num-col">${m.qty.toLocaleString()}</td>
+                <td class="num-col">${avgPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td class="num-col">${m.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            `;
+                    tbody.appendChild(tr);
+                });
+
+                const totalTr = document.createElement('tr');
+                totalTr.style.background = '#f0fdf4';
+                totalTr.style.fontWeight = 'bold';
+                totalTr.innerHTML = `
+            <td colspan="4" style="text-align:right">JAMI OMBOR QIYMATI:</td>
+            <td class="num-col">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })} so'm</td>
+        `;
+                tbody.appendChild(totalTr);
+            }
+
+            function renderHistory() {
+                const list = document.getElementById('history-list');
+                list.innerHTML = '';
+
+                history.forEach(item => {
+                    const isKirim = item.type.includes('Kirim');
+                    const colorClass = isKirim ? 'badge-kirim' : 'badge-chiqim';
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+
+                    li.innerHTML = `
+                <div>
+                    <div>
+                        <span class="badge ${colorClass}">${item.type}</span>
+                        <span style="font-weight:bold; margin-left:5px;">${item.name}</span>
+                    </div>
+                    <div style="font-size:0.85rem; color:#666; margin-top:4px;">
+                        ${item.date} | ${item.qty} ${item.unit} | Jami: ${item.price.toLocaleString()} so'm
+                    </div>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <button onclick="openPrint(${item.id})" class="print-btn" style="display:inline-block; padding:5px 10px;">🖨️</button>
+                    <button class="print-btn" onclick="editTransaction(${item.id})" style="display:inline-block; padding:5px 10px; background-color:#f59e0b;">✏️</button>
+                    ${isKirim ? `<button onclick="deleteKirim(${item.id})" style="border:1px solid #fee2e2; background:#fef2f2; color:red; cursor:pointer; padding:5px 10px; border-radius:4px;" title="Faqat oxirgi kirimni o'chirsa bo'ladi">🗑️</button>` : ''}
+                </div>
+            `;
+                    list.appendChild(li);
+                });
+            }
+
+            // --- EDIT LOGIC (AVECO) ---
+            function editTransaction(id) {
+                const index = history.findIndex(h => h.id === id);
+                if (index === -1) return;
+                const tx = history[index];
+
+                if (!confirm(`Ushbu ${tx.type} operatsiyasini tahrirlaysizmi?`)) return;
+
+                // REVERT STOCK (Simple + / - )
+                const m = materials[tx.name];
+                if (!m) { alert("Material topilmadi"); return; }
+
+                if (tx.type.includes('Kirim')) {
+                    // Revert Kirim: Deduct qty and price
+                    m.qty -= tx.qty;
+                    m.totalPrice -= tx.price;
+
+                    // Form setup
+                    switchTab('kirim');
+                    document.getElementById('k-date').value = tx.date;
+                    document.getElementById('k-name').value = tx.name;
+                    document.getElementById('k-qty').value = tx.qty;
+                    document.getElementById('k-unit').value = tx.unit;
+                    document.getElementById('k-total-price').value = tx.price;
+                    document.getElementById('k-supplier').value = tx.party;
+                    document.getElementById('btn-kirim-submit').innerText = "💾 Saqlash (O'zgartirish)";
+                    document.getElementById('btn-kirim-cancel').style.display = 'inline-block';
+                } else {
+                    // Revert Chiqim: Add back qty and price
+                    m.qty += tx.qty;
+                    m.totalPrice += tx.price;
+
+                    // Form setup
+                    switchTab('chiqim');
+                    updateMaterialLists();
+                    document.getElementById('ch-date').value = tx.date;
+                    document.getElementById('ch-name').value = tx.name; // This needs select populated
+                    setTimeout(() => { document.getElementById('ch-name').value = tx.name; updateChiqimInfo(); }, 50);
+
+                    document.getElementById('ch-qty').value = tx.qty;
+                    document.getElementById('ch-target').value = tx.party;
+                    document.getElementById('btn-chiqim-submit').innerText = "💾 Saqlash (O'zgartirish)";
+                    document.getElementById('btn-chiqim-cancel').style.display = 'inline-block';
+                }
+
+                // Remove from history
+                editingId = tx.id;
+                history.splice(index, 1);
+                saveData();
+            }
+
+            function cancelEdit() {
+                if (editingId) {
+                    alert("Tahrirlash bekor qilindi. ESLATMA: Eski hujjat tizimdan o'chirildi (REVERT qilindi). Qaytadan kiritishingiz kerak.");
+                    editingId = null;
+                }
+
+                document.getElementById('kirim-form').reset();
+                document.getElementById('chiqim-form').reset();
+
+                document.getElementById('btn-kirim-submit').innerText = "Omborga Kirim Qilish";
+                document.getElementById('btn-kirim-cancel').style.display = 'none';
+                document.getElementById('btn-chiqim-submit').innerText = "Ishlab Chiqarishga Berish";
+                document.getElementById('btn-chiqim-cancel').style.display = 'none';
+            }
+
+            function deleteKirim(id) {
+                // Allow deletion for AVCO? 
+                // Technically allows any deletion because it just adjusts average.
+                // But negative stock is bad.
+                const index = history.findIndex(x => x.id === id);
+                if (index === -1) return;
+                const tx = history[index];
+
+                const m = materials[tx.name];
+                if (m.qty < tx.qty) {
+                    alert("O'chirish mumkin emas: Omborda qoldiq yetarli emas (allaqachon ishlatilgan bo'lishi mumkin).");
+                    return;
+                }
+
+                if (!confirm("Haqiqatan o'chirasizmi?")) return;
+
+                m.qty -= tx.qty;
+                m.totalPrice -= tx.price;
+                history.splice(index, 1);
+                saveData();
+            }
+
+            function openPrint(id) {
+                const item = history.find(h => h.id === id);
+                if (!item) return;
+                const printArea = document.getElementById('print-area');
+
+                if (item.type.includes('Kirim')) {
+                    printArea.innerHTML = `
+                <div class="m-form">
+                    <div class="m-title">KIRIM ORDERI № ${item.id.toString().slice(-6)} <br> (M-4 Shakli)</div>
+                     
+                    <table class="m-header-table">
+                        <tr>
+                            <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
+                            <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Yetkazib beruvchi:</strong> ${item.party}</td>
+                            <td style="text-align:right"><strong>Ombor:</strong> Asosiy Ombor</td>
+                        </tr>
+                    </table>
+
+                    <table class="m-data-table">
+                        <thead>
+                            <tr>
+                                <th>Material Nomi</th>
+                                <th>O'lchov bir.</th>
+                                <th>Miqdor</th>
+                                <th>Narxi</th>
+                                <th>Summasi</th>
+                                <th>Schyot (Dt)</th>
+                                <th>Schyot (Kt)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.unit}</td>
+                                <td>${item.qty.toLocaleString()}</td>
+                                <td>${(item.price / item.qty).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                <td>${item.price.toLocaleString()}</td>
+                                <td>${item.debet}</td>
+                                <td>${item.kredit}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="m-footer">
+                        <div>
+                            Qabul qildi (Omborchi): __________________
+                        </div>
+                        <div>
+                            Topshirdi: __________________
+                        </div>
+                    </div>
+                </div>
+            `;
+                } else {
+                    printArea.innerHTML = `
+                <div class="m-form">
+                    <div class="m-title">TALABNOMA-YUKXATI № ${item.id.toString().slice(-6)} <br> (M-11 Shakli)</div>
+                    <table class="m-header-table">
+                        <tr>
+                            <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
+                            <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Yuboruvchi:</strong> Asosiy Ombor</td>
+                        <tr>
+                            <td><strong>Oluvchi:</strong> ${item.party}</td>
+                            <td style="text-align:right"><strong>Maqsad:</strong> Ishlab chiqarish ehtiyoji uchun</td>
+                        </tr>
+                    </table>
+
+                    <table class="m-data-table">
+                        <thead>
+                            <tr>
+                                <th>Material Nomi</th>
+                                <th>O'lchov bir.</th>
+                                <th>So'raldi</th>
+                                <th>Berildi</th>
+                                <th>Narxi (AVECO)</th>
+                                <th>Summasi</th>
+                                <th>Schyot (Dt)</th>
+                                <th>Schyot (Kt)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.unit}</td>
+                                <td>${item.qty.toLocaleString()}</td>
+                                <td>${item.qty.toLocaleString()}</td>
+                                <td>${(item.price / item.qty).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                <td>${item.price.toLocaleString()}</td>
+                                <td>${item.debet}</td>
+                                <td>${item.kredit}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="m-footer">
+                        <div>
+                            Ruxsat berdi: __________________
+                        </div>
+                        <div>
+                            Omborchi: __________________
+                        </div>
+                        <div>
+                            Oldi: __________________
+                        </div>
+                    </div>
+                </div>
+            `;
+                }
+                document.getElementById('print-overlay').style.display = 'flex';
+            }
+
+            function closePrint() {
+                document.getElementById('print-overlay').style.display = 'none';
+            }
+
+            function printInventoryReport() {
+                window.print();
+            }
+
+            function exportToExcel() {
+                let table = document.getElementById("inventory-table");
+                let html = table.outerHTML;
+                let url = 'data:application/vnd.ms-excel,' + escape(html);
+                let link = document.createElement("a");
+                link.href = url;
+                link.download = "ombor_aveco.xls";
+                link.click();
+            }
+
+        </script>
+        <script>
+            // --- QUIZ LOGIC (MINI-TRENAJYOR - AVECO) ---
+            const quizQuestions = [
+                { q: "Materiallar AVECO usulida hisobdan chiqarilganda qaysi narx olinadi?", dt: "O'rtacha", kt: "Narx", sum: 0 },
+                { q: "Materiallar tannarxi oshganda AVECO usulida foyda qanday bo'ladi?", dt: "O'rta", kt: "Daraja", sum: 0 },
+                { q: "Omborga material kirim qilindi (Yetkazib beruvchidan) (5,000,000 so'm)", dt: "1010", kt: "6010", sum: 5000000 },
+                { q: "Materiallar ishlab chiqarishga berildi (AVECO narxda) (1,000,000 so'm)", dt: "2010", kt: "1010", sum: 1000000 },
+                { q: "Materiallar ma'muriy ehtiyojlar uchun sarflandi (200,000 so'm)", dt: "9420", kt: "1010", sum: 200000 },
+                { q: "Chet eldan material sotib olindi (Import) (10,000,000 so'm)", dt: "1010", kt: "6010", sum: 10000000 },
+                { q: "Materiallarni tashish xarajatlari tannarxga qo'shildi (500,000 so'm)", dt: "1010", kt: "6990", sum: 500000 },
+                { q: "Yaroqsiz materiallar hisobdan chiqarildi (Zarar) (300,000 so'm)", dt: "9430", kt: "1010", sum: 300000 },
+                { q: "Omborda ortiqcha material aniqlandi (Kirim) (100,000 so'm)", dt: "1010", kt: "9390", sum: 100000 },
+                { q: "Materiallar sotildi (Chetga) (2,000,000 so'm)", dt: "9220", kt: "1010", sum: 2000000 }
+            ];
+            // Note: Questions 1 & 2 are conceptual, users should enter 0 or specific text. 
+            // Better to stick to accounting entries for consistency. Modified below for pure Accounting.
+
+            const quizQuestionsActual = [
+                { q: "Omborga material kirim qilindi (Mol yetkazib beruvchidan) (10,000,000 so'm)", dt: "1010", kt: "6010", sum: 10000000 },
+                { q: "Materiallar ishlab chiqarishga berildi (AVECO narxda) (2,500,000 so'm)", dt: "2010", kt: "1010", sum: 2500000 },
+                { q: "Materiallar ma'muriyat binosi ta'miri uchun ishlatildi (500,000 so'm)", dt: "9420", kt: "1010", sum: 500000 },
+                { q: "Materiallar sotish bo'limiga berildi (Upakovka) (300,000 so'm)", dt: "9410", kt: "1010", sum: 300000 },
+                { q: "Omborda kamomad aniqlandi (Aybdor topilmadi) (200,000 so'm)", dt: "9430", kt: "1010", sum: 200000 },
+                { q: "Omborda ortiqcha yuk aniqlandi (Daromad) (150,000 so'm)", dt: "1010", kt: "9390", sum: 150000 },
+                { q: "Materiallar chetga sotildi (Tannarxi hisobdan chiqarildi) (1,200,000 so'm)", dt: "9220", kt: "1010", sum: 1200000 },
+                { q: "Xodimga material ish haqi hisobiga berildi (1,000,000 so'm)", dt: "6710", kt: "9220", sum: 1000000 },
+                { q: "Materiallarni yetkazib berish xarajatlari (Transport) (400,000 so'm)", dt: "1010", kt: "6010", sum: 400000 },
+                { q: "Qaytarilgan materiallar omborga kirim qilindi (Sexdan) (100,000 so'm)", dt: "1010", kt: "2010", sum: 100000 }
+            ];
+
+            let currentQIndex = 0;
+
+            function openQuiz() {
+                currentQIndex = 0;
+                document.getElementById('quiz-modal').style.display = 'flex';
+                loadQuestion();
+            }
+
+            function closeQuiz() {
+                document.getElementById('quiz-modal').style.display = 'none';
+            }
+
+            function loadQuestion() {
+                if (currentQIndex >= quizQuestionsActual.length) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h2 style="color:#0d9488;">🎉 Tabriklaymiz!</h2>
+                        <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                        <button onclick="closeQuiz()" class="submit-btn" style="width:100%">Yopish</button>
+                        <button onclick="openQuiz()" class="submit-btn" style="background-color:#f59e0b; width:100%; margin-top:10px;">Qayta ishlash</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const q = quizQuestionsActual[currentQIndex];
+                // Reset content if it was overwritten
+                if (!document.getElementById('q-text')) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="background:#f0fdf4; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#134e4a;" id="q-text"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet (Schyot)</label>
+                            <input type="text" id="q-dt" placeholder="Mas: 1010" style="width:100%; padding:8px; border:1px solid #ccfbf1; border-radius:4px;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Kredit (Schyot)</label>
+                            <input type="text" id="q-kt" placeholder="Mas: 6010" style="width:100%; padding:8px; border:1px solid #ccfbf1; border-radius:4px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Summa</label>
+                        <input type="number" id="q-sum" placeholder="So'mda kiriting" style="width:100%; padding:8px; border:1px solid #ccfbf1; border-radius:4px;">
+                    </div>
+                    <div id="q-feedback" style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;"></div>
+                    <button onclick="checkAnswer()" class="submit-btn" style="background-color:#0d9488; width:100%;">Tekshirish</button>
+                 `;
+                }
+
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-dt').value = '';
+                document.getElementById('q-kt').value = '';
+                document.getElementById('q-sum').value = '';
+                document.getElementById('q-feedback').innerText = '';
+                document.getElementById('q-feedback').style.display = 'none';
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('q-dt').value.trim();
+                const kt = document.getElementById('q-kt').value.trim();
+                const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+                const target = quizQuestionsActual[currentQIndex];
+                const feedback = document.getElementById('q-feedback');
+
+                if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                    feedback.innerHTML = '<span style="color:var(--primary-color); font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                    feedback.style.display = 'block';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.style.display = 'block';
+                }
+            }
+        </script>
+
+        <!-- QUIZ MODAL -->
+        <div class="modal-overlay" id="quiz-modal" style="display:none; z-index:9999;">
+            <div class="modal" style="max-width:500px; padding:0; overflow:hidden; text-align:left;">
+                <div class="header"
+                    style="background:var(--primary-color); padding:1rem; display:flex; justify-content:space-between; align-items:center; color:white;">
+                    <h3 style="margin:0;">🧠 Bilimni Sinash</h3>
+                    <button onclick="closeQuiz()"
+                        style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; width:auto;">&times;</button>
+                </div>
+                <div style="padding:1.5rem;" id="quiz-content">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

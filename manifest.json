@@ -1,0 +1,17 @@
+{
+    "name": "FAXR MADAD KONSALT",
+    "short_name": "FMK Portal",
+    "start_url": ".",
+    "scope": ".",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#4361ee",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

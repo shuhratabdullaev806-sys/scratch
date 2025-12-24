@@ -1,0 +1,233 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="ProgId" content="Excel.Sheet">
+    <meta name="Generator" content="Microsoft Excel 15">
+    <!--[if gte mso 9]>
+    <xml>
+        <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                    <x:Name>To'lov Talabnomasi</x:Name>
+                    <x:WorksheetOptions>
+                        <x:Print>
+                            <x:ValidPrinterInfo/>
+                            <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                            <x:HorizontalResolution>600</x:HorizontalResolution>
+                            <x:VerticalResolution>600</x:VerticalResolution>
+                        </x:Print>
+                        <x:Selected/>
+                        <x:ProtectContents>False</x:ProtectContents>
+                        <x:ProtectObjects>False</x:ProtectObjects>
+                        <x:ProtectScenarios>False</x:ProtectScenarios>
+                    </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+    </xml>
+    <![endif]-->
+    <style>
+        table {
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+        .bordered {
+            border: 1px solid black;
+            padding: 3px;
+        }
+        .center {
+            text-align: center;
+        }
+        .small {
+            font-size: 8pt;
+        }
+        .label {
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+    <table border="0" cellpadding="2" cellspacing="0">
+        <!-- Header Section -->
+        <tr>
+            <td colspan="6" class="header">Ўзбекистон Республикасининг</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="header">наси пулини хисоб-китобларни</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="header">тўғрисидаги низома</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="header">3-ИЛОВА</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Title -->
+        <tr>
+            <td colspan="6" style="text-align: center; font-weight: bold; font-size: 12pt;">ТЎ'ЛОВ ТАЛАБНОМАСИ РАҚАМИ</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Hujjat sanasi -->
+        <tr>
+            <td width="25%" class="label">Ҳужжат санаси</td>
+            <td width="25%" class="bordered"></td>
+            <td width="15%">&nbsp;</td>
+            <td width="10%" class="label">КБ-00-ВВВВВ</td>
+            <td width="25%" colspan="2" class="bordered"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni to'lovchining nomi -->
+        <tr>
+            <td colspan="6" class="label">Мабла'ғларни тў'ловчининг номи</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- DEBET Section -->
+        <tr>
+            <td colspan="6" style="font-weight: bold;">ДЕБЕТ</td>
+        </tr>
+        
+        <!-- Mablag'larni to'lovchining xisob-fakturasi -->
+        <tr>
+            <td colspan="3" class="label">Мабла'ғларни тў'ловчининг хисоб-фактураси</td>
+            <td colspan="3" class="label">Мабла'ғларни тў'ловчининг СТИРи</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni to'lovchining banki nomi -->
+        <tr>
+            <td colspan="3" class="label">Мабла'ғларни тў'ловчининг банки номи</td>
+            <td colspan="3" class="label">Мабла'ғларни тў'ловчининг банки коди</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Summa -->
+        <tr>
+            <td colspan="6" class="label">Сумма</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni oluvchining nomi -->
+        <tr>
+            <td colspan="6" class="label">Мабла'ғларни олувчининг номи</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- KREDIT Section -->
+        <tr>
+            <td colspan="6" style="font-weight: bold;">КРЕДИТ</td>
+        </tr>
+        
+        <!-- Mablag'larni oluvchining xisob-fakturasi -->
+        <tr>
+            <td colspan="3" class="label">Мабла'ғларни олувчининг хисоб-фактураси</td>
+            <td colspan="3">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3">&nbsp;</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni oluvchining banki nomi -->
+        <tr>
+            <td colspan="3" class="label">Мабла'ғларни олувчининг банки номи</td>
+            <td colspan="3" class="label">Мабла'ғларни олувчининг банки коди</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Summa (so'z bilan) -->
+        <tr>
+            <td colspan="6" class="label">Сумма (сў'з билан)</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="bordered" style="height: 30px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- To'lov maqsadi -->
+        <tr>
+            <td colspan="6" class="label">Тў'лов мақсади</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="bordered" style="height: 40px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Razmor -->
+        <tr>
+            <td colspan="3" class="label">Размор</td>
+            <td colspan="3" class="label">Бош бухгалтер</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr>
+            <td colspan="3" class="center small">(Ф.И.О., имзо)</td>
+            <td colspan="3" class="center small">(Ф.И.О., имзо)</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Bottom Table -->
+        <tr>
+            <td colspan="6" class="bordered center" style="font-weight: bold; background-color: #f0f0f0;">
+                Тўловларни қабул қилган банк томонидан тўлдирилади
+            </td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Bank Table Headers -->
+        <tr>
+            <td colspan="2" class="bordered center" style="font-weight: bold;">Тасдиқлаган</td>
+            <td colspan="2" class="bordered center" style="font-weight: bold;">Мамурхизмат</td>
+            <td colspan="2" class="bordered center" style="font-weight: bold;">Банк тўловларни Тўзатилган</td>
+        </tr>
+        
+        <!-- Bank Table Rows -->
+        <tr>
+            <td class="bordered center">Банк</td>
+            <td class="bordered" style="height: 25px;"></td>
+            <td class="bordered center">имзо</td>
+            <td class="bordered"></td>
+            <td class="bordered center">имзо</td>
+            <td class="bordered"></td>
+        </tr>
+    </table>
+</body>
+</html>

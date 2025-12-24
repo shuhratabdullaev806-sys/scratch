@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xizmat Safari Tizimi - FAXR MADAD KONSALT</title>
+    <style>
+        :root {
+            /* TRAVEL THEME VARIABLES (Sky/Slate) */
+            --primary-color: #0ea5e9;
+            /* Sky 500 */
+            --primary-dark: #0369a1;
+            /* Sky 700 */
+            --bg-color: #f0f9ff;
+            /* Sky 50 */
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            /* Slate 900 */
+            --border-color: #bae6fd;
+            /* Sky 200 */
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #0c4a6e;
+            /* Dark Sky */
+            color: white;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+
+        .nav-btn {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background: none;
+            border: none;
+            color: #e0f2fe;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            color: var(--primary-dark);
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #0ea5e9;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        /* Print Overlay */
+        #print-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #print-area-wrapper {
+            background: white;
+            padding: 20px;
+            width: 210mm;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #print-area,
+            #print-area * {
+                visibility: visible;
+            }
+
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Official Documents Style */
+        .doc-paper {
+            font-family: 'Times New Roman', serif;
+            color: black;
+            padding: 20px;
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .doc-body {
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .doc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Xizmat Safari</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <!-- Sidebar -->
+        <nav class="sidebar no-print">
+            <div class="brand">
+                ✈️ XIZMAT SAFARI
+                <small style="display:block; font-size:0.8rem; font-weight:normal; opacity:0.7;">FAXR MADAD
+                    KONSALT</small>
+            </div>
+            <div style="flex:1;">
+                <button class="nav-btn active" onclick="showView('list')">📋 Safarlar Ro'yxati</button>
+                <button class="nav-btn" onclick="showView('create')">➕ Yangi Safar (Buyruq)</button>
+                <button class="nav-btn" onclick="showView('expenses')">💰 Avans Hisoboti (AO-1)</button>
+                <button class="nav-btn" onclick="showView('employees')">👥 Xodimlar</button>
+                <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                    <button class="nav-btn" onclick="openQuiz()" style="color:#dbebff;">🧠 Bilimni Sinash</button>
+                </div>
+            </div>
+            <div style="font-size:0.8rem; text-align:center; opacity:0.6;">v1.0 (2025)</div>
+        </nav>
+
+        <!-- Main -->
+        <main class="main-content">
+            <!-- 1. ACTIVE TRIPS LIST -->
+            <div id="view-list">
+                <div class="card">
+                    <h2 class="section-title">
+                        Xizmat Safarlari Reestri
+                        <button class="btn btn-primary" onclick="showView('create')">+ Yangi Buyruq</button>
+                    </h2>
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Buyruq №</th>
+                                    <th>Sana</th>
+                                    <th>Xodim</th>
+                                    <th>Manzil (Shahar/Tashkilot)</th>
+                                    <th>Muddat</th>
+                                    <th>Holat</th>
+                                    <th>Amallar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trips-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. CREATE TRIP FORM -->
+            <div id="view-create" style="display:none;">
+                <div class="card">
+                    <h2 class="section-title">Yangi Xizmat Safari Buyrug'ini Rasmiylashtirish</h2>
+                    <form id="trip-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Xodimni tanlang</label>
+                                <select id="t-employee" required>
+                                    <option value="">Tanlang...</option>
+                                    <!-- JS fills -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Buyruq Raqami</label>
+                                <input type="text" id="t-doc-num" placeholder="№ 5-K" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Qayerga (Shahar/Viloyat)</label>
+                                <input type="text" id="t-city" placeholder="Toshkent shahri" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tashkilot nomi</label>
+                                <input type="text" id="t-org" placeholder="Masalan: 'Grand Trade' MChJ" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Boshlanish Sanasi</label>
+                                <input type="date" id="t-start-date" required onchange="calcDays()">
+                            </div>
+                            <div class="form-group">
+                                <label>Tugash Sanasi</label>
+                                <input type="date" id="t-end-date" required onchange="calcDays()">
+                            </div>
+                            <div class="form-group">
+                                <label>Kunlar Soni</label>
+                                <input type="number" id="t-days" readonly style="background:#f1f5f9;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Safar Maqsadi</label>
+                            <textarea id="t-purpose" rows="3"
+                                placeholder="Masalan: Shartnoma imzolash va mahsulot sifatini tekshirish"
+                                required></textarea>
+                        </div>
+
+                        <div style="margin-top:2rem;">
+                            <button type="submit" id="btn-save" class="btn btn-primary">💾 Saqlash</button>
+                            <button type="button" class="btn btn-secondary" onclick="showView('list')">Bekor
+                                qilish</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 3. EXPENSE REPORTS (AO-1) -->
+            <div id="view-expenses" style="display:none;">
+                <div class="card">
+                    <h2 class="section-title">
+                        Avans Hisobotlari (AO-1)
+                        <button class="btn btn-primary" onclick="showExpenseForm()">+ Yangi Hisobot</button>
+                    </h2>
+
+                    <!-- LIST -->
+                    <div id="expenses-list-view">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sana</th>
+                                    <th>Xodim</th>
+                                    <th>Buyruq №</th>
+                                    <th>Jami Xarajat</th>
+                                    <th>Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- FORM -->
+                    <div id="expenses-form-view"
+                        style="display:none; margin-top:20px; border-top:1px dashed #ccc; padding-top:20px;">
+                        <h3 style="color:var(--primary-dark)">Hisobotni To'ldirish</h3>
+                        <form id="expense-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Safar (Buyruq)ni tanlang</label>
+                                    <select id="ex-trip" required onchange="fillTripDetails()">
+                                        <option value="">Tanlang...</option>
+                                        <!-- JS fills -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hisobot Sanasi</label>
+                                    <input type="date" id="ex-date" required>
+                                </div>
+                            </div>
+
+                            <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin-bottom:15px;">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Sutkalik (Kunlik) - Avto (Kun x Rate)</label>
+                                        <div style="display:flex; gap:5px;">
+                                            <input type="number" id="ex-days" placeholder="Kun" style="width:70px"
+                                                readonly>
+                                            <input type="number" id="ex-rate" placeholder="Rate" value="185000"
+                                                onchange="calcExTotal()">
+                                            <input type="number" id="ex-daily-total" readonly
+                                                style="font-weight:bold; background:#e2e8f0;">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mehmonxona (Jami)</label>
+                                        <input type="number" id="ex-hotel" value="0" onchange="calcExTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Yo'l kira (Aviachipta/Poyezd)</label>
+                                        <input type="number" id="ex-transport" value="0" onchange="calcExTotal()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Boshqa Xarajatlar</label>
+                                        <input type="number" id="ex-other" value="0" onchange="calcExTotal()">
+                                    </div>
+                                </div>
+                                <div
+                                    style="text-align:right; font-size:1.2rem; font-weight:bold; color:var(--primary-dark); margin-top:10px;">
+                                    Jami: <span id="ex-grand-total">0</span> so'm
+                                </div>
+                            </div>
+
+                            <div style="margin-top:20px;">
+                                <button type="submit" id="btn-ex-save" class="btn btn-primary">Saqlash</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideExpenseForm()">Bekor
+                                    qilish</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. EMPLOYEES -->
+            <div id="view-employees" style="display:none;">
+                <div class="card">
+                    <h2 class="section-title">Xodimlar Bazasi</h2>
+                    <form id="emp-form"
+                        style="background:#f8fafc; padding:1.5rem; border-radius:1rem; margin-bottom:2rem;">
+                        <div class="form-grid">
+                            <div class="form-group"><label>F.I.SH</label><input type="text" id="e-name" required
+                                    placeholder="Abdullaev Suxrat"></div>
+                            <div class="form-group"><label>Lavozimi</label><input type="text" id="e-role" required
+                                    placeholder="Bosh hisobchi"></div>
+                            <div class="form-group"><label>Pasport</label><input type="text" id="e-passport"
+                                    placeholder="AA 1234567"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Qo'shish</button>
+                    </form>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>F.I.SH</th>
+                                <th>Lavozim</th>
+                                <th>Pasport</th>
+                                <th>Amal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emp-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- PRINT OVERLAY -->
+        <div id="print-overlay" class="no-print">
+            <div id="print-area-wrapper">
+                <div style="text-align:right; margin-bottom:10px;">
+                    <button onclick="window.print()" class="btn btn-primary">🖨️ Chop etish</button>
+                    <button onclick="closePrint()" class="btn btn-secondary">Yopish</button>
+                </div>
+                <div id="print-area"></div>
+            </div>
+        </div>
+
+        <script>
+            // DATA
+            // DATA
+            let trips = [];
+            let employees = [];
+            let expenses = [];
+            let editingTripId = null;
+            let editingExId = null;
+            let currentUser = null;
+
+            // INIT
+            window.onload = function () {
+                checkLogin();
+            };
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('safari_user');
+                const storedGroup = sessionStorage.getItem('safari_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadData();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('safari_user', name);
+                    sessionStorage.setItem('safari_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadData();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('safari_user');
+                    sessionStorage.removeItem('safari_group');
+                    location.reload();
+                }
+            }
+
+            function loadData() {
+                if (!currentUser) return;
+                trips = JSON.parse(localStorage.getItem('safari_trips_' + currentUser) || '[]');
+                employees = JSON.parse(localStorage.getItem('safari_employees_' + currentUser) || '[]');
+                expenses = JSON.parse(localStorage.getItem('safari_expenses_' + currentUser) || '[]');
+
+                if (employees.length === 0) {
+                    // Demo employees
+                    employees = [{
+                        id: 1,
+                        name: "Abdullaev Suxrat",
+                        role: "Direktor",
+                        passport: "AB 1234567"
+                    }, {
+                        id: 2,
+                        name: "Karimov jamshid",
+                        role: "Menejer",
+                        passport: "CD 9876543"
+                    }];
+                    saveEmp();
+                }
+                renderTrips();
+                renderEmployees();
+                updateEmpSelect();
+            }
+
+            // NAV
+            function showView(view) {
+                document.querySelectorAll('main > div').forEach(d => d.style.display = 'none');
+                document.getElementById('view-' + view).style.display = 'block';
+
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                if (view === 'list') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+                if (view === 'create') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+                if (view === 'employees') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+
+                if (view !== 'create') cancelEdit();
+            }
+
+            // --- TRIPS LOGIC ---
+            function calcDays() {
+                const s = document.getElementById('t-start-date').valueAsDate;
+                const e = document.getElementById('t-end-date').valueAsDate;
+                if (s && e) {
+                    const diff = (e - s) / (1000 * 60 * 60 * 24);
+                    document.getElementById('t-days').value = diff >= 0 ? diff + 1 : 0;
+                }
+            }
+
+            document.getElementById('trip-form').onsubmit = function (e) {
+                e.preventDefault();
+                const empId = document.getElementById('t-employee').value;
+                const emp = employees.find(x => x.id == empId);
+
+                const trip = {
+                    id: editingTripId || Date.now(),
+                    empName: emp.name,
+                    empRole: emp.role,
+                    empId: emp.id,
+                    docNum: document.getElementById('t-doc-num').value,
+                    city: document.getElementById('t-city').value,
+                    org: document.getElementById('t-org').value,
+                    start: document.getElementById('t-start-date').value,
+                    end: document.getElementById('t-end-date').value,
+                    days: document.getElementById('t-days').value,
+                    purpose: document.getElementById('t-purpose').value
+                };
+
+                if (editingTripId) {
+                    const idx = trips.findIndex(t => t.id === editingTripId);
+                    if (idx !== -1) trips[idx] = trip;
+                } else {
+                    trips.unshift(trip);
+                }
+
+                saveTrips();
+                showView('list');
+            };
+
+            function renderTrips() {
+                const tbody = document.getElementById('trips-body');
+                tbody.innerHTML = '';
+                trips.forEach(t => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td><b>${t.docNum}</b></td>
+                    <td>${t.start}</td>
+                    <td>${t.empName}<br><small style="color:#64748b">${t.empRole}</small></td>
+                    <td>${t.city}<br><small>${t.org}</small></td>
+                    <td>${t.days} kun</td>
+                    <td><span style="color:green; background:#dcfce7; padding:2px 6px; border-radius:4px;">Faol</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding:5px;" onclick="printDoc('buyruq', ${t.id})" title="Buyruqni chop etish">📜</button>
+                        <button class="btn btn-secondary" style="padding:5px;" onclick="printDoc('guvohnoma', ${t.id})" title="Guvohnomani chop etish">✈️</button>
+                        <button class="btn btn-info" style="padding:5px;" onclick="editTrip(${t.id})">✏️</button>
+                        <button class="btn btn-danger" style="padding:5px;" onclick="deleteTrip(${t.id})">🗑️</button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function editTrip(id) {
+                const t = trips.find(x => x.id === id);
+                if (!t) return;
+                showView('create');
+                editingTripId = id;
+
+                document.getElementById('t-employee').value = t.empId;
+                document.getElementById('t-doc-num').value = t.docNum;
+                document.getElementById('t-city').value = t.city;
+                document.getElementById('t-org').value = t.org;
+                document.getElementById('t-start-date').value = t.start;
+                document.getElementById('t-end-date').value = t.end;
+                document.getElementById('t-days').value = t.days;
+                document.getElementById('t-purpose').value = t.purpose;
+
+                document.getElementById('btn-save').innerText = "💾 O'zgartirish";
+            }
+
+            function cancelEdit() {
+                editingTripId = null;
+                document.getElementById('trip-form').reset();
+                document.getElementById('btn-save').innerText = "💾 Saqlash";
+            }
+
+            function deleteTrip(id) {
+                if (!confirm("O'chirasizmi?")) return;
+                trips = trips.filter(t => t.id !== id);
+                saveTrips();
+            }
+
+            function saveTrips() {
+                if (!currentUser) return;
+                localStorage.setItem('safari_trips_' + currentUser, JSON.stringify(trips));
+                renderTrips();
+            }
+
+            // --- EMPLOYEES LOGIC ---
+            document.getElementById('emp-form').onsubmit = function (e) {
+                e.preventDefault();
+                const emp = {
+                    id: Date.now(),
+                    name: document.getElementById('e-name').value,
+                    role: document.getElementById('e-role').value,
+                    passport: document.getElementById('e-passport').value
+                };
+                employees.push(emp);
+                saveEmp();
+                this.reset();
+            };
+
+            function saveEmp() {
+                if (!currentUser) return;
+                localStorage.setItem('safari_employees_' + currentUser, JSON.stringify(employees));
+                renderEmployees();
+                updateEmpSelect();
+            }
+
+            function renderEmployees() {
+                const tbody = document.getElementById('emp-body');
+                tbody.innerHTML = '';
+                employees.forEach(e => {
+                    tbody.innerHTML += `<tr><td>${e.name}</td><td>${e.role}</td><td>${e.passport}</td><td><button onclick="deleteEmp(${e.id})" class="btn btn-danger" style="padding:5px;">x</button></td></tr>`;
+                });
+            }
+
+            function deleteEmp(id) {
+                employees = employees.filter(e => e.id !== id);
+                saveEmp();
+            }
+
+            function updateEmpSelect() {
+                const sel = document.getElementById('t-employee');
+                sel.innerHTML = '<option value="">Tanlang...</option>';
+                employees.forEach(e => {
+                    const opt = document.createElement('option');
+                    opt.value = e.id;
+                    opt.text = e.name;
+                    sel.appendChild(opt);
+                });
+            }
+
+            // --- EXPENSE REPORT LOGIC ---
+            function showExpenseForm() {
+                document.getElementById('expenses-list-view').style.display = 'none';
+                document.getElementById('expenses-form-view').style.display = 'block';
+                document.getElementById('ex-date').valueAsDate = new Date();
+                updateExTripSelect();
+            }
+
+            function hideExpenseForm() {
+                document.getElementById('expenses-list-view').style.display = 'block';
+                document.getElementById('expenses-form-view').style.display = 'none';
+                cancelEditEx();
+            }
+
+            function updateExTripSelect() {
+                const sel = document.getElementById('ex-trip');
+                sel.innerHTML = '<option value="">Tanlang...</option>';
+                trips.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.text = `${t.docNum} - ${t.empName} (${t.city})`;
+                    sel.appendChild(opt);
+                });
+            }
+
+            function fillTripDetails() {
+                const id = document.getElementById('ex-trip').value;
+                const t = trips.find(x => x.id == id);
+                if (t) {
+                    document.getElementById('ex-days').value = t.days;
+                    calcExTotal();
+                }
+            }
+
+            function calcExTotal() {
+                const days = parseFloat(document.getElementById('ex-days').value) || 0;
+                const rate = parseFloat(document.getElementById('ex-rate').value) || 0;
+                const dailyTotal = days * rate;
+                document.getElementById('ex-daily-total').value = dailyTotal;
+
+                const hotel = parseFloat(document.getElementById('ex-hotel').value) || 0;
+                const transport = parseFloat(document.getElementById('ex-transport').value) || 0;
+                const other = parseFloat(document.getElementById('ex-other').value) || 0;
+
+                const total = dailyTotal + hotel + transport + other;
+                document.getElementById('ex-grand-total').innerText = total.toLocaleString();
+            }
+
+            document.getElementById('expense-form').onsubmit = function (e) {
+                e.preventDefault();
+                const tripId = document.getElementById('ex-trip').value;
+                const t = trips.find(x => x.id == tripId);
+
+                const ex = {
+                    id: Date.now(),
+                    tripId: tripId,
+                    date: document.getElementById('ex-date').value,
+                    empName: t.empName,
+                    docNum: t.docNum,
+                    daily: parseFloat(document.getElementById('ex-daily-total').value),
+                    hotel: parseFloat(document.getElementById('ex-hotel').value),
+                    transport: parseFloat(document.getElementById('ex-transport').value),
+                    other: parseFloat(document.getElementById('ex-other').value),
+                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/,/g, ''))
+                };
+
+                if (editingExId) {
+                    const idx = expenses.findIndex(x => x.id === editingExId);
+                    if (idx !== -1) expenses[idx] = ex;
+                } else {
+                    expenses.unshift(ex);
+                }
+
+                localStorage.setItem('safari_expenses_' + currentUser, JSON.stringify(expenses));
+                renderExpenses();
+                hideExpenseForm();
+            };
+
+            function renderExpenses() {
+                const tbody = document.getElementById('expenses-body');
+                tbody.innerHTML = '';
+                expenses.forEach(ex => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td>${ex.date}</td>
+                    <td>${ex.empName}</td>
+                    <td>${ex.docNum}</td>
+                    <td style="font-weight:bold;">${ex.total.toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding:5px;" onclick="printDoc('ao1', ${ex.id})">🖨️</button>
+                        <button class="btn btn-info" style="padding:5px;" onclick="editEx(${ex.id})">✏️</button>
+                        <button class="btn btn-danger" style="padding:5px;" onclick="deleteEx(${ex.id})">🗑️</button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function editEx(id) {
+                const ex = expenses.find(x => x.id === id);
+                if (!ex) return;
+
+                showExpenseForm();
+                editingExId = id;
+
+                document.getElementById('ex-trip').value = ex.tripId;
+                document.getElementById('ex-date').value = ex.date;
+                document.getElementById('ex-days').value = (ex.daily / (parseFloat(document.getElementById('ex-rate').value) || 185000)); // Approx reverse or store days? 
+                // Better to rely on manual calc or just let user re-enter?
+                // Let's actually store days in the object next time. For now, we can try to infer or just set the total daily amount.
+                document.getElementById('ex-daily-total').value = ex.daily;
+                document.getElementById('ex-hotel').value = ex.hotel;
+                document.getElementById('ex-transport').value = ex.transport;
+                document.getElementById('ex-other').value = ex.other;
+                document.getElementById('ex-grand-total').innerText = ex.total.toLocaleString();
+
+                // Re-trigger calc is safer if we want to support rate changes, 
+                // but if we just want to show stored values:
+
+                document.getElementById('btn-ex-save').innerText = "💾 O'zgartirish";
+            }
+
+            function cancelEditEx() {
+                editingExId = null;
+                document.getElementById('expense-form').reset();
+                document.getElementById('btn-ex-save').innerText = "Saqlash";
+                document.getElementById('ex-grand-total').innerText = "0";
+            }
+
+            function deleteEx(id) {
+                if (!confirm("O'chirasizmi?")) return;
+                expenses = expenses.filter(e => e.id !== id);
+                localStorage.setItem('safari_expenses', JSON.stringify(expenses));
+                renderExpenses();
+            }
+
+            // --- PRINTING LOGIC ---
+            function printDoc(type, id) {
+                const t = trips.find(x => x.id === id);
+                if (!t) return;
+                const area = document.getElementById('print-area');
+
+                if (type === 'buyruq') {
+                    area.innerHTML = `
+                    <div class="doc-paper">
+                        <div style="text-align:center; font-weight:bold; margin-bottom:20px;">
+                            "FAXR MADAD KONSALT" MChJ<br>
+                            BUYRUQ № ${t.docNum}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
+                            <div>${t.city} sh.</div>
+                            <div>${new Date().toLocaleDateString('uz-UZ')}</div>
+                        </div>
+                        <div class="doc-header">XIZMAT SAFARIGA YUBORISH TO'G'RISIDA</div>
+                        <div class="doc-body">
+                            <p>
+                                Korxonaning ishlab chiqarish (xizmat) zaruriyatidan kelib chiqib, 
+                                <b>${t.empRole}</b> lavozimidagi <b>${t.empName}</b> 
+                                quyidagi shartlar asosida xizmat safariga yuborilsin:
+                            </p>
+                            <ul>
+                                <li><b>Manzil:</b> ${t.city} shahri, "${t.org}" tashkiloti.</li>
+                                <li><b>Muddat:</b> ${t.start} dan ${t.end} gacha (${t.days} kun).</li>
+                                <li><b>Maqsad:</b> ${t.purpose}.</li>
+                            </ul>
+                            <p>
+                                Bosh hisobchiga: Xizmat safari bilan bog'liq barcha xarajatlar (yo'l kira, yashash, sutkalik) 
+                                belgilangan me'yorlar asosida qoplab berilsin.
+                            </p>
+                        </div>
+                        <div class="doc-row">
+                            <div style="font-weight:bold;">Direktor:</div>
+                            <div style="border-bottom:1px solid black; width:200px;"></div>
+                        </div>
+                        <div class="doc-row">
+                             <div style="font-weight:bold;">Buyruq bilan tanishdim:</div>
+                             <div style="border-bottom:1px solid black; width:200px;"></div>
+                        </div>
+                    </div>
+                `;
+                } else if (type === 'guvohnoma') {
+                    area.innerHTML = `
+                    <div class="doc-paper" style="border:2px solid black; padding:30px;">
+                        <div style="text-align:center; font-weight:bold; border-bottom:1px solid black; padding-bottom:10px; margin-bottom:20px;">
+                            XIZMAT SAFARI GUVOHNOMASI <br> № ${t.docNum}
+                        </div>
+                        <div class="doc-body">
+                            <p>Berildi: <b>${t.empName}</b> (${t.empRole})</p>
+                            <p>Qayerga: <b>${t.city}, ${t.org}</b></p>
+                            <p>Xizmat safari maqsadi: ${t.purpose}</p>
+                            <p>Muddat: <b>${t.days}</b> kun (<b>${t.start}</b> dan <b>${t.end}</b> gacha)</p>
+                            <p>Pasport ma'lumotlari: ____________________</p>
+                        </div>
+                        <div style="margin-top:40px; border-top:1px solid black; padding-top:20px;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <div><b>Jo'nab ketdi:</b><br>${t.start}<br>Imzo/Muhr: _________</div>
+                                <div><b>Yetib keldi:</b><br>____________<br>Imzo/Muhr: _________</div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                                <div><b>Jo'nab ketdi (manzildan):</b><br>____________<br>Imzo/Muhr: _________</div>
+                                <div><b>Yetib keldi (qaytish):</b><br>${t.end}<br>Imzo/Muhr: _________</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                } else if (type === 'ao1') {
+                    const ex = expenses.find(x => x.id === id);
+                    if (!ex) return;
+                    area.innerHTML = `
+                    <div class="doc-paper">
+                        <div style="text-align:right; font-size:0.8rem;">AO-1 Shakli</div>
+                        <div style="text-align:center; font-weight:bold; margin:20px 0;">
+                            AVANS HISOBOTI № ${ex.id.toString().slice(-4)} <br>
+                            Sana: ${ex.date}
+                        </div>
+                        <div class="doc-body">
+                            <p><b>Xodim:</b> ${ex.empName}</p>
+                            <p><b>Asos (Buyruq):</b> ${ex.docNum}</p>
+                            
+                            <table style="width:100%; margin-top:20px; border:1px solid black;">
+                                <thead>
+                                    <tr style="background:#eee;">
+                                        <th style="border:1px solid black;">Xarajat Nomi</th>
+                                        <th style="border:1px solid black; text-align:right;">Summa (so'm)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="border:1px solid black;">Sutkalik xarajatlar (Komandirovochniy)</td>
+                                        <td style="border:1px solid black; text-align:right;">${ex.daily.toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border:1px solid black;">Mehmonxona (Yashash joyi)</td>
+                                        <td style="border:1px solid black; text-align:right;">${ex.hotel.toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border:1px solid black;">Yo'l kira (Transport)</td>
+                                        <td style="border:1px solid black; text-align:right;">${ex.transport.toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border:1px solid black;">Boshqa xarajatlar</td>
+                                        <td style="border:1px solid black; text-align:right;">${ex.other.toLocaleString()}</td>
+                                    </tr>
+                                    <tr style="font-weight:bold;">
+                                        <td style="border:1px solid black;">JAMI</td>
+                                        <td style="border:1px solid black; text-align:right;">${ex.total.toLocaleString()}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div style="margin-top:40px; display:flex; justify-content:space-between;">
+                                <div>
+                                    Hisobot topshiruvchi:<br>
+                                    _________________ (Imzo)
+                                </div>
+                                <div>
+                                    Hisobchi:<br>
+                                    _________________ (Imzo)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                }
+
+                document.getElementById('print-overlay').style.display = 'flex';
+            }
+
+            function closePrint() {
+                document.getElementById('print-overlay').style.display = 'none';
+            }
+
+        </script>
+        <script>
+            // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
+            const quizQuestions = [
+                { q: "Xizmat safari uchun kassadan avans berildi (2,000,000 so'm)", dt: "4211", kt: "5010", sum: 2000000 },
+                { q: "Xizmat safari uchun bankdan plastik kartaga pul o'tkazildi (3,000,000 so'm)", dt: "4211", kt: "5110", sum: 3000000 },
+                { q: "Avans hisoboti (AO-1) tasdiqlandi: Sutkalik xarajatlar (500,000 so'm)", dt: "9420", kt: "4211", sum: 500000 },
+                { q: "Mehmonxona xarajati (QQSsiz) hisobdan chiqarildi (1,000,000 so'm)", dt: "9420", kt: "4211", sum: 1000000 },
+                { q: "Mehmonxona xarajati uchun QQS hisobga olindi (120,000 so'm)", dt: "4410", kt: "4211", sum: 120000 },
+                { q: "Aviachipta sotib olindi (Pul o'tkazish yo'li bilan) (2,000,000 so'm)", dt: "4310", kt: "5110", sum: 2000000 },
+                { q: "Aviachipta 'Pul hujjatlari' sifatida kirim qilindi (2,000,000 so'm)", dt: "5610", kt: "4310", sum: 2000000 },
+                { q: "Xodimga aviachipta berildi (Hisobdorlikka) (2,000,000 so'm)", dt: "4211", kt: "5610", sum: 2000000 },
+                { q: "Foydalanilmagan avans summasi kassaga qaytarildi (100,000 so'm)", dt: "5010", kt: "4211", sum: 100000 },
+                { q: "Safar xarajatlari ishlab chiqarish tannarxiga qo'shildi (Sex boshlig'i) (1,500,000 so'm)", dt: "2510", kt: "4211", sum: 1500000 }
+            ];
+
+            let currentQIndex = 0;
+
+            function openQuiz() {
+                currentQIndex = 0;
+                document.getElementById('quiz-modal').style.display = 'flex';
+                loadQuestion();
+            }
+
+            function closeQuiz() {
+                document.getElementById('quiz-modal').style.display = 'none';
+            }
+
+            function loadQuestion() {
+                if (currentQIndex >= quizQuestions.length) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h2 style="color:#0ea5e9;">🎉 Tabriklaymiz!</h2>
+                        <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                        <button onclick="closeQuiz()" class="btn btn-primary" style="width:100%">Yopish</button>
+                        <button onclick="openQuiz()" class="btn btn-secondary" style="width:100%; margin-top:10px;">Qayta ishlash</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const q = quizQuestions[currentQIndex];
+                // Reset content if it was overwritten
+                if (!document.getElementById('q-text')) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#0f172a;" id="q-text"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet (Schyot)</label>
+                            <input type="text" id="q-dt" placeholder="Mas: 4211" class="form-control" style="width:100%">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Kredit (Schyot)</label>
+                            <input type="text" id="q-kt" placeholder="Mas: 5010" class="form-control" style="width:100%">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Summa</label>
+                        <input type="number" id="q-sum" placeholder="So'mda kiriting" class="form-control" style="width:100%">
+                    </div>
+                    <div id="q-feedback" style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;"></div>
+                    <button onclick="checkAnswer()" class="btn btn-primary" style="background:#0ea5e9; width:100%;">Tekshirish</button>
+                 `;
+                }
+
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-dt').value = '';
+                document.getElementById('q-kt').value = '';
+                document.getElementById('q-sum').value = '';
+                document.getElementById('q-feedback').innerText = '';
+                document.getElementById('q-feedback').style.display = 'none';
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('q-dt').value.trim();
+                const kt = document.getElementById('q-kt').value.trim();
+                const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+                const target = quizQuestions[currentQIndex];
+                const feedback = document.getElementById('q-feedback');
+
+                if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                    feedback.innerHTML = '<span style="color:var(--success-color); font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                    feedback.style.display = 'block';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.style.display = 'block';
+                }
+            }
+        </script>
+
+        <!-- QUIZ MODAL -->
+        <div class="modal-overlay" id="quiz-modal" style="display:none; z-index:9999;">
+            <div class="login-modal-box" style="max-width:500px; padding:0; overflow:hidden; text-align:left;">
+                <div class="header"
+                    style="background:var(--primary-color); padding:1rem; display:flex; justify-content:space-between; align-items:center; color:white;">
+                    <h3 style="margin:0;">🧠 Bilimni Sinash</h3>
+                    <button onclick="closeQuiz()"
+                        style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; width:auto;">&times;</button>
+                </div>
+                <div style="padding:1.5rem;" id="quiz-content">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

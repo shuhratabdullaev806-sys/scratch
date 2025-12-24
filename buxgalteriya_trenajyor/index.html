@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provodkalar Ustasi - Trenajyor</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --success: #22c55e;
+            --error: #ef4444;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --text: #1f2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        header small {
+            opacity: 0.8;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .game-area {
+            padding: 30px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .score {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .question-box {
+            background: #eef2ff;
+            border: 2px solid #c7d2fe;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .dt-label {
+            color: var(--success);
+        }
+
+        .kt-label {
+            color: var(--error);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-check {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-check:hover {
+            background: #4338ca;
+        }
+
+        .btn-check:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .next-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .level-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .level-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: default;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🎯 Provodkalar Ustasi</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <div class="user-info" id="user-display">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <div class="container">
+            <header>
+                <h1>🎯 Provodkalar Ustasi</h1>
+                <small>"FAXR MADAD KONSALT" | Muallif: Suxrat Abdullaev</small>
+            </header>
+
+            <div class="game-area">
+                <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+                    <button onclick="setLevel('easy')" class="level-btn active" id="lvl-easy">🟢 Oson</button>
+                    <button onclick="setLevel('medium')" class="level-btn" id="lvl-medium">🟡 O'rta</button>
+                    <button onclick="setLevel('hard')" class="level-btn" id="lvl-hard">🔴 Qiyin</button>
+                </div>
+
+                <div class="stats">
+                    <span>Savol: <span id="q-num">1</span></span>
+                    <span class="score">Ball: <span id="score">0</span></span>
+                </div>
+
+                <div class="question-box" id="question-text">
+                    Yuklanmoqda...
+                </div>
+
+                <div class="inputs">
+                    <div class="input-group">
+                        <label class="dt-label">DEBET (Dt)</label>
+                        <select id="sel-dt">
+                            <option value="">Tanlang...</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="kt-label">KREDIT (Kt)</label>
+                        <select id="sel-kt">
+                            <option value="">Tanlang...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-check" onclick="checkAnswer()" id="btn-action">✅ Tekshirish</button>
+
+                <div class="feedback" id="feedback"></div>
+                <div style="text-align:center;">
+                    <button class="next-btn" onclick="nextQuestion()" id="btn-next">Keyingi Savol ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // --- DATABASE ---
+            const accounts = [
+                { c: '0110', n: 'Asosiy vositalar (Yer, Bino)' },
+                { c: '0130', n: 'Invertar va xo\'jalik jihozlari' },
+                { c: '0710', n: 'O\'rnatiladigan uskunalar' },
+                { c: '1010', n: 'Materiallar (Xom-ashyo)' },
+                { c: '1090', n: 'Boshqa materiallar' },
+                { c: '2010', n: 'Asosiy ishlab chiqarish' },
+                { c: '2910', n: 'Tovarlar (Ombordagi)' },
+                { c: '3110', n: 'Kelgusi davr xarajatlari' },
+                { c: '4010', n: 'Xaridorlar (Bizdan qarzdorlar)' },
+                { c: '4210', n: 'Xodimlarga berilgan bo\'naklar (Avans)' },
+                { c: '4220', n: 'Xizmat safari uchun berilgan bo\'naklar' },
+                { c: '4230', n: 'Umumxo\'jalik xarajatlari uchun bo\'naklar' },
+                { c: '4310', n: 'Mol yetkazib beruvchilarga berilgan bo\'naklar' },
+                { c: '4610', n: 'Ustav kapitaliga ta\'sischilarning qarzi' },
+                { c: '4720', n: 'Xizmat safari bo\'yicha xodimlar bilan hisob' },
+                { c: '4730', n: 'Moddiy zarar bo\'yicha xodimlar qarzi' },
+                { c: '5010', n: 'Kassa (Naqd pul)' },
+                { c: '5110', n: 'Bank (Hisob raqam)' },
+                { c: '5210', n: 'Valyuta hisob raqami' },
+                { c: '5710', n: 'Yo\'ldagi pul mablag\'lari' },
+                { c: '6010', n: 'Mol yetkazib beruvchilar (Qarzimiz)' },
+                { c: '6310', n: 'Xaridorlardan olingan bo\'naklar (Avans)' },
+                { c: '6410', n: 'Byudjetga to\'lovlar (Soliq)' },
+                { c: '6510', n: 'Sug\'urta to\'lovlari' },
+                { c: '6610', n: 'Ta\'sischilarga to\'lanadigan dividendlar' },
+                { c: '6710', n: 'Xodimlar bilan hisob-kitob (Oylik)' },
+                { c: '6810', n: 'Ta\'sischilar bilan hisob-kitob' },
+                { c: '6910', n: 'Ijara bo\'yicha qarzlar' },
+                { c: '8330', n: 'Ustav kapitali' },
+                { c: '8710', n: 'Taqsimlanmagan foyda' },
+                { c: '9010', n: 'Mahsulot (Tayyor) sotishdan daromad' },
+                { c: '9020', n: 'Tovarlar sotishdan daromad' },
+                { c: '9030', n: 'Xizmatlar ko\'rsatishdan daromad' },
+                { c: '9040', n: 'Tovarlarni qaytarib olish (Vozvrat)' },
+                { c: '9110', n: 'Sotilgan mahsulot/tovar tannarxi' },
+                { c: '9410', n: 'Sotish xarajatlari' },
+                { c: '9420', n: 'Ma\'muriy xarajatlar' },
+                { c: '9390', n: 'Boshqa operatsion daromadlar' },
+                { c: '9430', n: 'Boshqa operatsion xarajatlar' },
+                { c: '9540', n: 'Valyuta kurs farqidan daromadlar' },
+                { c: '9620', n: 'Valyuta kurs farqidan zararlar' },
+                { c: '9810', n: 'Foyda solig\'i xarajatlari' },
+                { c: '9910', n: 'Yakuniy moliyaviy natija' }
+            ];
+
+            const questionsDB = {
+                easy: [
+                    { q: "Bankdan naqd pul yechib olindi va kassaga kirim qilindi.", dt: '5010', kt: '5110', expl: "Kassa ko'paydi (A+), Bank kamaydi (A-)." },
+                    { q: "Kassadan bankka pul topshirildi.", dt: '5110', kt: '5010', expl: "Bank ko'paydi (A+), Kassa kamaydi (A-)." },
+                    { q: "Xodimga kassadan oylik maosh berildi.", dt: '6710', kt: '5010', expl: "Xodim oldidagi qarz yopildi (P-), Kassa kamaydi (A-)." },
+                    { q: "Mol yetkazib beruvchiga bank orqali pul o'tkazildi.", dt: '6010', kt: '5110', expl: "Qarz kamaydi (P-), Bank kamaydi (A-)." },
+                    { q: "Xaridor bizga bank orqali pul to'ladi.", dt: '5110', kt: '4010', expl: "Bankdagi pul ko'paydi (A+), Xaridor qarzi kamaydi (A-)." },
+                    { q: "Kassadan xizmat safari uchun xodimga pul berildi.", dt: '4220', kt: '5010', expl: "Xizmat safari avansi (A+), Kassa kamaydi (A-)." },
+                    { q: "Kassadan mayda xarajatlar (konstovar) uchun pul berildi.", dt: '4230', kt: '5010', expl: "Xo'jalik xarajati avansi (A+), Kassa kamaydi (A-)." },
+                    { q: "Hisobdor shaxs ishlatilmagan pulni kassaga qaytardi (4230 yopildi).", dt: '5010', kt: '4230', expl: "Kassa ko'paydi (A+), Xodim qarzi kamaydi (A-)." },
+                    { q: "Bankdan soliq to'landi.", dt: '6410', kt: '5110', expl: "Soliq qarzi kamaydi (P-), Bank kamaydi (A-)." },
+                    { q: "Ta'sischi ustav kapitaliga pul tikdi.", dt: '5110', kt: '4610', expl: "Bank ko'paydi (A+), Ta'sischi qarzi kamaydi (A-)." },
+                    { q: "Omborga material sotib olindi (puli to'lanmadi).", dt: '1010', kt: '6010', expl: "Material ko'paydi (A+), Yetkazib beruvchidan qarz bo'ldik (P+)." },
+                    { q: "Ombordan ishlab chiqarishga material berildi.", dt: '2010', kt: '1010', expl: "Ishlab chiqarish xarajati oshdi (A+), Material kamaydi (A-)." },
+                    { q: "Hisobdor shaxs xizmat safari hisobotini topshirdi (Xarajat tasdiqlandi).", dt: '9420', kt: '4220', expl: "Xarajat tan olindi (Ma'muriy), Avans yopildi." },
+                    { q: "Xodimning oyligidan daromad solig'i ushlab qolindi.", dt: '6710', kt: '6410', expl: "Xodimga qarz kamaydi (P-), Soliqqa qarz oshdi (P+)." },
+                    { q: "Sotuvchi bizga tovar yetkazib berdi (nasiyaga).", dt: '2910', kt: '6010', expl: "Tovar ko'paydi (A+), Qarz oshdi (P+)." },
+                    { q: "Bank xizmat haqi ushlab qolindi.", dt: '9430', kt: '5110', expl: "Boshqa operatsion xarajat (A+), Bank kamaydi (A-)." }
+                ],
+                medium: [
+                    { q: "Ofis ijarasi uchun hisob-faktura keldi.", dt: '9420', kt: '6910', expl: "Ma'muriy xarajat (A+), Ijara qarzi oshdi (P+)." },
+                    { q: "Ijara haqi bankdan to'landi.", dt: '6910', kt: '5110', expl: "Ijara qarzi kamaydi (P-), Bank puli kamaydi (A-)." },
+                    { q: "Aloqa xizmatlari (internet, telefon) uchun akt keldi.", dt: '9420', kt: '6010', expl: "Xarajat oshdi (A+), Yetkazib beruvchidan qarz oshdi (P+)." },
+                    { q: "Tovarlar xaridorga sotildi (tannarxi hisobdan chiqarildi).", dt: '9110', kt: '2910', expl: "Sotilgan tovar tannarxi oshdi (Xarajat), Tovar kamaydi." },
+                    { q: "Tovarlar xaridorga sotildi (sotish narxida daromad yozildi).", dt: '4010', kt: '9020', expl: "Xaridor qarzi oshdi (A+), Tovar sotishdan Daromad tan olindi (P+)." },
+                    { q: "Ishchilar oyligi hisoblandi (Ishlab chiqarish xodimlari).", dt: '2010', kt: '6710', expl: "Mahsulot tannarxiga qo'shildi (A+), Oylik qarzi oshdi (P+)." },
+                    { q: "Ma'muriy xodimlar oyligi hisoblandi.", dt: '9420', kt: '6710', expl: "Xarajat oshdi (A+), Oylik qarzi oshdi (P+)." },
+                    { q: "Yetkazib beruvchiga avans (bo'nak) to'landi.", dt: '4310', kt: '5110', expl: "Berilgan avans (Aktiv) oshdi, Bank puli kamaydi." },
+                    { q: "Xaridordan avans (bo'nak) kelib tushdi.", dt: '5110', kt: '6310', expl: "Bank puli oshdi, Olingan avans (Passiv) oshdi." },
+                    { q: "Elektr energiyasi uchun hisob-faktura (Ishlab chiqarishga).", dt: '2010', kt: '6010', expl: "Tannarxga kirdi (A+), Qarz oshdi (P+)." },
+                    { q: "Reklama xizmati uchun to'landi.", dt: '6010', kt: '5110', expl: "Agar avval qarz bo'lsa 6010, oldindan bo'lsa 4310. Keling qarzni yopdik deb olaylik." },
+                    { q: "Reklama xizmati ko'rsatildi (Act oldik).", dt: '9410', kt: '6010', expl: "Sotish xarajati oshdi, Qarz oshdi." },
+                    { q: "Asosiy vosita (kurer) sotib olindi.", dt: '0110', kt: '6010', expl: "AV kirim qilindi, Qarz oshdi." },
+                    { q: "Buzilgan tovar hisobdan chiqarildi (Zararga).", dt: '9420', kt: '2910', expl: "Zarar bo'ldi, Tovar kamaydi." },
+                    { q: "Yil oxirida foyda solig'i hisoblandi (Budjetga).", dt: '9810', kt: '6410', expl: "Foyda solig'i xarajati (Dt 9810), Soliq qarzi oshdi (Kt 6410)." },
+                    { q: "Xodim yetkazgan moddiy zarar aniqlandi (Aybdor topildi).", dt: '4730', kt: '9390', expl: "Xodim qarzdor bo'ldi (A+), Boshqa operatsion daromad (Qoplash) hisoblandi." },
+                    { q: "Xodim moddiy zararni to'ladi (Kassaga).", dt: '5010', kt: '4730', expl: "Kassa oshdi, Xodim qarzi yopildi." }
+                ],
+                hard: [
+                    { q: "Chet el valyutasi sotib olindi (Konvertatsiya).", dt: '5210', kt: '5110', expl: "Valyuta oshdi (A+), So'm kamaydi (A-)." },
+                    { q: "Valyuta kursi oshdi (Ijobiy kurs farqi - Bankdagi pul).", dt: '5210', kt: '9540', expl: "Valyuta qiymati oshdi (A+), Daromad ko'rildi (P+)." },
+                    { q: "Valyuta kursi tushdi (Salbiy kurs farqi - Bankdagi pul).", dt: '9620', kt: '5210', expl: "Zarar ko'rildi (A+), Valyuta qiymati tushdi (A-)." },
+                    { q: "Ta'sischilarga dividend hisoblandi (Foydadan).", dt: '8710', kt: '6610', expl: "Taqsimlanmagan foyda kamaydi (P-), Dividend qarzi oshdi (P+)." },
+                    { q: "Dividend to'landi (Soliq ushlab qolgandan keyin).", dt: '6610', kt: '5110', expl: "Dividend qarzi yopildi, Bankdan pul ketdi." },
+                    { q: "Ustav kapitali shakllantirildi (Ro'yxatdan o'tildi).", dt: '4610', kt: '8330', expl: "Ta'sischilar qarzi paydo bo'ldi (A+), Ustav kapitali oshdi (P+)." },
+                    { q: "Yil yakunida daromadlar yopildi (9010 -> 9910).", dt: '9010', kt: '9910', expl: "Daromad schyoti nil qilindi (Dt), Foyda schyotiga o'tdi (Kt)." },
+                    { q: "Yil yakunida xarajatlar yopildi (9420 -> 9910).", dt: '9910', kt: '9420', expl: "Foyda kamaydi (Dt), Xarajat schyoti nol qilindi (Kt)." },
+                    { q: "Sof foyda taqsimlanmagan foydaga o'tkazildi.", dt: '9910', kt: '8710', expl: "Yillik natija (Foyda) kapitalga qo'shildi." },
+                    { q: "Kelgusi yil uchun obuna to'lovi (Oldindan to'lov).", dt: '3110', kt: '5110', expl: "Kelgusi davr xarajati (Aktiv) oshdi, Bank kamaydi." },
+                    { q: "Internet uchun to'langan oldindan to'lov xarajatga olib borildi (Oy tugadi).", dt: '9420', kt: '3110', expl: "Joriy davr xarajati bo'ldi, Kelgusi davr xarajati kamaydi." },
+                    { q: "O'rnatiladigan uskuna sotib olindi.", dt: '0710', kt: '6010', expl: "Uskuna (montaj qilinmagan) kirim, Qarz oshdi." },
+                    { q: "Uskuna montaj qilindi va ishga tushirildi (01 ga o'tdi).", dt: '0110', kt: '0710', expl: "Asosiy vosita bo'ldi (A+), 0710 yopildi (A-)." },
+                    { q: "Arzon baholi buyumlar (Inventar) hisobdan chiqarildi.", dt: '9420', kt: '0130', expl: "Xarajatga olib borildi, Inventar kamaydi." },
+                    { q: "Yo'ldagi pullar (Inkomissiya) bankka kelib tushdi.", dt: '5110', kt: '5710', expl: "Bank oshdi, Yo'ldagi pul nol bo'ldi." },
+                    { q: "Kassadagi pulni inkassator olib ketdi (hali bankka yetmadi).", dt: '5710', kt: '5010', expl: "Yo'ldagi pul oshdi, Kassa kamaydi." },
+                    { q: "Xaridor tovarni qaytarib berdi (vozvrat).", dt: '9040', kt: '4010', expl: "Tovarlar qaytarilganda 9040 (Vozvrat) debetlanadi, Xaridor qarzi (4010) kamayadi." },
+                    { q: "Qaytarilgan tovar omborga kirim qilindi.", dt: '2910', kt: '9110', expl: "Tovar tiklandi (Dt), Tannarx xarajati kamaydi (Kt)." },
+                    { q: "Tekin olingan mulk (Daromad).", dt: '0110', kt: '8530', expl: "AV oshdi, Tekin olingan mulk (Kapital) oshdi. (8530 ro'yxatda yo'q, 93xx bo'lishi ham mumkin. Keling oddiyroq: 9380). Keling bu savolni o'zgartiramiz: Amortizatsiya hisoblandi." },
+                    { q: "Asosiy vositaga amortizatsiya hisoblandi (Ma'muriy).", dt: '9420', kt: '0200', expl: "Xarajat oshdi, Eskirish oshdi. (0200 ni 0110 dan ayiramiz deb o'rgatilgan bo'lsa Kt 0110 deymiz, lekin aslida Kt 02xx. Ro'yxatda 02xx yo'q. Keling Tannarx yopilishini olaylik)." },
+                ]
+            };
+
+            // --- STATE ---
+            let currentLevel = 'easy';
+            let currentQ = null;
+            let score = 0;
+            let qCount = 0;
+            let currentUser = null;
+
+            // --- INIT ---
+            function init() {
+                checkLogin();
+
+                const selDt = document.getElementById('sel-dt');
+                const selKt = document.getElementById('sel-kt');
+
+                // Populate Selects
+                let opts = '<option value="">Tanlang...</option>';
+                accounts.forEach(a => {
+                    opts += `<option value="${a.c}">${a.c} - ${a.n}</option>`;
+                });
+                selDt.innerHTML = opts;
+                selKt.innerHTML = opts;
+
+                setLevel('easy');
+            }
+
+            function setLevel(lvl) {
+                currentLevel = lvl;
+                document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('lvl-' + lvl).classList.add('active');
+                nextQuestion();
+            }
+
+            function nextQuestion() {
+                // Reset UI
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('btn-next').style.display = 'none';
+                document.getElementById('btn-action').disabled = false;
+                document.getElementById('sel-dt').value = "";
+                document.getElementById('sel-kt').value = "";
+
+                // Pick Question from Current Level
+                const pool = questionsDB[currentLevel];
+                const idx = Math.floor(Math.random() * pool.length);
+                currentQ = pool[idx];
+
+                document.getElementById('question-text').innerText = currentQ.q;
+                qCount++;
+                document.getElementById('q-num').innerText = qCount;
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('sel-dt').value;
+                const kt = document.getElementById('sel-kt').value;
+                const fb = document.getElementById('feedback');
+
+                if (!dt || !kt) {
+                    alert("Iltimos, Debet va Kreditni tanlang!");
+                    return;
+                }
+
+                document.getElementById('btn-action').disabled = true;
+                fb.style.display = 'block';
+
+                if (dt === currentQ.dt && kt === currentQ.kt) {
+                    // Correct
+                    score += 10;
+                    document.getElementById('score').innerText = score;
+                    saveProgress(); // SAVE
+                    fb.className = 'feedback success';
+                    fb.innerHTML = `<h3>👏 Barakalla! To'g'ri!</h3><p>${currentQ.expl}</p>`;
+                } else {
+                    // Incorrect
+                    fb.className = 'feedback error';
+                    fb.innerHTML = `<h3>❌ Xato!</h3><p>To'g'ri javob: <b>Dt ${currentQ.dt} - Kt ${currentQ.kt}</b></p><hr style="opacity:0.3"><p>${currentQ.expl}</p>`;
+                }
+
+                document.getElementById('btn-next').style.display = 'inline-block';
+            }
+
+            // --- LOGIN LOGIC ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('trenajyor_current_user');
+                const storedGroup = sessionStorage.getItem('trenajyor_current_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadProgress();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('trenajyor_current_user', name);
+                    sessionStorage.setItem('trenajyor_current_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadProgress();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('trenajyor_current_user');
+                    sessionStorage.removeItem('trenajyor_current_group');
+                    location.reload();
+                }
+            }
+
+            function saveProgress() {
+                if (!currentUser) return;
+                const data = {
+                    score: score,
+                    qCount: qCount,
+                    level: currentLevel
+                };
+                localStorage.setItem('trenajyor_data_' + currentUser, JSON.stringify(data));
+            }
+
+            function loadProgress() {
+                if (!currentUser) return;
+                const saved = localStorage.getItem('trenajyor_data_' + currentUser);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    score = data.score || 0;
+                    qCount = data.qCount || 0;
+                    currentLevel = data.level || 'easy';
+
+                    // Update UI
+                    document.getElementById('score').innerText = score;
+                    document.getElementById('q-num').innerText = qCount + 1; // display next q number
+
+                    // Set level visual
+                    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                    const btn = document.getElementById('lvl-' + currentLevel);
+                    if (btn) btn.classList.add('active');
+                }
+            }
+
+            window.onload = init;
+
+        </script>
+
+    </body>
+
+</html>

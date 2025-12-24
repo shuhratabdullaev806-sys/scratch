@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debitorlar Bilan Ishlash Tizimi - FAXR MADAD KONSALT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --background-color: #f1f5f9;
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            z-index: 20;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: #f8fafc;
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .author-info {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Main */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            height: var(--header-height);
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--background-color);
+        }
+
+        /* Components */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: #f8fafc;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f8fafc;
+        }
+
+        td {
+            padding: 1rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-blue {
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
+
+        .badge-green {
+            background-color: #ecfdf5;
+            color: #10b981;
+        }
+
+        /* Print Specifics */
+        .invoice-paper {
+            background: white;
+            padding: 20px 40px;
+            border: 1px solid #ddd;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            color: #000;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 20px;
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            vertical-align: middle;
+        }
+
+        @media print {
+
+            .sidebar,
+            .header,
+            .btn-section,
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                height: auto;
+                display: block;
+            }
+
+            .content-area {
+                padding: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .modal {
+                position: static;
+                background: none;
+                display: block;
+            }
+
+            .modal-content {
+                border: none;
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            #printModal {
+                display: block !important;
+            }
+
+            #mainContainer,
+            #formModal,
+            #toastContainer {
+                display: none !important;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            margin-top: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Debitorlar Tizimi</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fa-solid fa-briefcase"></i></div>
+                <div class="brand-text">
+                    <h1>FAXR MADAD<br>KONSALT</h1>
+                    <p>O'quv tizimi</p>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="app.navigate('dashboard')"><i
+                        class="fa-solid fa-chart-pie"></i><span>Bosh sahifa</span></li>
+                <li class="nav-item" onclick="app.navigate('clients')"><i class="fa-solid fa-users"></i><span>Mijozlar
+                        (Debitorlar)</span></li>
+                <li class="nav-item" onclick="app.navigate('invoices')"><i
+                        class="fa-solid fa-file-invoice-dollar"></i><span>Hisob-fakturalar</span></li>
+                <li class="nav-item" onclick="app.navigate('payments')"><i
+                        class="fa-solid fa-money-check-dollar"></i><span>To'lovlar</span></li>
+                <li class="nav-item" onclick="app.navigate('reports')"><i
+                        class="fa-solid fa-chart-line"></i><span>Hisobotlar</span></li>
+            </ul>
+            <div class="author-info">
+                <p>&copy; 2025 Suxrat Abdullaev</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h2 class="page-title" id="pageTitle">Umumiy ko'rsatkichlar</h2>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <button onclick="openQuiz()" class="btn btn-primary btn-sm"
+                        style="background:#8b5cf6; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4);">
+                        🧠 Bilimni Sinash
+                    </button>
+                    <div class="avatar">A</div>
+                </div>
+            </header>
+            <div class="content-area" id="mainContainer"></div>
+        </main>
+
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Form Modal -->
+        <div class="modal" id="formModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Yangi qo'shish</h3>
+                    <button class="btn-outline btn-sm" onclick="app.closeModal()"><i
+                            class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="modal-body" id="modalFormBody"></div>
+            </div>
+        </div>
+
+        <!-- Print Modal -->
+        <div class="modal" id="printModal">
+            <div class="modal-content" style="max-width: 950px;">
+                <div class="modal-header no-print">
+                    <h3>Hujjatni ko'rish</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary btn-sm" onclick="window.print()"><i
+                                class="fa-solid fa-print"></i>
+                            Chop etish</button>
+                        <button class="btn-outline btn-sm"
+                            onclick="document.getElementById('printModal').classList.remove('active')">Yopish</button>
+                    </div>
+                </div>
+                <div class="modal-body" id="printBody"></div>
+            </div>
+        </div>
+
+        <script>
+            const utils = {
+                formatMoney: (n) => new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS' }).format(n),
+                formatDate: (d) => new Date(d).toLocaleDateString('uz-UZ'),
+                genId: () => Date.now().toString(36) + Math.random().toString(36).substr(2)
+            };
+
+            let currentUser = null;
+
+            const store = {
+                get: (k) => {
+                    if (!currentUser) return [];
+                    return JSON.parse(localStorage.getItem('debitor_' + k + '_' + currentUser) || '[]');
+                },
+                set: (k, d) => {
+                    if (!currentUser) return;
+                    localStorage.setItem('debitor_' + k + '_' + currentUser, JSON.stringify(d));
+                },
+                add: (k, i) => { const d = store.get(k); d.push(i); store.set(k, d); },
+                update: (k, id, data) => {
+                    const list = store.get(k);
+                    const idx = list.findIndex(x => x.id === id);
+                    if (idx !== -1) {
+                        list[idx] = { ...list[idx], ...data };
+                        store.set(k, list);
+                    }
+                },
+                del: (k, id) => store.set(k, store.get(k).filter(x => x.id !== id))
+            };
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('debitor_user');
+                const storedGroup = sessionStorage.getItem('debitor_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    app.init();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('debitor_user', name);
+                    sessionStorage.setItem('debitor_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    app.init();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('debitor_user');
+                    sessionStorage.removeItem('debitor_group');
+                    location.reload();
+                }
+            }
+
+            // Auto-run login check on load, instead of immediate app.init
+            window.onload = function () {
+                checkLogin();
+            };
+
+            const app = {
+                view: 'dashboard',
+                init() {
+                    if (!currentUser) return;
+                    this.render('dashboard');
+                },
+
+                navigate(v) {
+                    this.view = v;
+                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                    document.querySelector(`.nav-item[onclick="app.navigate('${v}')"]`).classList.add('active');
+                    this.render(v);
+                },
+
+                render(view) {
+                    const c = document.getElementById('mainContainer');
+                    const t = document.getElementById('pageTitle');
+                    if (view === 'dashboard') { t.innerText = 'Bosh sahifa'; this.renderDashboard(c); }
+                    else if (view === 'clients') { t.innerText = 'Mijozlar'; this.renderClients(c); }
+                    else if (view === 'invoices') { t.innerText = 'Hisob-fakturalar'; this.renderInvoices(c); }
+                    else if (view === 'payments') { t.innerText = 'To\'lovlar'; this.renderPayments(c); }
+                    else if (view === 'reports') { t.innerText = 'Hisobotlar'; this.renderReports(c); }
+                },
+
+                // --- DASHBOARD ---
+                renderDashboard(c) {
+                    const invs = store.get('invoices');
+                    const pays = store.get('payments');
+                    const totalInv = invs.reduce((s, i) => s + i.grandTotal, 0);
+                    const totalPay = pays.reduce((s, p) => s + p.amount, 0);
+
+                    c.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon" style="background:#eff6ff;color:#2563eb"><i class="fa-solid fa-users"></i></div></div>
+                    <div class="stat-label">Jami Mijozlar</div><div class="stat-value">${store.get('clients').length}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon" style="background:#ecfdf5;color:#10b981"><i class="fa-solid fa-file-invoice-dollar"></i></div></div>
+                    <div class="stat-label">Savdo (Kt 90)</div><div class="stat-value">${utils.formatMoney(totalInv)}</div>
+                </div>
+                 <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon" style="background:#fef2f2;color:#ef4444"><i class="fa-solid fa-hand-holding-dollar"></i></div></div>
+                    <div class="stat-label">Undirilgan (Dt 51)</div><div class="stat-value">${utils.formatMoney(totalPay)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon" style="background:#fff7ed;color:#f97316"><i class="fa-solid fa-money-bill-trend-up"></i></div></div>
+                    <div class="stat-label">Qarzdorlik (Dt 40)</div><div class="stat-value">${utils.formatMoney(totalInv - totalPay)}</div>
+                </div>
+            </div>
+        `;
+                },
+
+                // --- CLIENTS ---
+                renderClients(c) {
+                    const cls = store.get('clients');
+                    c.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Mijozlar</div>
+                    <button class="btn btn-primary btn-sm" onclick="app.modalClient()"><i class="fa-plus fa-solid"></i> Yangi</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Nomi</th><th>STIR/QQS</th><th>Bank/MFO</th><th>Manzil</th><th>Amallar</th></tr></thead>
+                        <tbody>
+                            ${cls.map(x => `
+                                <tr>
+                                    <td><strong>${x.name}</strong></td>
+                                    <td>${x.inn}<br><small>${x.vatCode || ''}</small></td>
+                                    <td>${x.mfo}<br><small>${x.bankAccount || ''}</small></td>
+                                    <td>${x.address}</td>
+                                    <td>
+                                        <button class="btn-outline btn-sm" onclick="app.editClient('${x.id}')" title="Tahrirlash"><i class="fa-edit fa-solid"></i></button>
+                                        <button class="btn-outline btn-sm" style="color:#ef4444" onclick="app.delClient('${x.id}')"><i class="fa-trash fa-solid"></i></button>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="5" align="center">Mijozlar yo\'q</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+                },
+
+                modalClient(id = null) {
+                    const data = id ? store.get('clients').find(x => x.id === id) : {};
+                    document.getElementById('modalTitle').innerText = id ? 'Mijozni Tahrirlash' : 'Yangi Mijoz';
+                    document.getElementById('modalFormBody').innerHTML = `
+            <form onsubmit="app.saveClient(event)">
+                <input type="hidden" name="id" value="${data.id || ''}">
+                <div class="form-group"><label class="form-label">Tashkilot nomi</label><input name="name" class="form-control" required value="${data.name || ''}"></div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">STIR (INN)</label><input name="inn" class="form-control" required value="${data.inn || ''}"></div>
+                    <div class="form-group"><label class="form-label">QQS Kodi</label><input name="vatCode" class="form-control" value="${data.vatCode || ''}"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Manzil</label><input name="address" class="form-control" value="${data.address || ''}"></div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Bank MFO</label><input name="mfo" class="form-control" value="${data.mfo || ''}"></div>
+                    <div class="form-group"><label class="form-label">Hisob Raqam</label><input name="bankAccount" class="form-control" value="${data.bankAccount || ''}"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Telefon</label><input name="phone" class="form-control" value="${data.phone || ''}"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">${id ? 'Saqlash' : 'Qo\'shish'}</button>
+            </form>
+        `;
+                    document.getElementById('formModal').classList.add('active');
+                },
+
+                editClient(id) { this.modalClient(id); },
+                saveClient(e) {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    const obj = Object.fromEntries(fd.entries());
+                    if (obj.id) store.update('clients', obj.id, obj);
+                    else { obj.id = utils.genId(); store.add('clients', obj); }
+                    this.closeModal(); this.render('clients');
+                },
+                delClient(id) { if (confirm('O\'chirasizmi?')) { store.del('clients', id); this.render('clients'); } },
+
+                // --- INVOICES ---
+                renderInvoices(c) {
+                    const invs = store.get('invoices');
+                    c.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Hisob-fakturalar</div>
+                    <button class="btn btn-primary btn-sm" onclick="app.modalInvoice()"><i class="fa-plus fa-solid"></i> Yangi</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Sana</th><th>№</th><th>Mijoz</th><th>Shartnoma</th><th>Summa</th><th>Holat</th><th>Amallar</th></tr></thead>
+                        <tbody>
+                            ${invs.map(x => `
+                                <tr>
+                                    <td>${x.date}</td>
+                                    <td>${x.number}</td>
+                                    <td>${x.clientName}</td>
+                                    <td>${x.contract}</td>
+                                    <td><strong>${utils.formatMoney(x.grandTotal)}</strong></td>
+                                    <td><span class="badge badge-blue">Dt 40 - Kt 90</span></td>
+                                    <td>
+                                        <button class="btn-outline btn-sm" onclick="app.printInv('${x.id}')"><i class="fa-print fa-solid"></i></button>
+                                        <button class="btn-outline btn-sm" onclick="app.editInvoice('${x.id}')"><i class="fa-edit fa-solid"></i></button>
+                                        <button class="btn-outline btn-sm" onclick="app.delInv('${x.id}')" style="color:#ef4444"><i class="fa-trash fa-solid"></i></button>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="7" align="center">Fakturalar yo\'q</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+                },
+
+                modalInvoice(id = null) {
+                    const data = id ? store.get('invoices').find(x => x.id === id) : {};
+                    const clients = store.get('clients');
+                    const it = data.item || {};
+
+                    document.getElementById('modalTitle').innerText = id ? 'Fakturani Tahrirlash' : 'Yangi Faktura';
+                    document.getElementById('modalFormBody').innerHTML = `
+            <form onsubmit="app.saveInvoice(event)">
+                <input type="hidden" name="id" value="${data.id || ''}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Mijoz</label>
+                        <select name="clientId" class="form-control" required>
+                             <option value="">Tanlang...</option>
+                             ${clients.map(c => `<option value="${c.id}" ${c.id === data.clientId ? 'selected' : ''}>${c.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">Raqam</label><input name="number" class="form-control" required value="${data.number || ''}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Sana</label><input type="date" name="date" class="form-control" required value="${data.date || new Date().toISOString().split('T')[0]}"></div>
+                    <div class="form-group"><label class="form-label">Shartnoma</label><input name="contract" class="form-control" value="${data.contract || ''}"></div>
+                </div>
+                <hr style="margin:10px 0">
+                <div class="form-group"><label class="form-label">Tovar</label><input name="itemDescription" class="form-control" required value="${it.name || ''}"></div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">MXIK</label><input name="mxik" class="form-control" value="${it.mxik || ''}"></div>
+                    <div class="form-group"><label class="form-label">O'lchov</label><input name="unit" class="form-control" value="${it.unit || ''}"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Miqdor</label><input type="number" id="qty" name="quantity" class="form-control" value="${it.qty || 1}" oninput="app.calcInv()"></div>
+                    <div class="form-group"><label class="form-label">Narx</label><input type="number" id="price" class="form-control" value="${it.price || 0}" oninput="app.calcInv()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">QQS %</label>
+                        <select id="vat" class="form-control" onchange="app.calcInv()">
+                            <option value="12" ${it.vatRate === 12 ? 'selected' : ''}>12%</option>
+                            <option value="0" ${it.vatRate === 0 ? 'selected' : ''}>0%</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">Jami</label><input id="totalDisp" class="form-control" readonly style="background:#ddd;font-weight:bold"></div>
+                </div>
+                 <div class="form-group"><label class="form-label">Ishonchnoma</label><input name="attorney" class="form-control" value="${data.attorney || ''}"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Saqlash</button>
+            </form>
+        `;
+                    document.getElementById('formModal').classList.add('active');
+                    setTimeout(() => app.calcInv(), 100);
+                },
+
+                calcInv() {
+                    const q = parseFloat(document.getElementById('qty').value) || 0;
+                    const p = parseFloat(document.getElementById('price').value) || 0;
+                    const v = parseFloat(document.getElementById('vat').value) || 0;
+                    const tot = (q * p) * (1 + v / 100);
+                    document.getElementById('totalDisp').value = utils.formatMoney(tot);
+                },
+
+                editInvoice(id) { this.modalInvoice(id); },
+                saveInvoice(e) {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    const client = store.get('clients').find(c => c.id === fd.get('clientId'));
+
+                    const q = parseFloat(fd.get('quantity'));
+                    const p = parseFloat(document.getElementById('price').value);
+                    const v = parseFloat(document.getElementById('vat').value);
+                    const base = q * p;
+                    const tax = base * (v / 100);
+                    const grand = base + tax;
+
+                    const data = {
+                        clientId: client.id, clientName: client.name, clientDetails: client,
+                        date: fd.get('date'), number: fd.get('number'), contract: fd.get('contract'), attorney: fd.get('attorney'),
+                        grandTotal: grand,
+                        item: {
+                            name: fd.get('itemDescription'), mxik: fd.get('mxik'), unit: fd.get('unit'),
+                            qty: q, price: p, deliveryCost: base, vatRate: v, vatAmount: tax, total: grand
+                        }
+                    };
+
+                    const id = fd.get('id');
+                    if (id) store.update('invoices', id, data);
+                    else { data.id = utils.genId(); store.add('invoices', data); }
+                    this.closeModal(); this.render('invoices');
+                },
+                delInv(id) { if (confirm('O\'chirasizmi?')) { store.del('invoices', id); this.render('invoices'); } },
+
+                printInv(id) {
+                    const inv = store.get('invoices').find(x => x.id === id);
+                    const c = inv.clientDetails || {};
+                    const it = inv.item;
+                    const seller = { name: "\"FAXR MADAD KONSALT\" MChJ", inn: "123 456 789", vat: "123456789001", bank: "2020 8000 ... 001", mfo: "01001", addr: "Toshkent sh." };
+
+                    document.getElementById('printBody').innerHTML = `
+             <div class="invoice-paper">
+                <h2 style="text-align:center">HISOBOVARAQ-FAKTURA</h2>
+                <div style="text-align:center;margin-bottom:20px">№ ${inv.number} &nbsp; ${utils.formatDate(inv.date)} yil<br>${inv.contract}-son shartnomaga asosan</div>
+                
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:20px">
+                    <div style="width:48%">
+                        <b>Sotuvchi:</b> ${seller.name}<br>Manzil: ${seller.addr}<br>STIR: ${seller.inn}<br>QQS: ${seller.vat}<br>H/R: ${seller.bank} MFO: ${seller.mfo}
+                    </div>
+                    <div style="width:48%">
+                        <b>Xaridor:</b> ${c.name}<br>Manzil: ${c.address}<br>STIR: ${c.inn}<br>QQS: ${c.vatCode || '-'}<br>H/R: ${c.bankAccount || '-'} MFO: ${c.mfo || '-'}
+                    </div>
+                </div>
+
+                 <table class="invoice-table">
+                    <thead>
+                        <tr><th>T/r</th><th>Nomi</th><th>MXIK</th><th>O'lchov</th><th>Miqdor</th><th>Narx</th><th>Qiymat</th><th>QQS %</th><th>QQS Sum</th><th>Jami</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td><td>${it.name}</td><td>${it.mxik || ''}</td><td>${it.unit}</td><td>${it.qty}</td>
+                            <td>${utils.formatMoney(it.price)}</td><td>${utils.formatMoney(it.deliveryCost)}</td>
+                            <td>${it.vatRate}%</td><td>${utils.formatMoney(it.vatAmount)}</td><td>${utils.formatMoney(it.total)}</td>
+                        </tr>
+                         <tr style="font-weight:bold;background:#eee"><td colspan="9" align="right">JAMI:</td><td>${utils.formatMoney(it.total)}</td></tr>
+                    </tbody>
+                </table>
+                <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:12px">
+                    <div>Rahbar: _______________ S.Abdullaev<br><br>Berdim: _______________</div>
+                    <div>Oldim: _______________<br><br>${inv.attorney ? inv.attorney + ' bo\'yicha' : ''}</div>
+                </div>
+             </div>
+        `;
+                    document.getElementById('printModal').classList.add('active');
+                },
+
+                // --- PAYMENTS ---
+                renderPayments(c) {
+                    const pays = store.get('payments');
+                    c.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">To'lovlar</div>
+                    <button class="btn btn-success btn-sm" onclick="app.modalPay()"><i class="fa-plus fa-solid"></i> Kirim</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Sana</th><th>Hujjat</th><th>Mijoz</th><th>Summa</th><th>Izoh</th><th>Amallar</th></tr></thead>
+                        <tbody>
+                            ${pays.map(p => `
+                                <tr>
+                                    <td>${p.date}</td><td>${p.docNumber}</td><td>${p.clientName}</td>
+                                    <td><strong>${utils.formatMoney(p.amount)}</strong></td><td>${p.note}</td>
+                                    <td>
+                                        <button class="btn-outline btn-sm" onclick="app.editPay('${p.id}')"><i class="fa-edit fa-solid"></i></button>
+                                        <button class="btn-outline btn-sm" onclick="app.delPay('${p.id}')" style="color:#ef4444"><i class="fa-trash fa-solid"></i></button>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="6" align="center">To\'lovlar yo\'q</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+                },
+
+                modalPay(id = null) {
+                    const data = id ? store.get('payments').find(x => x.id === id) : {};
+                    const clients = store.get('clients');
+                    document.getElementById('modalTitle').innerText = id ? 'To\'lovni Tahrirlash' : 'Yangi To\'lov';
+                    document.getElementById('modalFormBody').innerHTML = `
+            <form onsubmit="app.savePay(event)">
+                <input type="hidden" name="id" value="${data.id || ''}">
+                <div class="form-group">
+                    <label class="form-label">Mijoz</label>
+                    <select name="clientId" class="form-control" required>
+                        <option value="">Tanlang...</option>
+                        ${clients.map(c => `<option value="${c.id}" ${c.id === data.clientId ? 'selected' : ''}>${c.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Sana</label><input type="date" name="date" class="form-control" value="${data.date || new Date().toISOString().split('T')[0]}" required></div>
+                    <div class="form-group"><label class="form-label">Hujjat №</label><input name="docNumber" class="form-control" value="${data.docNumber || ''}"></div>
+                </div>
+                <div class="form-group"><label class="form-label">Summa</label><input type="number" name="amount" class="form-control" required value="${data.amount || ''}"></div>
+                <div class="form-group"><label class="form-label">Izoh</label><input name="note" class="form-control" value="${data.note || ''}"></div>
+                <button type="submit" class="btn btn-success" style="width:100%">${id ? 'Saqlash' : 'Qabul qilish'}</button>
+            </form>
+        `;
+                    document.getElementById('formModal').classList.add('active');
+                },
+
+                editPay(id) { this.modalPay(id); },
+                savePay(e) {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    const c = store.get('clients').find(x => x.id === fd.get('clientId'));
+                    const data = {
+                        clientId: c.id, clientName: c.name,
+                        date: fd.get('date'), docNumber: fd.get('docNumber'),
+                        amount: parseFloat(fd.get('amount')), note: fd.get('note')
+                    };
+                    const id = fd.get('id');
+                    if (id) store.update('payments', id, data);
+                    else { data.id = utils.genId(); store.add('payments', data); }
+                    this.closeModal(); this.render('payments');
+                },
+                delPay(id) { if (confirm('O\'chirasizmi?')) { store.del('payments', id); this.render('payments'); } },
+
+                // --- REPORTS ---
+                renderReports(c) {
+                    const cls = store.get('clients');
+                    const invs = store.get('invoices');
+                    const pays = store.get('payments');
+
+                    // Simple balances logic
+                    const bals = cls.map(cl => {
+                        const sold = invs.filter(i => i.clientId === cl.id).reduce((s, x) => s + x.grandTotal, 0);
+                        const paid = pays.filter(p => p.clientId === cl.id).reduce((s, x) => s + x.amount, 0);
+                        return { name: cl.name, sold, paid, bal: sold - paid };
+                    });
+
+                    c.innerHTML = `
+            <div class="card">
+                <div class="card-header"><div class="card-title">Debitorlik Qoldig'i</div><button class="btn btn-primary btn-sm" onclick="window.print()">Print</button></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Mijoz</th><th>Hisoblangan</th><th>To'langan</th><th>Qoldiq</th></tr></thead>
+                        <tbody>
+                            ${bals.map(b => `
+                                <tr>
+                                    <td>${b.name}</td><td>${utils.formatMoney(b.sold)}</td><td>${utils.formatMoney(b.paid)}</td>
+                                    <td style="font-weight:bold;color:${b.bal > 0 ? 'red' : 'green'}">${utils.formatMoney(b.bal)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot><tr><td><b>JAMI:</b></td>
+                            <td><b>${utils.formatMoney(bals.reduce((s, b) => s + b.sold, 0))}</b></td>
+                            <td><b>${utils.formatMoney(bals.reduce((s, b) => s + b.paid, 0))}</b></td>
+                            <td><b>${utils.formatMoney(bals.reduce((s, b) => s + b.bal, 0))}</b></td>
+                        </tr></tfoot>
+                    </table>
+                </div>
+            </div>
+        `;
+                },
+
+                closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+            };
+            window.onload = () => app.init();
+        </script>
+        <script>
+            // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
+            const quizQuestions = [
+                { q: "Mijozga mahsulot sotildi (10,000,000 so'm)", dt: "4010", kt: "9010", sum: 10000000 },
+                { q: "Sotilgan mahsulot uchun QQS (12%) hisoblandi (1,200,000 so'm)", dt: "9030", kt: "6410", sum: 1200000 },
+                { q: "Mijozdan bank hisobiga pul kelib tushdi (8,000,000 so'm)", dt: "5110", kt: "4010", sum: 8000000 },
+                { q: "Mijozdan oldindan to'lov (Avans) olindi (5,000,000 so'm)", dt: "5110", kt: "6310", sum: 5000000 },
+                { q: "Oldin olingan avans daromadga o'tkazildi (Hisob-faktura berilgach) (5,000,000 so'm)", dt: "6310", kt: "4010", sum: 5000000 },
+                { q: "Mijozga chegirma (skidka) berildi (500,000 so'm)", dt: "9050", kt: "4010", sum: 500000 },
+                { q: "Mijoz mahsulotni qaytarib berdi (Vozvrat) (2,000,000 so'm)", dt: "9040", kt: "4010", sum: 2000000 },
+                { q: "Mijozdan veksel olindi (Qarz evaziga) (1,000,000 so'm)", dt: "4020", kt: "4010", sum: 1000000 },
+                { q: "Ishonchsiz qarz (Umidi uzilgan) hisobdan chiqarildi (300,000 so'm)", dt: "9430", kt: "4010", sum: 300000 },
+                { q: "Chet el mijoziga valyutada mahsulot sotildi (10,000,000 so'm)", dt: "4010", kt: "9010", sum: 10000000 }
+            ];
+
+            let currentQIndex = 0;
+
+            function openQuiz() {
+                currentQIndex = 0;
+                document.getElementById('quiz-modal').style.display = 'flex';
+                loadQuestion();
+            }
+
+            function closeQuiz() {
+                document.getElementById('quiz-modal').style.display = 'none';
+            }
+
+            function loadQuestion() {
+                if (currentQIndex >= quizQuestions.length) {
+                    document.getElementById('quiz-content').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h2 style="color:#2563eb;">🎉 Tabriklaymiz!</h2>
+                        <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                        <button onclick="closeQuiz()" class="btn btn-primary" style="width:100%">Yopish</button>
+                        <button onclick="openQuiz()" class="btn btn-outline" style="width:100%; margin-top:10px;">Qayta ishlash</button>
+                    </div>
+                `;
+                    return;
+                }
+
+                const q = quizQuestions[currentQIndex];
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-dt').value = '';
+                document.getElementById('q-kt').value = '';
+                document.getElementById('q-sum').value = '';
+                document.getElementById('q-feedback').innerText = '';
+                document.getElementById('q-feedback').style.display = 'none';
+            }
+
+            function checkAnswer() {
+                const dt = document.getElementById('q-dt').value.trim();
+                const kt = document.getElementById('q-kt').value.trim();
+                const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+                const target = quizQuestions[currentQIndex];
+                const feedback = document.getElementById('q-feedback');
+
+                if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                    feedback.innerHTML = '<span style="color:green; font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                    feedback.style.display = 'block';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 1000);
+                } else {
+                    feedback.innerHTML = `<span style="color:red; font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.style.display = 'block';
+                }
+            }
+        </script>
+
+        <!-- QUIZ MODAL -->
+        <div class="modal" id="quiz-modal"
+            style="display:none; z-index:9999; align-items:center; justify-content:center;">
+            <div class="modal-content" style="max-width:500px; max-height:initial;">
+                <div class="modal-header">
+                    <h3 style="margin:0; color:#8b5cf6;">🧠 Bilimni Sinash</h3>
+                    <button class="btn-outline btn-sm" onclick="closeQuiz()">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#1f2937;"
+                        id="q-text">
+                        Savol yuklanmoqda...
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet
+                                (Schyot)</label>
+                            <input type="text" id="q-dt" placeholder="Mas: 4010" class="form-control">
+                        </div>
+                        <div>
+                            <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Kredit
+                                (Schyot)</label>
+                            <input type="text" id="q-kt" placeholder="Mas: 9010" class="form-control">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label
+                            style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Summa</label>
+                        <input type="number" id="q-sum" placeholder="So'mda kiriting" class="form-control">
+                    </div>
+
+                    <div id="q-feedback"
+                        style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;">
+                    </div>
+
+                    <button onclick="checkAnswer()" class="btn btn-primary"
+                        style="width:100%; background:#8b5cf6; border:none;">Tekshirish</button>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

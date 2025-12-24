@@ -1,0 +1,194 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="ProgId" content="Excel.Sheet">
+    <meta name="Generator" content="Microsoft Excel 15">
+    <!--[if gte mso 9]>
+    <xml>
+        <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                    <x:Name>Reestr Raqami</x:Name>
+                    <x:WorksheetOptions>
+                        <x:Print>
+                            <x:ValidPrinterInfo/>
+                            <x:PaperSizeIndex>9</x:PaperSizeIndex>
+                            <x:HorizontalResolution>600</x:HorizontalResolution>
+                            <x:VerticalResolution>600</x:VerticalResolution>
+                        </x:Print>
+                        <x:Selected/>
+                        <x:ProtectContents>False</x:ProtectContents>
+                        <x:ProtectObjects>False</x:ProtectObjects>
+                        <x:ProtectScenarios>False</x:ProtectScenarios>
+                    </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+    </xml>
+    <![endif]-->
+    <style>
+        table {
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+        .bordered {
+            border: 1px solid black;
+            padding: 5px;
+        }
+        .center {
+            text-align: center;
+        }
+        .small {
+            font-size: 8pt;
+        }
+    </style>
+</head>
+<body>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <!-- Header Section -->
+        <tr>
+            <td colspan="6" class="header">Ўзбекистон Республикасининг</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="header">наси пулини хисоб-китобларни</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="header">тўғрисидаги низома</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="header">6-ИЛОВА</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- REESTR RAQAMI Section -->
+        <tr>
+            <td colspan="6" style="text-align: center; font-weight: bold; font-size: 12pt;">РЕЕСТР РАҚАМИ</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Sana Section -->
+        <tr>
+            <td width="15%">Сана</td>
+            <td width="35%" class="bordered"></td>
+            <td width="15%">&nbsp;</td>
+            <td width="35%" colspan="3">&nbsp;</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni Section -->
+        <tr>
+            <td colspan="6">Мабла'ғларни олувчилар номи</td>
+        </tr>
+        <tr>
+            <td colspan="6" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni oluvchilar manzillari -->
+        <tr>
+            <td colspan="6">Мабла'ғларни олувчилар мансиллари</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Mablag'larni oluvchi bank nomi -->
+        <tr>
+            <td colspan="3">Мабла'ғларни олувчи банк номи</td>
+            <td colspan="3">Мабла'ғларни олувчининг банкда коди</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+            <td colspan="3" class="bordered" style="height: 20px;"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Date Range -->
+        <tr>
+            <td colspan="6">20 ___йил __________ дан бошлаб товарлар (хизмат, ишлатилар) бўйича тўлов талабномалари қуйидаги суммада имзоланган тасдиқ этилади:</td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Main Table -->
+        <tr>
+            <td class="bordered center" style="font-weight: bold; width: 8%;">Т/р</td>
+            <td class="bordered center" style="font-weight: bold; width: 20%;">Тузилган<br>санаси</td>
+            <td class="bordered center" style="font-weight: bold; width: 27%;">Тузилган ҳужжат номи</td>
+            <td class="bordered center" style="font-weight: bold; width: 27%;">Тузилган<br>хисоб-фактуралар</td>
+            <td class="bordered center" style="font-weight: bold; width: 18%;">Сумма</td>
+        </tr>
+        
+        <!-- Data Rows (10 rows) -->
+        <tr>
+            <td class="bordered center" style="height: 25px;"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+        </tr>
+        <tr>
+            <td class="bordered center" style="height: 25px;"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+        </tr>
+        <tr>
+            <td class="bordered center" style="height: 25px;"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+        </tr>
+        <tr>
+            <td class="bordered center" style="height: 25px;"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+        </tr>
+        <tr>
+            <td class="bordered center" style="height: 25px;"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+        </tr>
+        <tr>
+            <td class="bordered center" style="height: 25px;"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+            <td class="bordered"></td>
+        </tr>
+        
+        <!-- Jami (Total) Row -->
+        <tr>
+            <td colspan="4" class="bordered center" style="font-weight: bold;">Жами:</td>
+            <td class="bordered"></td>
+        </tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        <tr><td colspan="6">&nbsp;</td></tr>
+        
+        <!-- Footer Signatures -->
+        <tr>
+            <td colspan="3">Мабла'ғларни олувчининг<br>нохаси</td>
+            <td colspan="3">Бош тўловларни тасдиқлоган<br>(имза, иши ва мўҳур)</td>
+        </tr>
+        <tr>
+            <td colspan="3" style="height: 40px; border-bottom: 1px solid black;"></td>
+            <td colspan="3" style="height: 40px; border-bottom: 1px solid black;"></td>
+        </tr>
+    </table>
+</body>
+</html>

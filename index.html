@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAXR MADAD KONSALT - O'quv Portali</title>
+    <meta name="description" content="Barcha buxgalteriya simulyatorlari va trenajyorlari uchun yagona portal.">
+    <!-- Manifest File for PWA Removed -->
+    <!-- <link rel="manifest" href="manifest.json"> -->
+    <meta name="theme-color" content="#4361ee">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --surface: rgba(255, 255, 255, 0.9);
+            --surface-dark: rgba(255, 255, 255, 0.5);
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: 40px;
+        }
+
+        .install-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+            /* Hidden by default, shown via JS if installable */
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.4);
+            background: var(--primary-dark);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+            background: white;
+            border-color: rgba(67, 97, 238, 0.2);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.5;
+            flex-grow: 1;
+            /* Pushes button down if we had one */
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-new {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .badge-hot {
+            background: rgba(244, 63, 94, 0.1);
+            color: #f43f5e;
+        }
+
+        .badge-core {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        /* Footer */
+        footer {
+            background: white;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        footer p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i>
+                FAXR MADAD
+            </a>
+            <!-- Install button removed -->
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Buxgalteriya Amaliyot Portali</h1>
+            <p>Barcha simulyator va trenajyorlar yagona makonda. O'rganishni boshlang!</p>
+        </section>
+
+        <div class="grid-container">
+
+            <!-- 1. Buxgalteriya Asoslari -->
+            <div class="section-title">
+                <i class="fa-solid fa-book-open"></i> Buxgalteriya Asoslari
+            </div>
+
+            <a href="buxgalteriya_trenajyor/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
+                <h3>Buxgalteriya Trenajyori</h3>
+                <p>Provodkalar (Dt/Kt) bo'yicha bilimingizni o'yin shaklida mustahkamlang.</p>
+                <span class="card-badge badge-core">Asosiy</span>
+            </a>
+
+            <a href="buxgalteriya_simulyator/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-calculator"></i></div>
+                <h3>Buxgalteriya Simulyatori</h3>
+                <p>Umumiy buxgalteriya amaliyoti, jurnal orderlar va boshlang'ich hisob.</p>
+            </a>
+
+            <!-- 2. Pul Mablag'lari -->
+            <div class="section-title">
+                <i class="fa-solid fa-money-bill-wave"></i> Pul Mablag'lari
+            </div>
+
+            <a href="kassa_tizimi/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-cash-register"></i></div>
+                <h3>Kassa Tizimi</h3>
+                <p>Kirim (PKO) va Chiqim (RKO) orderlari, kassa kitobi yuritish.</p>
+            </a>
+
+            <a href="bank_tizimi/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-building-columns"></i></div>
+                <h3>Bank Tizimi</h3>
+                <p>To'lov topshiriqnomalari, bank ko'chirmalari va pul o'tkazmalari.</p>
+            </a>
+
+            <!-- 3. Ombor Hisobi -->
+            <div class="section-title">
+                <i class="fa-solid fa-boxes-stacked"></i> Ombor Hisobi
+            </div>
+
+            <a href="ombor_tizimi/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-dolly"></i></div>
+                <h3>Ombor (FIFO)</h3>
+                <p>Materiallar hisobi. Birinchi kirgan - birinchi chiqadi usuli.</p>
+            </a>
+
+            <a href="ombor_tizimi_aveco/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                <h3>Ombor (AVECO)</h3>
+                <p>Materiallar hisobi. O'rtacha tortilgan qiymat usuli.</p>
+                <span class="card-badge badge-new">Yangi</span>
+            </a>
+
+            <!-- 4. Kadrlar -->
+            <div class="section-title">
+                <i class="fa-solid fa-users"></i> Kadrlar va Ish Haqi
+            </div>
+
+            <a href="kadrlar/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-user-tie"></i></div>
+                <h3>Kadrlar Bo'limi</h3>
+                <p>Ishga olish, buyruqlar, mehnat shartnomalari va shtat jadvali.</p>
+            </a>
+
+            <a href="tabel/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
+                <h3>Tabel Hisobi</h3>
+                <p>Ish vaqtini hisobga olish tabelini yuritish.</p>
+            </a>
+
+            <a href="xizmat_safari/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-plane"></i></div>
+                <h3>Xizmat Safari</h3>
+                <p>Xizmat safari guvohnomalari, buyruqlar va avans hisobotlari.</p>
+            </a>
+
+            <!-- 5. Aktivlar -->
+            <div class="section-title">
+                <i class="fa-solid fa-laptop-file"></i> Uzoq Muddatli Aktivlar
+            </div>
+
+            <a href="asosiy_vositalar/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-truck-moving"></i></div>
+                <h3>Asosiy Vositalar</h3>
+                <p>0100 - Asosiy vositalar kirimi, eskirishi (amortizatsiyasi) va hisobi.</p>
+            </a>
+
+            <a href="nomoddiy_aktivlar/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-file-contract"></i></div>
+                <h3>Nomoddiy Aktivlar</h3>
+                <p>0400 - Nomoddiy aktivlar (litsenziya, dastur) hisobi.</p>
+            </a>
+
+            <!-- 6. Kontragentlar -->
+            <div class="section-title">
+                <i class="fa-solid fa-handshake"></i> Kontragentlar
+            </div>
+
+            <a href="debitorlar/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <h3>Debitorlar</h3>
+                <p>Xaridorlar va mol yetkazib beruvchilar bilan hisob-kitoblar (Haqdorlik).</p>
+            </a>
+
+            <a href="kreditorlar/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                <h3>Kreditorlar</h3>
+                <p>Yetkazib beruvchilar va boshqa qarzdorliklar hisobi.</p>
+            </a>
+
+            <!-- 7. Boshqalar -->
+            <div class="section-title">
+                <i class="fa-solid fa-layer-group"></i> Boshqalar
+            </div>
+
+            <a href="ishlab_chiqarish/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-industry"></i></div>
+                <h3>Ishlab Chiqarish</h3>
+                <p>Mahsulot tannarxi kalkulyatsiyasi va ishlab chiqarish jarayoni.</p>
+            </a>
+
+            <a href="soliq/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                <h3>Soliqlar</h3>
+                <p>Soliq hisobotlari va regestrlari. Aylanmadan soliq hisobi.</p>
+            </a>
+
+            <a href="buxgalteriya/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-book"></i></div>
+                <h3>Bosh Kitob</h3>
+                <p>Barcha operatsiyalarni umumlashtirish, aylanma qoldiq va balans.</p>
+                <span class="card-badge badge-hot">Final</span>
+            </a>
+
+            <a href="korxona_profili/index.html" class="card">
+                <div class="card-icon"><i class="fa-solid fa-building"></i></div>
+                <h3>Korxona Profili</h3>
+                <p>Korxona rekvizitlari va hisob siyosatini sozlash.</p>
+            </a>
+
+            <a href="AMALIY_VAZIFALAR.html" class="card" style="background: #e0f2fe; border-color: #7dd3fc;">
+                <div class="card-icon" style="color: #0284c7; background: white;"><i class="fa-solid fa-list-check"></i>
+                </div>
+                <h3>Amaliy Vazifalar</h3>
+                <p>Kurs davomida bajarilishi kerak bo'lgan barcha vazifalar ro'yxati.</p>
+            </a>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 FAXR MADAD KONSALT. Muallif: Suxrat Abdullaev. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+    <script>
+        // PWA functionality removed as per request.
+        // Unregister any existing service workers to fix caching issues.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    console.log('Unregistering Service Worker to fix cache:', registration);
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

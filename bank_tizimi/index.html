@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Tizimi (5110) - FAXR MADAD KONSALT</title>
+    <style>
+        :root {
+            /* BANK THEME VARIABLES (Indigo/Blue) */
+            --primary-color: #4338ca;
+            /* Indigo 700 */
+            --primary-light: #6366f1;
+            /* Indigo 500 */
+            --primary-dark: #312e81;
+            /* Indigo 900 */
+            --bg-color: #f1f5f9;
+            /* Slate 100 */
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            /* Slate 800 */
+            --border-color: #e2e8f0;
+            /* Slate 200 */
+            --success-color: #10b981;
+            /* Emerald 500 */
+            --danger-color: #ef4444;
+            /* Red 500 */
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #1e1b4b;
+            /* Very dark indigo */
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+
+        .brand small {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: normal;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-btn {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background-color: var(--primary-light);
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            max-width: 1600px;
+        }
+
+        /* Header */
+        .top-bar {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(67, 56, 202, 0.3);
+            min-width: 250px;
+        }
+
+        .balance-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        /* Cards & Containers */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            color: var(--primary-dark);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Form Elements */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .amount-col {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .text-green {
+            color: var(--success-color);
+        }
+
+        .text-red {
+            color: var(--danger-color);
+        }
+
+        /* Hints */
+        .accounting-hint {
+            background-color: #e0e7ff;
+            /* Indigo 100 */
+            color: #3730a3;
+            /* Indigo 800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Print Overlay */
+        #print-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #print-area-wrapper {
+            background: white;
+            padding: 20px;
+            width: 210mm;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .sidebar {
+                width: 70px;
+                padding: 1rem 0.5rem;
+            }
+
+            .sidebar .brand,
+            .nav-btn span,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .nav-btn {
+                justify-content: center;
+                padding: 1rem 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                padding: 1rem;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #print-area,
+            #print-area * {
+                visibility: visible;
+            }
+
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Payment Order Form Styles (Standard Uzbekistan) */
+        .po-container {
+            font-family: 'Times New Roman', serif;
+            border: 1px solid black;
+            padding: 20px;
+            color: black;
+            max-width: 200mm;
+            margin: 0 auto;
+        }
+
+        .po-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .po-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid black;
+            margin-bottom: 15px;
+        }
+
+        .po-table td {
+            border: 1px solid black;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <!-- LOGIN MODAL -->
+        <div class="modal-overlay" id="login-modal">
+            <div class="login-modal-box">
+                <h2>🔐 Bank-Mijoz Tizimi</h2>
+                <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+                <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+                <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+                <button onclick="loginUser()">Boshlash</button>
+            </div>
+        </div>
+        </div>
+
+        <!-- USER DISPLAY -->
+        <div class="user-info no-print" id="user-display" style="cursor: default;">
+            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                onclick="logout()" title="Chiqish">❌</span>
+        </div>
+
+        <!-- Sidebar -->
+        <nav class="sidebar no-print">
+            <div class="brand">
+                🏛 BANK-CLIENT
+                <small>FAXR MADAD KONSALT</small>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <button class="nav-btn active" onclick="showView('dashboard')">
+                        📊 <span>Asosiy Panel</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" onclick="showView('payment')">
+                        💸 <span>To'lov (Platyojka)</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" onclick="showView('history')">
+                        📜 <span>Ko'chirma (Tarix)</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" onclick="showView('counterparties')">
+                        👥 <span>Kontragentlar</span>
+                    </button>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                Muallif: Suxrat Abdullaev<br>
+                &copy; 2025
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar no-print">
+                <div>
+                    <h2 style="margin:0;">Xush kelibsiz!</h2>
+                    <div style="font-size:0.9rem; color:#64748b;">Bugun: <span id="current-date"></span></div>
+                </div>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <button onclick="openQuiz()" class="btn"
+                        style="background:#8b5cf6; color:white; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4); display:flex; align-items:center; gap:5px; padding: 10px 20px;">
+                        🧠 Bilimni Sinash
+                    </button>
+                    <div class="balance-card">
+                        <div class="balance-title">Asosiy Hisob Raqam (5110)</div>
+                        <div class="balance-amount" id="main-balance">0.00 <span style="font-size:1rem">so'm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Views -->
+            <div id="views">
+
+                <!-- 1. DASHBOARD -->
+                <div id="view-dashboard" class="view-section">
+                    <div class="content-card">
+                        <h3 class="section-title">Oxirgi Operatsiyalar</h3>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Sana</th>
+                                        <th>Hujjat №</th>
+                                        <th>Kontragent</th>
+                                        <th>Maqsad</th>
+                                        <th class="amount-col">Summa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-trans-body">
+                                    <!-- JS fills -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. PAYMENT ORDER (PLATYOJKA) -->
+                <div id="view-payment" class="view-section" style="display:none;">
+                    <div class="content-card">
+                        <h3 class="section-title">To'lov Topshiriqnomasi Yaratish (Chiqim)</h3>
+                        <form id="payment-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Sana</label>
+                                    <input type="date" id="p-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hujjat Raqami</label>
+                                    <input type="number" id="p-num" value="1" readonly style="background:#f1f5f9;">
+                                </div>
+                            </div>
+
+                            <div class="form-grid"
+                                style="margin-top:1rem; border-top:1px dashed #cbd5e1; padding-top:1rem;">
+                                <!-- PAYER -->
+                                <div>
+                                    <h4 style="margin-top:0; color:var(--primary-dark)">To'lovchi (Biz)</h4>
+                                    <div class="form-group">
+                                        <label>Nomi</label>
+                                        <input type="text" value="FAXR MADAD KONSALT" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hisob Raqam (20 talik)</label>
+                                        <input type="text" value="2020 8000 9000 0012 3456" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>MFO</label>
+                                        <input type="text" value="00450" readonly>
+                                    </div>
+                                </div>
+
+                                <!-- PAYEE -->
+                                <div>
+                                    <h4 style="margin-top:0; color:var(--primary-dark)">Qabul Qiluvchi</h4>
+                                    <div class="form-group">
+                                        <label>Kontragentni tanlang</label>
+                                        <div style="display:flex; gap:5px;">
+                                            <select id="p-payee-select" onchange="fillPayeeDetails()">
+                                                <option value="">Tanlang...</option>
+                                            </select>
+                                            <button type="button" class="btn btn-secondary"
+                                                onclick="showView('counterparties')" title="Yangi qo'shish">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nomi</label>
+                                        <input type="text" id="p-payee-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hisob Raqam</label>
+                                        <input type="text" id="p-payee-account" required placeholder="2020 ..."
+                                            maxlength="20">
+                                    </div>
+                                    <div class="form-group"
+                                        style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                        <div>
+                                            <label>MFO</label>
+                                            <input type="text" id="p-payee-mfo" required maxlength="5">
+                                        </div>
+                                        <div>
+                                            <label>STIR (INN)</label>
+                                            <input type="text" id="p-payee-inn" required maxlength="9">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top:1rem;">
+                                <label>To'lov Summasi (so'm)</label>
+                                <input type="number" id="p-amount" min="1" step="0.01" required
+                                    style="font-size:1.2rem; font-weight:bold; color:var(--primary-dark);">
+                            </div>
+                            <div class="form-group">
+                                <label>To'lov Maqsadi</label>
+                                <textarea id="p-purpose" rows="2" required
+                                    placeholder="Masalan: Shartnoma №12 bo'yicha tovarlar uchun to'lov..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Provodka Turi</label>
+                                <select id="p-type-code">
+                                    <option value="6010">Mol yetkazib beruvchilarga to'lov (Dt 6010 - Kt 5110)</option>
+                                    <option value="6400">Byudjetga to'lovlar (Soliq) (Dt 6400 - Kt 5110)</option>
+                                    <option value="6700">Ish haqi to'lash (Dt 6700 - Kt 5110)</option>
+                                    <option value="6800">Boshqa to'lovlar (Dt 6800 - Kt 5110)</option>
+                                </select>
+                            </div>
+
+                            <div class="accounting-hint">
+                                <strong>☝️ Buxgalteriya:</strong> Ushbu operatsiya <b>5110 (Hisob-kitob schyoti)</b>dan
+                                chiqim qiladi va tanlangan schyotni debetlaydi.
+                            </div>
+
+                            <div style="margin-top:2rem; display:flex; gap:1rem;">
+                                <button type="submit" id="submit-btn" class="btn btn-primary">To'lash va
+                                    Saqlash</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Tozalash / Bekor
+                                    qilish</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 3. HISTORY & STATEMENT -->
+                <div id="view-history" class="view-section" style="display:none;">
+                    <div class="content-card">
+                        <div class="section-title">
+                            <h3>Bank Ko'chirmasi (Vipiska)</h3>
+                            <div>
+                                <button onclick="exportToExcel()" class="btn btn-success" style="font-size:0.9rem;">📊
+                                    Excel</button>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:1rem; display:flex; gap:10px;">
+                            <input type="text" id="search-tx" onkeyup="renderHistory()"
+                                placeholder="Qidirish (Nomi, summa...)" style="max-width:300px;">
+                            <input type="date" id="filter-date" onchange="renderHistory()" style="max-width:150px;">
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table" id="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sana</th>
+                                        <th>№</th>
+                                        <th>Operatsiya Turi</th>
+                                        <th>Kontragent</th>
+                                        <th>Debet</th>
+                                        <th>Kredit</th>
+                                        <th class="amount-col">Summa</th>
+                                        <th>Amal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-body">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. EDIT MODE INDICATOR (Optional, or just handle in form) -->
+
+                <!-- 4. COUNTERPARTIES -->
+                <div id="view-counterparties" class="view-section" style="display:none;">
+                    <div class="content-card">
+                        <h3 class="section-title">Kontragentlar (Hamkorlar)</h3>
+                        <form id="cp-form"
+                            style="background:#f8fafc; padding:1.5rem; border-radius:0.5rem; margin-bottom:2rem;">
+                            <div class="form-grid">
+                                <div class="form-group"><label>Nomi</label><input type="text" id="cp-name" required>
+                                </div>
+                                <div class="form-group"><label>H/R</label><input type="text" id="cp-account" required>
+                                </div>
+                                <div class="form-group"><label>MFO</label><input type="text" id="cp-mfo" required></div>
+                                <div class="form-group"><label>STIR</label><input type="text" id="cp-inn" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Qo'shish</button>
+                        </form>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nomi</th>
+                                    <th>H/R</th>
+                                    <th>MFO</th>
+                                    <th>STIR</th>
+                                    <th>Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cp-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- PRINT OVERLAY -->
+        <div id="print-overlay" class="no-print">
+            <div id="print-area-wrapper">
+                <div style="text-align:right; margin-bottom:10px;">
+                    <button onclick="window.print()" class="btn btn-primary">🖨️ Chop etish</button>
+                    <button onclick="document.getElementById('print-overlay').style.display='none'"
+                        class="btn btn-secondary">Yopish</button>
+                </div>
+                <div id="print-area"></div>
+            </div>
+        </div>
+
+        <script>
+            // --- DATA STORE ---
+            let balance = 0;
+            let transactions = [];
+            let counterparties = [];
+            let editingTxId = null;
+            let currentUser = null;
+
+            // --- INIT ---
+            window.onload = function () {
+                checkLogin();
+            };
+
+            // --- LOGIN SYSTEM ---
+            function checkLogin() {
+                const storedUser = sessionStorage.getItem('bank_user');
+                const storedGroup = sessionStorage.getItem('bank_group');
+                if (storedUser && storedGroup) {
+                    currentUser = storedUser;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(storedUser, storedGroup);
+                    loadData();
+                } else {
+                    document.getElementById('login-modal').style.display = 'flex';
+                }
+            }
+
+            function loginUser() {
+                const name = document.getElementById('username-input').value.trim();
+                const group = document.getElementById('group-input').value.trim();
+
+                if (name && group) {
+                    currentUser = name;
+                    sessionStorage.setItem('bank_user', name);
+                    sessionStorage.setItem('bank_group', group);
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('user-display').style.display = 'block';
+                    updateDisplay(name, group);
+                    loadData();
+                } else {
+                    alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+                }
+            }
+
+            function updateDisplay(name, group) {
+                document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+            }
+
+            function logout() {
+                if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                    sessionStorage.removeItem('bank_user');
+                    sessionStorage.removeItem('bank_group');
+                    location.reload();
+                }
+            }
+
+            function loadData() {
+                if (!currentUser) return;
+                balance = parseFloat(localStorage.getItem('bank_balance_' + currentUser) || '1000000000');
+                transactions = JSON.parse(localStorage.getItem('bank_transactions_' + currentUser) || '[]');
+                counterparties = JSON.parse(localStorage.getItem('bank_counterparties_' + currentUser) || '[]');
+
+                document.getElementById('current-date').innerText = new Date().toLocaleDateString('uz-UZ');
+                updateBalanceDisplay();
+                renderHistory();
+                renderCP();
+                updateCPSelect();
+
+                // Set default date
+                document.getElementById('p-date').valueAsDate = new Date();
+
+                // Set next doc number
+                const lastDoc = transactions.length > 0 ? Math.max(...transactions.map(t => parseInt(t.docNum || 0))) : 0;
+                document.getElementById('p-num').value = lastDoc + 1;
+            }
+
+            // --- NAVIGATION ---
+            function showView(viewId) {
+                document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+                document.getElementById('view-' + viewId).style.display = 'block';
+
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                // Find button by onclick content is hard, so let's skip active class toggle strictly or do basic
+                // Basic specific handling:
+                const btns = document.querySelectorAll('.nav-btn');
+                if (viewId === 'dashboard') btns[0].classList.add('active');
+                if (viewId === 'payment') btns[1].classList.add('active');
+                if (viewId === 'history') btns[2].classList.add('active');
+                if (viewId === 'counterparties') btns[3].classList.add('active');
+            }
+
+            // --- CORE FUNCTIONS ---
+            function updateBalanceDisplay() {
+                if (!currentUser) return;
+                document.getElementById('main-balance').innerHTML = balance.toLocaleString() + ' <span style="font-size:1rem">so\'m</span>';
+                localStorage.setItem('bank_balance_' + currentUser, balance);
+            }
+
+            function saveTx() {
+                if (!currentUser) return;
+                localStorage.setItem('bank_transactions_' + currentUser, JSON.stringify(transactions));
+                updateBalanceDisplay();
+                renderHistory();
+            }
+
+            function saveCP() {
+                if (!currentUser) return;
+                localStorage.setItem('bank_counterparties_' + currentUser, JSON.stringify(counterparties));
+                renderCP();
+                updateCPSelect();
+            }
+
+            // --- PAYMENT LOGIC ---
+            document.getElementById('payment-form').onsubmit = function (e) {
+                e.preventDefault();
+
+                const amount = parseFloat(document.getElementById('p-amount').value);
+
+                // Validation
+                if (editingTxId) {
+                    // If editing, we first need to check if we have enough balance assuming the old amount is refunded
+                    const oldTx = transactions.find(t => t.id === editingTxId);
+                    const tempBalance = balance + oldTx.amount;
+                    if (amount > tempBalance) {
+                        alert("Mablag' yetarli emas! (Tahrirlashda)");
+                        return;
+                    }
+                } else {
+                    if (amount > balance) {
+                        alert("Mablag' yetarli emas!");
+                        return;
+                    }
+                }
+
+                const docNum = document.getElementById('p-num').value;
+                const date = document.getElementById('p-date').value;
+                const payee = document.getElementById('p-payee-name').value;
+                const payeeAcc = document.getElementById('p-payee-account').value;
+                const payeeMfo = document.getElementById('p-payee-mfo').value;
+                const payeeInn = document.getElementById('p-payee-inn').value;
+                const purpose = document.getElementById('p-purpose').value;
+                const typeCode = document.getElementById('p-type-code').value; // Dt Account
+
+                if (editingTxId) {
+                    // UPDATE EXISTING
+                    const index = transactions.findIndex(t => t.id === editingTxId);
+                    if (index !== -1) {
+                        const oldTx = transactions[index];
+
+                        // 1. Revert old balance
+                        balance += oldTx.amount;
+                        // 2. Apply new balance
+                        balance -= amount;
+
+                        // 3. Update tx
+                        transactions[index] = {
+                            ...oldTx,
+                            docNum, date, payee,
+                            payeeDetails: { acc: payeeAcc, mfo: payeeMfo, inn: payeeInn },
+                            amount, purpose, dt: typeCode
+                        };
+
+                        alert("O'zgarishlar saqlandi!");
+                    }
+                } else {
+                    // CREATE NEW
+                    const tx = {
+                        id: Date.now(),
+                        docNum: docNum,
+                        date: date,
+                        type: 'Chiqim',
+                        payee: payee,
+                        payeeDetails: { acc: payeeAcc, mfo: payeeMfo, inn: payeeInn },
+                        amount: amount,
+                        purpose: purpose,
+                        dt: typeCode,
+                        kt: '5110'
+                    };
+
+                    balance -= amount;
+                    transactions.unshift(tx);
+
+                    // Auto increment next doc num only for new
+                    document.getElementById('p-num').value = parseInt(docNum) + 1;
+                }
+
+                saveTx();
+
+                // Clean up
+                cancelEdit(); // Resets form and ID
+                document.getElementById('p-date').value = date; // Keep date for convenience
+
+                if (!editingTxId) {
+                    // Only redirect if it was a new creation, or stay if edit? 
+                    // Let's go to history to see changes
+                    showView('history');
+                }
+            };
+
+            function editTransaction(id) {
+                const tx = transactions.find(t => t.id === id);
+                if (!tx) return;
+
+                editingTxId = id;
+
+                // Switch to form
+                showView('payment');
+
+                // Fill form
+                document.getElementById('p-num').value = tx.docNum || '';
+                document.getElementById('p-date').value = tx.date;
+
+                document.getElementById('p-payee-name').value = tx.payee;
+                if (tx.payeeDetails) {
+                    document.getElementById('p-payee-account').value = tx.payeeDetails.acc || '';
+                    document.getElementById('p-payee-mfo').value = tx.payeeDetails.mfo || '';
+                    document.getElementById('p-payee-inn').value = tx.payeeDetails.inn || '';
+                }
+
+                document.getElementById('p-type-code').value = tx.dt || '6010';
+                document.getElementById('p-amount').value = tx.amount;
+                document.getElementById('p-purpose').value = tx.purpose;
+
+                // Change UI
+                document.querySelector('.section-title').innerText = "To'lov Topshiriqnomasi (Tahrirlash)";
+                document.getElementById('submit-btn').innerText = "💾 Saqlash";
+                document.getElementById('submit-btn').classList.remove('btn-primary');
+                document.getElementById('submit-btn').classList.add('btn-success');
+            }
+
+            function cancelEdit() {
+                editingTxId = null;
+                document.getElementById('payment-form').reset();
+
+                // Reset UI
+                document.querySelector('.section-title').innerText = "To'lov Topshiriqnomasi Yaratish (Chiqim)";
+                document.getElementById('submit-btn').innerText = "To'lash va Saqlash";
+                document.getElementById('submit-btn').classList.add('btn-primary');
+                document.getElementById('submit-btn').classList.remove('btn-success');
+
+                // Restore ID logic
+                const lastDoc = transactions.length > 0 ? Math.max(...transactions.map(t => parseInt(t.docNum || 0))) : 0;
+                document.getElementById('p-num').value = lastDoc + 1;
+                document.getElementById('p-date').valueAsDate = new Date();
+            }
+
+            // --- COUNTERPARTIES LOGIC ---
+            document.getElementById('cp-form').onsubmit = function (e) {
+                e.preventDefault();
+                const cp = {
+                    id: Date.now(),
+                    name: document.getElementById('cp-name').value,
+                    account: document.getElementById('cp-account').value,
+                    mfo: document.getElementById('cp-mfo').value,
+                    inn: document.getElementById('cp-inn').value
+                };
+                counterparties.push(cp);
+                saveCP();
+                this.reset();
+                alert("Kontragent qo'shildi!");
+            };
+
+            function deleteCP(id) {
+                if (!confirm("O'chirasizmi?")) return;
+                counterparties = counterparties.filter(c => c.id !== id);
+                saveCP();
+            }
+
+            function renderCP() {
+                const tbody = document.getElementById('cp-body');
+                tbody.innerHTML = '';
+                counterparties.forEach(c => {
+                    tbody.innerHTML += `
+                    <tr>
+                        <td>${c.name}</td>
+                        <td>${c.account}</td>
+                        <td>${c.mfo}</td>
+                        <td>${c.inn}</td>
+                        <td><button onclick="deleteCP(${c.id})" class="btn btn-danger" style="padding:5px 10px;">x</button></td>
+                    </tr>
+                `;
+                });
+            }
+
+            function updateCPSelect() {
+                const sel = document.getElementById('p-payee-select');
+                sel.innerHTML = '<option value="">Tanlang...</option>';
+                counterparties.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.text = c.name;
+                    sel.appendChild(opt);
+                });
+            }
+
+            function fillPayeeDetails() {
+                const id = document.getElementById('p-payee-select').value;
+                if (!id) return;
+                const c = counterparties.find(x => x.id == id);
+                if (c) {
+                    document.getElementById('p-payee-name').value = c.name;
+                    document.getElementById('p-payee-account').value = c.account;
+                    document.getElementById('p-payee-mfo').value = c.mfo;
+                    document.getElementById('p-payee-inn').value = c.inn;
+                }
+            }
+
+            // --- HISTORY RENDER ---
+            function renderHistory() {
+                const tbody = document.getElementById('history-body');
+                const dashBody = document.getElementById('dash-trans-body');
+                tbody.innerHTML = '';
+                dashBody.innerHTML = '';
+
+                const term = document.getElementById('search-tx').value.toLowerCase();
+                const dateFilter = document.getElementById('filter-date').value;
+
+                const filtered = transactions.filter(t => {
+                    const matchTerm = t.payee.toLowerCase().includes(term) || t.amount.toString().includes(term) || t.purpose.toLowerCase().includes(term);
+                    const matchDate = dateFilter ? t.date === dateFilter : true;
+                    return matchTerm && matchDate;
+                });
+
+                filtered.forEach(t => {
+                    const isOut = t.type === 'Chiqim';
+                    const row = `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td>${t.docNum || '-'}</td>
+                        <td><span class="badge" style="background:${isOut ? '#fee2e2' : '#d1fae5'}; color:${isOut ? 'red' : 'green'}; padding:2px 6px; border-radius:4px; font-size:0.8rem">${t.type}</span></td>
+                        <td>${t.payee} <div style="font-size:0.8rem; color:#888">${t.purpose.substring(0, 30)}...</div></td>
+                        <td>${t.dt}</td>
+                        <td>${t.kt}</td>
+                        <td class="amount-col ${isOut ? 'text-red' : 'text-green'}">
+                            ${isOut ? '-' : '+'}${t.amount.toLocaleString()}
+                        </td>
+                        <td style="display:flex; gap:5px;">
+                            <button onclick="printPaymentOrderById(${t.id})" class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem;" title="Chop etish">🖨️</button>
+                            <button onclick="editTransaction(${t.id})" class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem; background-color:#f59e0b; border:none;" title="Tahrirlash">✏️</button>
+                        </td>
+                    </tr>
+                `;
+                    tbody.innerHTML += row;
+                });
+
+                // Dashboard items (top 5)
+                filtered.slice(0, 5).forEach(t => {
+                    const isOut = t.type === 'Chiqim';
+                    dashBody.innerHTML += `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td>${t.docNum || '-'}</td>
+                        <td>${t.payee}</td>
+                         <td>${t.purpose.substring(0, 20)}...</td>
+                        <td class="amount-col ${isOut ? 'text-red' : 'text-green'}">${t.amount.toLocaleString()}</td>
+                    </tr>
+                 `;
+                });
+            }
+
+            // --- PRINTING ---
+            function printPaymentOrderById(id) {
+                const tx = transactions.find(t => t.id === id);
+                if (tx) printPaymentOrder(tx);
+            }
+
+            function printPaymentOrder(tx) {
+                const div = document.getElementById('print-area');
+                const dateObj = new Date(tx.date);
+
+                div.innerHTML = `
+                <div class="po-container">
+                    <div style="text-align:right; font-size:0.8rem;">0903802-shakl</div>
+                    <h2 style="text-align:center; margin-bottom:5px;">TO'LOV TOPSHIRIQNOMASI № ${tx.docNum}</h2>
+                    <p style="text-align:center; margin-top:0;">${tx.date} yil</p>
+
+                    <table class="po-table">
+                         <tr>
+                            <td width="5%"></td>
+                            <td width="45%">To'lovchi: <b>FAXR MADAD KONSALT</b></td>
+                            <td width="15%">STIR: 123456789</td>
+                            <td width="35%"><strong>DEBET</strong><br>H/R: 2020 8000 9000 0012 3456</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Bank: AT "XALQ BANKI" OPERU</td>
+                            <td>Bank kodi: 00450</td>
+                            <td>Summa: <b>${tx.amount.toLocaleString()}</b></td>
+                        </tr>
+                    </table>
+
+                    <table class="po-table">
+                         <tr>
+                            <td width="5%"></td>
+                            <td width="45%">Qabul qiluvchi: <b>${tx.payee}</b></td>
+                            <td width="15%">STIR: ${tx.payeeDetails.inn}</td>
+                            <td width="35%"><strong>KREDIT</strong><br>H/R: ${tx.payeeDetails.acc}</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Bank: Bank kodi bo'yicha filial</td>
+                            <td>Bank kodi: ${tx.payeeDetails.mfo}</td>
+                            <td>Summa: <b>${tx.amount.toLocaleString()}</b></td>
+                        </tr>
+                    </table>
+                    
+                    <div style="margin: 10px 0; border-bottom: 1px solid black; padding-bottom:5px;">
+                        <strong>To'lov maqsadi:</strong> ${tx.purpose}
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; margin-top:40px;">
+                        <div style="text-align:center;">
+                            ___________________<br>(Rahbar imzosi)
+                        </div>
+                        <div style="text-align:center;">
+                            ___________________<br>(Bosh Buxgalter)
+                        </div>
+                        <div style="text-align:center; width:100px; height:100px; border:2px solid #ddd; border-radius:50%;">
+                            <br><small style="color:#ddd">Muhr o'rni</small>
+                        </div>
+                    </div>
+                     <div style="margin-top:20px; font-size:0.7rem; text-align:center; border-top:1px dashed grey; padding-top:5px;">
+                        "FAXR MADAD KONSALT" | Muallif: Suxrat Abdullaev | 2025
+                    </div>
+                </div>
+            `;
+                document.getElementById('print-overlay').style.display = 'flex';
+            }
+
+            function exportToExcel() {
+                let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+                csvContent += "Sana,Hujjat Raqami,Kontragent,DT,KT,Summa,Maqsad\n";
+                transactions.forEach(t => {
+                    csvContent += `${t.date},${t.docNum},"${t.payee}",${t.dt},${t.kt},${t.amount},"${t.purpose}"\n`;
+                });
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "bank_kochat_" + new Date().toLocaleDateString() + ".csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        </script>
+    </body>
+
+    <script>
+        // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
+        const quizQuestions = [
+            { q: "Mijozdan bank hisob raqamga tushum (5,000,000 so'm)", dt: "5110", kt: "4010", sum: 5000000 },
+            { q: "Yetkazib beruvchiga pul o'tkazildi (2,000,000 so'm)", dt: "6010", kt: "5110", sum: 2000000 },
+            { q: "Byudjetga soliq to'landi (1,000,000 so'm)", dt: "6410", kt: "5110", sum: 1000000 },
+            { q: "Xodimlarga ish haqi plastik kartaga o'tkazildi (8,000,000 so'm)", dt: "6710", kt: "5110", sum: 8000000 },
+            { q: "Kassadan bankka naqd pul topshirildi (Inkassatsiya) (3,000,000 so'm)", dt: "5110", kt: "5010", sum: 3000000 },
+            { q: "Bank xizmat haqi ushlab qolindi (50,000 so'm)", dt: "9430", kt: "5110", sum: 50000 },
+            { q: "Bank krediti olindi (50,000,000 so'm)", dt: "5110", kt: "6810", sum: 50000000 },
+            { q: "Bank krediti foizi to'landi (1,000,000 so'm)", dt: "6920", kt: "5110", sum: 1000000 },
+            { q: "Ta'sischi tomonidan Ustav kapitaliga pul o'tkazildi (10,000,000 so'm)", dt: "5110", kt: "4610", sum: 10000000 },
+            { q: "Valyuta ayirboshlash (Sotib olish) uchun pul ko'chirildi (12,000,000 so'm)", dt: "5530", kt: "5110", sum: 12000000 }
+        ];
+
+        let currentQIndex = 0;
+
+        function openQuiz() {
+            currentQIndex = 0;
+            document.getElementById('quiz-modal').style.display = 'flex';
+            loadQuestion();
+        }
+
+        function closeQuiz() {
+            document.getElementById('quiz-modal').style.display = 'none';
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= quizQuestions.length) {
+                document.getElementById('quiz-content').innerHTML = `
+                        <div style="text-align:center; padding:20px;">
+                            <h2 style="color:#4338ca;">🎉 Tabriklaymiz!</h2>
+                            <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
+                            <button onclick="closeQuiz()" class="btn btn-primary">Yopish</button>
+                            <button onclick="openQuiz()" class="btn btn-secondary" style="margin-top:10px;">Qayta ishlash</button>
+                        </div>
+                    `;
+                return;
+            }
+
+            const q = quizQuestions[currentQIndex];
+            document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+            document.getElementById('q-dt').value = '';
+            document.getElementById('q-kt').value = '';
+            document.getElementById('q-sum').value = '';
+            document.getElementById('q-feedback').innerText = '';
+            document.getElementById('q-feedback').style.display = 'none';
+        }
+
+        function checkAnswer() {
+            const dt = document.getElementById('q-dt').value.trim();
+            const kt = document.getElementById('q-kt').value.trim();
+            const sum = parseFloat(document.getElementById('q-sum').value) || 0;
+
+            const target = quizQuestions[currentQIndex];
+            const feedback = document.getElementById('q-feedback');
+
+            if (dt === target.dt && kt === target.kt && sum === target.sum) {
+                feedback.innerHTML = '<span style="color:green; font-weight:bold;">✅ Javob to\'g\'ri!</span>';
+                feedback.style.display = 'block';
+                setTimeout(() => {
+                    currentQIndex++;
+                    loadQuestion();
+                }, 1000);
+            } else {
+                feedback.innerHTML = `<span style="color:red; font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                feedback.style.display = 'block';
+            }
+        }
+    </script>
+
+    <!-- QUIZ MODAL -->
+    <div class="modal-overlay" id="quiz-modal" style="display:none; z-index:9999;">
+        <div class="modal" style="max-width:500px; text-align:left;" id="quiz-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h2 style="margin:0; color:#8b5cf6;">🧠 Bilimni Sinash</h2>
+                <button onclick="closeQuiz()"
+                    style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#1f2937;"
+                id="q-text">
+                Savol yuklanmoqda...
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div>
+                    <label style="font-size:0.8rem; font-weight:bold;">Debet (Schyot)</label>
+                    <input type="text" id="q-dt" placeholder="Mas: 5110">
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; font-weight:bold;">Kredit (Schyot)</label>
+                    <input type="text" id="q-kt" placeholder="Mas: 4010">
+                </div>
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="font-size:0.8rem; font-weight:bold;">Summa</label>
+                <input type="number" id="q-sum" placeholder="So'mda kiriting">
+            </div>
+
+            <div id="q-feedback"
+                style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;">
+            </div>
+
+            <button onclick="checkAnswer()" class="btn btn-primary"
+                style="width:100%; justify-content:center;">Tekshirish</button>
+        </div>
+    </div>
+</body>
+
+</html>

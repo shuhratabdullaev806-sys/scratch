@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buxgalteriya Simulyatori - 8 Tur</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ca8a04;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --income: #059669;
+            /* Emerald 600 */
+            --expense: #d97706;
+            /* Amber 600 */
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            color: #64748b;
+        }
+
+        /* EQUATION VISUALIZER */
+        .equation {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        .eq-block {
+            flex: 1;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid #ccc;
+            transition: transform 0.2s;
+        }
+
+        .eq-block h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .asset-block {
+            border-top-color: var(--success);
+        }
+
+        .liability-block {
+            border-top-color: var(--danger);
+        }
+
+        .equity-block {
+            border-top-color: var(--primary);
+        }
+
+        .income-block {
+            border-top-color: var(--income);
+        }
+
+        .expense-block {
+            border-top-color: var(--expense);
+        }
+
+        .items-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: #f8fafc;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .total-row {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .control-group {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .control-group h3 {
+            margin-top: 0;
+            color: #475569;
+        }
+
+        .op-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .btn-op {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-op:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .btn-op strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .btn-op small {
+            display: block;
+            color: #64748b;
+            line-height: 1.2;
+        }
+
+        /* LOG */
+        .log-area {
+            margin-top: 20px;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        /* Animation Classes */
+        @keyframes flashGreen {
+            0% {
+                background: #dcfce7;
+            }
+
+            100% {
+                background: #f8fafc;
+            }
+        }
+
+        @keyframes flashRed {
+            0% {
+                background: #fee2e2;
+            }
+
+            100% {
+                background: #f8fafc;
+            }
+        }
+
+        .flash-up {
+            animation: flashGreen 1s ease;
+        }
+
+        .flash-down {
+            animation: flashRed 1s ease;
+        }
+
+        .eq-sign {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        /* LOGIN MODAL & USER INFO */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-modal-box h2 {
+            margin-top: 0;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .login-modal-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-modal-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            cursor: pointer;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="login-modal-box">
+            <h2>🔐 Simulyatorga Kirish</h2>
+            <p style="margin-bottom: 1rem; color: #6b7280;">Talaba ma'lumotlarini kiriting:</p>
+            <input type="text" id="username-input" placeholder="F.I.Sh (Masalan: Aliyev Vali)" autofocus>
+            <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
+            <button onclick="loginUser()">Boshlash</button>
+        </div>
+    </div>
+
+    <!-- USER DISPLAY -->
+    <div class="user-info no-print" id="user-display" style="cursor: default;">
+        <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+            onclick="logout()" title="Chiqish">❌</span>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>⚖️ Buxgalteriya Simulyatori</h1>
+            <div class="subtitle">Aktiv = Majburiyat + Kapital (8 xil operatsiya turi)</div>
+            <small>"FAXR MADAD KONSALT" | Muallif: Suxrat Abdullaev</small>
+        </header>
+
+        <!-- VISUAL DASHBOARD -->
+        <div class="equation">
+            <!-- ASSETS -->
+            <div class="eq-block asset-block">
+                <h2>🟢 Aktivlar</h2>
+                <ul class="items-list" id="assets-list">
+                    <!-- JS will populate -->
+                </ul>
+                <div class="total-row">
+                    <span>Jami:</span>
+                    <span id="total-assets">0</span>
+                </div>
+            </div>
+
+            <div class="eq-sign">=</div>
+
+            <!-- LIABILITIES -->
+            <div class="eq-block liability-block">
+                <h2>🔴 Majburiyatlar</h2>
+                <ul class="items-list" id="liabilities-list">
+                    <!-- JS will populate -->
+                </ul>
+                <div class="total-row">
+                    <span>Jami:</span>
+                    <span id="total-liabilities">0</span>
+                </div>
+            </div>
+
+            <div class="eq-sign">+</div>
+
+            <!-- EQUITY -->
+            <div class="eq-block equity-block">
+                <h2>🔵 Kapital (Sof Aktiv)</h2>
+                <ul class="items-list" id="equity-list">
+                    <!-- JS will populate -->
+                </ul>
+                <div class="total-row">
+                    <span>Jami:</span>
+                    <span id="total-equity">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFIT AND LOSS SECTION -->
+        <h2 style="text-align:center; color:#475569; margin-top:40px;">📉 Moliyaviy Natijalar (Foyda va Zarar)</h2>
+        <div class="equation">
+            <!-- INCOME -->
+            <div class="eq-block income-block">
+                <h2>🟢 Daromadlar</h2>
+                <ul class="items-list" id="income-list">
+                    <!-- JS will populate -->
+                </ul>
+                <div class="total-row">
+                    <span>Jami:</span>
+                    <span id="total-income">0</span>
+                </div>
+            </div>
+
+            <div class="eq-sign">-</div>
+
+            <!-- EXPENSES -->
+            <div class="eq-block expense-block">
+                <h2>🟠 Xarajatlar</h2>
+                <ul class="items-list" id="expenses-list">
+                    <!-- JS will populate -->
+                </ul>
+                <div class="total-row">
+                    <span>Jami:</span>
+                    <span id="total-expenses">0</span>
+                </div>
+            </div>
+
+            <div class="eq-sign">=</div>
+
+            <!-- NET PROFIT -->
+            <div class="eq-block" style="border-top-color: #64748b;">
+                <h2>Sof Foyda (Zarar)</h2>
+                <div style="text-align:center; font-size: 2rem; font-weight:bold; margin-top:20px;"
+                    id="net-profit-display">
+                    0
+                </div>
+                <small style="display:block; text-align:center; margin-top:10px; color:#64748b;">Bu summa Kapitalga
+                    qo'shiladi</small>
+            </div>
+        </div>
+
+        <!-- OPERATIONS -->
+        <div class="controls">
+            <!-- GROUP 1: NO CHANGE IN EQUITY -->
+            <div class="control-group">
+                <h3>1. Natijaga ta'sir qilmaydi (Foyda/Zarar yo'q)</h3>
+                <div class="op-grid">
+                    <button class="btn-op" onclick="runOp(3)">
+                        <strong>3-tur: Aktiv Almashinuvi (A+ A-)</strong>
+                        <small>Misol: Do'kondan oziq-ovqat sotib olish (Pulingiz kamayadi, tovamingiz
+                            ko'payadi).</small>
+                    </button>
+                    <button class="btn-op" onclick="runOp(4)">
+                        <strong>4-tur: Ikkalasi ham kamayishi (A- M-)</strong>
+                        <small>Misol: Qarzni qaytarish (Pulingiz ham, qarzingiz ham kamayadi).</small>
+                    </button>
+                    <button class="btn-op" onclick="runOp(6)">
+                        <strong>6-tur: Ikkalasi ham ko'payishi (A+ M+)</strong>
+                        <small>Misol: Kredit olish (Pulingiz ham, qarzingiz ham ko'payadi).</small>
+                    </button>
+                    <button class="btn-op" onclick="runOp(8)">
+                        <strong>8-tur: Majburiyat Almashinuvi (M+ M-)</strong>
+                        <small>Misol: Ish haqidan soliq ushlash (Xodim oldidagi qarz kamayib, Byudjet oldidagi qarz
+                            ortadi).</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GROUP 2: CHANGE IN EQUITY -->
+            <div class="control-group">
+                <h3>2. Natijaga ta'sir qiladi (Foyda/Zarar bor)</h3>
+                <div class="op-grid">
+                    <button class="btn-op" onclick="runOp(1)">
+                        <strong>1-tur: Xarajat (A- K-)</strong>
+                        <small>Misol: Olma yeyish (Olma yo'q bo'ldi, sizning boyligingiz kamaydi).</small>
+                    </button>
+                    <button class="btn-op" onclick="runOp(2)">
+                        <strong>2-tur: Hisoblangan Xarajat (M+ K-)</strong>
+                        <small>Misol: Komunal uchun qarz yozildi (Qarz ortdi, boylik kamaydi).</small>
+                    </button>
+                    <button class="btn-op" onclick="runOp(5)">
+                        <strong>5-tur: Daromad (A+ K+)</strong>
+                        <small>Misol: Nasiyaga xizmat ko'rsatish (Qarzdorlar ortdi, boylik ortdi).</small>
+                    </button>
+                    <button class="btn-op" onclick="runOp(7)">
+                        <strong>7-tur: Ishlangan Daromad (M- K+)</strong>
+                        <small>Misol: Avans yopilishi (Bo'yindagi qarz kamaydi, daromad tan olindi).</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-area" id="log-area">
+            <div style="font-weight:bold; margin-bottom:10px;">📋 Operatsiyalar Tarixi:</div>
+        </div>
+
+    </div>
+
+    <script>
+        // INITIAL STATE
+        // INITIAL STATE
+        let currentUser = null;
+        let data = {
+            assets: {
+                'Pul (Kassa)': 1000000,
+                'Tovar (Oziq-ovqat)': 500000,
+                'Debitorlar': 0
+            },
+            liabilities: {
+                'Qarzlar (Kreditor)': 200000,
+                'Kredit (Bank)': 0,
+                'Ish Haqi': 100000,
+                'Soliq': 0,
+                'Avanslar': 100000
+            },
+            equity: {
+                'Ustav Kapitali': 1100000
+                // 'Foyda/Zarar' will be calculated dynamically
+            },
+            income: {
+                'Xizmatdan tushum': 0,
+                'Sotuvdan tushum': 0
+            },
+            expenses: {
+                'Oziq-ovqat xarajati': 0,
+                'Komunal xarajatlar': 0
+            }
+        };
+
+        // --- LOGIN SYSTEM ---
+        function checkLogin() {
+            const storedUser = sessionStorage.getItem('sim_user');
+            const storedGroup = sessionStorage.getItem('sim_group');
+            if (storedUser && storedGroup) {
+                currentUser = storedUser;
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('user-display').style.display = 'block';
+                updateDisplay(storedUser, storedGroup);
+                loadData();
+            } else {
+                document.getElementById('login-modal').style.display = 'flex';
+            }
+        }
+
+        function loginUser() {
+            const name = document.getElementById('username-input').value.trim();
+            const group = document.getElementById('group-input').value.trim();
+            if (name && group) {
+                currentUser = name;
+                sessionStorage.setItem('sim_user', name);
+                sessionStorage.setItem('sim_group', group);
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('user-display').style.display = 'block';
+                updateDisplay(name, group);
+                loadData();
+            } else {
+                alert("Iltimos, F.I.Sh va Guruhni kiriting!");
+            }
+        }
+
+        function updateDisplay(name, group) {
+            document.getElementById('current-user-info').innerHTML = `👤 Talaba: <b>${name}</b> | Guruh: <b>${group}</b>`;
+        }
+
+        function logout() {
+            if (confirm("Tizimdan chiqmoqchimisiz?")) {
+                sessionStorage.removeItem('sim_user');
+                sessionStorage.removeItem('sim_group');
+                location.reload();
+            }
+        }
+
+        function loadData() {
+            if (!currentUser) return;
+            const storedData = localStorage.getItem('sim_data_' + currentUser);
+            if (storedData) {
+                data = JSON.parse(storedData);
+                // Migratsiya: Agar eski data bo'lsa va yangi bo'limlar yo'q bo'lsa
+                if (!data.income) data.income = { 'Xizmatdan tushum': 0, 'Sotuvdan tushum': 0 };
+                if (!data.expenses) data.expenses = { 'Oziq-ovqat xarajati': 0, 'Komunal xarajatlar': 0 };
+
+                // MIGRATION: Balance Sheetni saqlab qolish uchun eski Foyda/Zararni arxivlash
+                if (data.equity['Foyda/Zarar'] !== undefined) {
+                    // Agar qiymat 0 bo'lmasa, uni saqlab qolamiz
+                    if (data.equity['Foyda/Zarar'] !== 0) {
+                        data.equity["O'tgan davr natijasi"] = data.equity['Foyda/Zarar'];
+                    }
+                    delete data.equity['Foyda/Zarar'];
+                }
+            }
+            render();
+        }
+
+        function saveData() {
+            if (!currentUser) return;
+            localStorage.setItem('sim_data_' + currentUser, JSON.stringify(data));
+        }
+
+        function render() {
+            // Calculate Totals
+            let tA = 0, tL = 0, tE = 0, tI = 0, tEx = 0;
+
+            // Assets
+            const listA = document.getElementById('assets-list');
+            listA.innerHTML = '';
+            for (let k in data.assets) {
+                tA += data.assets[k];
+                listA.innerHTML += `<li class="item" id="row-a-${k}"><span>${k}</span><span>${data.assets[k].toLocaleString()}</span></li>`;
+            }
+            document.getElementById('total-assets').innerText = tA.toLocaleString();
+
+            // Liabilities
+            const listL = document.getElementById('liabilities-list');
+            listL.innerHTML = '';
+            for (let k in data.liabilities) {
+                tL += data.liabilities[k];
+                listL.innerHTML += `<li class="item" id="row-l-${k}"><span>${k}</span><span>${data.liabilities[k].toLocaleString()}</span></li>`;
+            }
+            document.getElementById('total-liabilities').innerText = tL.toLocaleString();
+
+            // Income
+            const listI = document.getElementById('income-list');
+            listI.innerHTML = '';
+            for (let k in data.income) {
+                tI += data.income[k];
+                listI.innerHTML += `<li class="item"><span>${k}</span><span>${data.income[k].toLocaleString()}</span></li>`;
+            }
+            document.getElementById('total-income').innerText = tI.toLocaleString();
+
+            // Expenses
+            const listEx = document.getElementById('expenses-list');
+            listEx.innerHTML = '';
+            for (let k in data.expenses) {
+                tEx += data.expenses[k];
+                listEx.innerHTML += `<li class="item"><span>${k}</span><span>${data.expenses[k].toLocaleString()}</span></li>`;
+            }
+            document.getElementById('total-expenses').innerText = tEx.toLocaleString();
+
+            // Calculate Net Profit
+            const netProfit = tI - tEx;
+            const npDiv = document.getElementById('net-profit-display');
+            npDiv.innerText = netProfit.toLocaleString();
+            npDiv.style.color = netProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+
+            // Equity
+            const listE = document.getElementById('equity-list');
+            listE.innerHTML = '';
+
+            // Loop through stored Equity items (Ustav, Retained Earnings, etc)
+            for (let k in data.equity) {
+                tE += data.equity[k];
+                listE.innerHTML += `<li class="item"><span>${k}</span><span>${data.equity[k].toLocaleString()}</span></li>`;
+            }
+
+            // Add Current Period Net Profit
+            tE += netProfit;
+            // Only show if not zero or specifically want to show it? Let's always show current period result.
+            listE.innerHTML += `<li class="item" style="color:${netProfit >= 0 ? 'green' : 'red'}"><span>Joriy Foyda/Zarar</span><span>${netProfit.toLocaleString()}</span></li>`;
+
+            document.getElementById('total-equity').innerText = tE.toLocaleString();
+        }
+
+        function log(msg, type) {
+            const area = document.getElementById('log-area');
+            const d = new Date().toLocaleTimeString();
+            const color = type === 'neutral' ? '#000' : (type === 'good' ? 'green' : 'red');
+            area.innerHTML = `<div class="log-entry"><span class="log-time">[${d}]</span> <span style="color:${color}">${msg}</span></div>` + area.innerHTML;
+        }
+
+        function runOp(type) {
+            const amount = 50000;
+            let msg = "";
+            let style = "neutral";
+
+            // Helper to update and flash
+            function update(cat, key, val) {
+                data[cat][key] += val;
+            }
+
+            switch (type) {
+                // --- NEUTRAL ---
+                case 3: // A+ A-
+                    if (data.assets['Pul (Kassa)'] < amount) { alert("Pul yetarli emas!"); return; }
+                    update('assets', 'Pul (Kassa)', -amount);
+                    update('assets', 'Tovar (Oziq-ovqat)', amount);
+                    msg = `3-tur: <b>Pul</b> kamaydi (-${amount.toLocaleString()}), <b>Tovar</b> ko'paydi (+${amount.toLocaleString()}). Aktiv shunchaki almashdi. Sof O'zgarish: 0`;
+                    break;
+                case 4: // A- M-
+                    if (data.assets['Pul (Kassa)'] < amount) { alert("Pul yetarli emas!"); return; }
+                    if (data.liabilities['Qarzlar (Kreditor)'] < amount) { alert("To'lashga qarz yo'q!"); return; }
+                    update('assets', 'Pul (Kassa)', -amount);
+                    update('liabilities', 'Qarzlar (Kreditor)', -amount);
+                    msg = `4-tur: <b>Pul</b> kamaydi (-${amount.toLocaleString()}), <b>Qarz</b> kamaydi (-${amount.toLocaleString()}). Balans kichraydi.`;
+                    break;
+                case 6: // A+ M+
+                    update('assets', 'Pul (Kassa)', amount);
+                    update('liabilities', 'Kredit (Bank)', amount);
+                    msg = `6-tur: <b>Pul</b> ko'paydi (+${amount.toLocaleString()}), <b>Kredit</b> qarzi paydo bo'ldi (+${amount.toLocaleString()}).`;
+                    break;
+                case 8: // M+ M-
+                    if (data.liabilities['Ish Haqi'] < amount) { alert("Ushlash uchun oylik yo'q!"); return; }
+                    update('liabilities', 'Ish Haqi', -amount);
+                    update('liabilities', 'Soliq', amount);
+                    msg = `8-tur: <b>Ish haqi</b> qarzi kamaydi (-${amount.toLocaleString()}), <b>Soliq</b> qarzi paydo bo'ldi (+${amount.toLocaleString()}). Majburiyat almashdi.`;
+                    break;
+
+                // --- PROFIT/LOSS ---
+                case 1: // A- K- (Expense)
+                    if (data.assets['Tovar (Oziq-ovqat)'] < amount) { alert("Yeyishga Tovar yo'q!"); return; }
+                    update('assets', 'Tovar (Oziq-ovqat)', -amount);
+                    update('expenses', 'Oziq-ovqat xarajati', amount); // Expense recorded (positive number)
+                    msg = `1-tur (Xarajat): <b>Tovar</b> yeyildi (-${amount.toLocaleString()}). Xarajat hisoblandi (+${amount.toLocaleString()}). Sof foyda kamaydi.`;
+                    style = 'bad';
+                    break;
+                case 2: // M+ K- (Expense)
+                    update('liabilities', 'Qarzlar (Kreditor)', amount);
+                    update('expenses', 'Komunal xarajatlar', amount);
+                    msg = `2-tur (Xarajat): <b>Komunal qarzi</b> yozildi (+${amount.toLocaleString()}). Xarajat oshdi (+${amount.toLocaleString()}). Sof foyda kamaydi.`;
+                    style = 'bad';
+                    break;
+                case 5: // A+ K+ (Income)
+                    update('assets', 'Debitorlar', amount);
+                    update('income', 'Xizmatdan tushum', amount);
+                    msg = `5-tur (Daromad): Xizmat ko'rsatildi. <b>Debitor</b> ortdi (+${amount.toLocaleString()}). Daromad yozildi (+${amount.toLocaleString()}).`;
+                    style = 'good';
+                    break;
+                case 7: // M- K+ (Income)
+                    if (data.liabilities['Avanslar'] < amount) { alert("Yopish uchun Avans yo'q!"); return; }
+                    update('liabilities', 'Avanslar', -amount);
+                    update('income', 'Sotuvdan tushum', amount);
+                    msg = `7-tur (Daromad): Avans hisobiga ish bajarildi. <b>Avans</b> yopildi (-${amount.toLocaleString()}). Daromad tan olindi (+${amount.toLocaleString()}).`;
+                    style = 'good';
+                    break;
+            }
+
+            render();
+            log(msg, style);
+            saveData();
+        }
+
+        window.onload = function () {
+            checkLogin();
+        };
+
+    </script>
+
+</body>
+
+</html>
