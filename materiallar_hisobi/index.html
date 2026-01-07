@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materiallar Hisobi Simulyatori - FAXR MADAD KONSALT</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path
+                                d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>FAXR MADAD KONSALT</h1>
+                        <p>Materiallar Hisobi Simulyatori</p>
+                    </div>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Jami Operatsiyalar</span>
+                        <span class="stat-value" id="totalTransactions">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Method Selector -->
+        <section class="method-selector">
+            <div class="method-info">
+                <h2>Hisoblash Usulini Tanlang</h2>
+                <p class="method-description" id="methodDescription">
+                    FIFO usulida birinchi kelgan materiallar birinchi ishlatiladi
+                </p>
+            </div>
+            <div class="toggle-container">
+                <button class="method-btn active" data-method="fifo" id="fifoBtn">
+                    <span class="method-icon">📦</span>
+                    <span class="method-name">FIFO</span>
+                    <span class="method-subtitle">First-In, First-Out</span>
+                </button>
+                <button class="method-btn" data-method="aveco" id="avecoBtn">
+                    <span class="method-icon">🔄</span>
+                    <span class="method-name">AVECO</span>
+                    <span class="method-subtitle">O'rtacha Narx</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Column: Input Form -->
+            <section class="card input-section">
+                <h3 class="card-title">Operatsiya Qo'shish</h3>
+                <form id="transactionForm">
+                    <div class="form-group">
+                        <label for="transactionType">Operatsiya Turi</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="type" value="kirim" checked>
+                                <span class="radio-custom kirim">
+                                    <span class="radio-icon">↓</span>
+                                    Kirim
+                                </span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="type" value="chiqim">
+                                <span class="radio-custom chiqim">
+                                    <span class="radio-icon">↑</span>
+                                    Chiqim
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Sana</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Miqdor (dona)</label>
+                        <input type="number" id="quantity" min="0.01" step="0.01" placeholder="100" required>
+                    </div>
+
+                    <div class="form-group" id="priceGroup">
+                        <label for="price">Narx (so'm)</label>
+                        <input type="number" id="price" min="0.01" step="0.01" placeholder="50000" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <span class="btn-icon">+</span>
+                        Operatsiya Qo'shish
+                    </button>
+                </form>
+
+                <!-- Current Balance -->
+                <div class="balance-summary">
+                    <h4>Joriy Qoldiq</h4>
+                    <div class="balance-grid">
+                        <div class="balance-item">
+                            <span class="balance-label">Miqdor</span>
+                            <span class="balance-value" id="currentQuantity">0</span>
+                            <span class="balance-unit">dona</span>
+                        </div>
+                        <div class="balance-item">
+                            <span class="balance-label">Summa</span>
+                            <span class="balance-value" id="currentValue">0</span>
+                            <span class="balance-unit">so'm</span>
+                        </div>
+                        <div class="balance-item">
+                            <span class="balance-label">O'rtacha Narx</span>
+                            <span class="balance-value" id="avgPrice">0</span>
+                            <span class="balance-unit">so'm</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Visualization -->
+            <section class="card visualization-section">
+                <h3 class="card-title">Vizual Ko'rinish</h3>
+                <div id="visualizationContainer" class="visualization-container">
+                    <!-- FIFO Visualization -->
+                    <div id="fifoVisualization" class="visualization active">
+                        <div class="warehouse-container">
+                            <div class="warehouse-label">Ombor (FIFO Qatlamlari)</div>
+                            <div id="fifoLayers" class="fifo-layers">
+                                <div class="empty-state">
+                                    <span class="empty-icon">📦</span>
+                                    <p>Hozircha ombor bo'sh</p>
+                                    <small>Kirim operatsiyasini qo'shing</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AVECO Visualization -->
+                    <div id="avecoVisualization" class="visualization">
+                        <div class="pool-container">
+                            <div class="pool-label">Ombor (Aralashgan Hovuz)</div>
+                            <div id="avecoPool" class="aveco-pool">
+                                <div class="empty-state">
+                                    <span class="empty-icon">🔄</span>
+                                    <p>Hozircha ombor bo'sh</p>
+                                    <small>Kirim operatsiyasini qo'shing</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Transaction History Table -->
+        <section class="card table-section">
+            <div class="table-header">
+                <h3 class="card-title">Operatsiyalar Tarixi</h3>
+                <button class="btn-secondary" id="clearBtn">
+                    <span>🗑️</span>
+                    Tozalash
+                </button>
+            </div>
+            <div class="table-wrapper">
+                <table id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Sana</th>
+                            <th>Tur</th>
+                            <th>Miqdor</th>
+                            <th>Narx</th>
+                            <th>Summa</th>
+                            <th>Qoldiq (Miqdor)</th>
+                            <th>Qoldiq (Summa)</th>
+                            <th>Tafsilot</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr class="empty-row">
+                            <td colspan="9">
+                                <div class="empty-state">
+                                    <span class="empty-icon">📋</span>
+                                    <p>Hozircha operatsiyalar yo'q</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Comparison Chart -->
+        <section class="card chart-section">
+            <h3 class="card-title">FIFO vs AVECO Taqqoslash</h3>
+            <div class="chart-container">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </section>
+    </div>
+
+    <script src="calculator.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
