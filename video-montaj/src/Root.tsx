@@ -2,6 +2,7 @@ import "./index.css";
 import { MyComposition } from "./Composition";
 import { VideoMontageComposition } from "./VideoMontage";
 import { DemoMontageComposition } from "./DemoMontage";
+import { KameralVideoComposition } from "./KameralVideo";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -9,6 +10,7 @@ export const RemotionRoot: React.FC = () => {
       <MyComposition />
       <VideoMontageComposition />
       <DemoMontageComposition />
+      <KameralVideoComposition />
     </>
   );
 };
