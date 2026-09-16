@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--primary:#4361ee;--primary-dark:#3a0ca3;--secondary:#7209b7;--accent:#f72585;}
+  html,body{margin:0;padding:0;background:transparent;}
+  body{width:340px;font-family:'Outfit',sans-serif;}
+  .card{
+    display:flex;align-items:center;gap:14px;
+    width:fit-content;
+    padding:12px 22px 12px 12px;
+    border-radius:20px;
+    background:linear-gradient(155deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%);
+    border:1.5px solid rgba(255,255,255,0.4);
+    box-shadow:0 14px 30px -6px rgba(10,6,30,0.5), inset 0 1px 0 rgba(255,255,255,0.55);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:55%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0)); pointer-events:none;}
+  .avatar{
+    width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg, var(--primary), var(--secondary));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:17px;letter-spacing:0.5px;
+    box-shadow:0 0 0 2px rgba(255,255,255,0.55), 0 4px 12px rgba(67,97,238,0.5);
+    flex-shrink:0;position:relative;z-index:1;
+  }
+  .meta{position:relative;z-index:1;}
+  .name{color:#fff;font-weight:700;font-size:16.5px;line-height:1.15;text-shadow:0 1px 6px rgba(0,0,0,0.4);}
+  .role{
+    font-weight:600;font-size:12.5px;letter-spacing:0.4px;margin-top:2px;
+    background:linear-gradient(90deg, #ffd1e6, #ffffff 70%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+</style></head>
+<body>
+  <div class="card">
+    <div class="avatar">ША</div>
+    <div class="meta">
+      <div class="name">Shuxrat Abdullaev</div>
+      <div class="role">BUXGALTER</div>
+    </div>
+  </div>
+</body></html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#4361ee; --primary-dark:#3a0ca3; --secondary:#7209b7; --accent:#f72585;
+  }
+  html,body{margin:0;padding:0;background:transparent;}
+  body{display:flex;align-items:flex-start;justify-content:center;width:560px;}
+  .card{
+    width:560px;
+    box-sizing:border-box;
+    padding:22px 30px 24px;
+    border-radius:26px;
+    background:linear-gradient(155deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.09) 60%, rgba(255,255,255,0.13) 100%);
+    border:1.5px solid rgba(255,255,255,0.38);
+    box-shadow:0 18px 40px -8px rgba(10,6,30,0.55), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -12px 24px -14px rgba(67,97,238,0.35);
+    position:relative;
+    overflow:hidden;
+    font-family:'Outfit',sans-serif;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:50%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0));
+    pointer-events:none;
+  }
+  .card::after{
+    content:"";position:absolute;left:16px;top:10px;bottom:10px;width:3px;border-radius:3px;
+    background:linear-gradient(180deg, var(--accent), var(--secondary));
+    box-shadow:0 0 12px rgba(247,37,133,0.6);
+  }
+  .txt{
+    position:relative;z-index:1;
+    color:#ffffff;
+    font-weight:600;
+    font-size:31px;
+    line-height:1.38;
+    letter-spacing:0.1px;
+    text-shadow:0 2px 10px rgba(0,0,0,0.55), 0 1px 0 rgba(0,0,0,0.3);
+    padding-left:14px;
+  }
+  .txt b.hl{
+    color:#ffffff;
+    font-weight:800;
+    background:linear-gradient(90deg, #ffd1e6, #ffffff 55%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:none;
+    filter:drop-shadow(0 0 10px rgba(247,37,133,0.55));
+  }
+</style></head>
+<body>
+  <div class="card"><div class="txt" id="txt"></div></div>
+</body></html>

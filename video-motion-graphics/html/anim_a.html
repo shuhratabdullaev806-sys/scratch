@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--primary:#4361ee;--primary-dark:#3a0ca3;--secondary:#7209b7;--accent:#f72585;}
+  html,body{margin:0;padding:0;width:608px;height:1080px;overflow:hidden;background:#0c0820;font-family:'Outfit',sans-serif;}
+  .stage{position:relative;width:608px;height:1080px;overflow:hidden;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(114,9,183,0.55), transparent 60%),
+      radial-gradient(120% 90% at 50% 100%, rgba(67,97,238,0.55), transparent 60%),
+      linear-gradient(180deg, #150b30 0%, #1b0f38 45%, #2a0e3a 100%);
+  }
+  .orb{position:absolute;border-radius:50%;filter:blur(30px);opacity:0.55;}
+  .o1{width:260px;height:260px;background:var(--primary);top:-60px;left:-70px;animation:drift1 7s ease-in-out infinite;}
+  .o2{width:220px;height:220px;background:var(--secondary);bottom:60px;right:-60px;animation:drift2 8s ease-in-out infinite;}
+  .o3{width:160px;height:160px;background:var(--accent);bottom:-40px;left:60px;opacity:0.35;animation:drift1 6s ease-in-out infinite reverse;}
+  @keyframes drift1{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(30px) scale(1.08);}}
+  @keyframes drift2{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.05);}}
+
+  .grain{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);background-size:4px 4px;opacity:0.25;}
+
+  .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;text-align:center;}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;margin:0 auto 26px;
+    padding:9px 20px;border-radius:999px;
+    background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.28);
+    color:#fff;font-weight:600;font-size:15px;letter-spacing:2px;
+    opacity:0;transform:translateY(-16px);
+    animation:fadeDown .5s cubic-bezier(.2,.8,.2,1) .05s forwards;
+  }
+  .pill i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
+  @keyframes fadeDown{to{opacity:1;transform:translateY(0);}}
+
+  .card{
+    padding:40px 30px 34px;border-radius:32px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05));
+    border:1.5px solid rgba(255,255,255,0.30);
+    box-shadow:0 30px 60px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+    opacity:0;transform:scale(0.85);
+    animation:pop .55s cubic-bezier(.2,.9,.25,1.2) .30s forwards;
+  }
+  @keyframes pop{to{opacity:1;transform:scale(1);}}
+
+  .label{color:rgba(255,255,255,0.75);font-weight:600;font-size:14.5px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+  .amount{font-weight:800;font-size:64px;color:#fff;line-height:1;letter-spacing:-1px;text-shadow:0 6px 20px rgba(0,0,0,0.4);}
+  .amount span{font-size:30px;font-weight:600;color:rgba(255,255,255,0.85);margin-left:6px;}
+  .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);margin:22px 0;}
+
+  .stampwrap{position:relative;display:inline-block;opacity:0;transform:scale(2.4) rotate(-18deg);
+    animation:stamp .38s cubic-bezier(.15,.9,.2,1.05) 1.05s forwards;}
+  @keyframes stamp{to{opacity:1;transform:scale(1) rotate(-6deg);}}
+  .ring{position:absolute;left:50%;top:50%;width:230px;height:230px;transform:translate(-50%,-50%) rotate(-6deg);
+    border:3px solid var(--accent);border-radius:50%;opacity:0.85;
+    box-shadow:0 0 30px rgba(247,37,133,0.6), inset 0 0 20px rgba(247,37,133,0.35);}
+  .jarima{position:relative;color:var(--accent);font-weight:900;font-size:44px;letter-spacing:3px;
+    text-shadow:0 0 18px rgba(247,37,133,0.7);padding:56px 10px;display:block;}
+
+  .foot{margin-top:18px;opacity:0;animation:fadeDown .4s ease 1.55s forwards;
+    color:rgba(255,255,255,0.65);font-weight:600;font-size:13.5px;letter-spacing:1px;}
+  .foot b{color:#fff;}
+</style></head>
+<body>
+<div class="stage">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="grain"></div>
+  <div class="center">
+    <div class="pill"><i></i>AUDIT NATIJASI</div>
+    <div class="card">
+      <div class="label">Sotuv summasidan hisoblangan QQS</div>
+      <div class="amount" id="amt">0<span>so'm</span></div>
+      <div class="divider"></div>
+      <div class="stampwrap">
+        <div class="ring"></div>
+        <span class="jarima">JARIMA</span>
+      </div>
+    </div>
+    <div class="foot">223-modda &nbsp;·&nbsp; <b>20%</b> jarima stavkasi</div>
+  </div>
+</div>
+<script>
+  const el = document.getElementById('amt');
+  const target = 4000000;
+  const dur = 650, startDelay = 420, start = performance.now();
+  function fmt(n){ return n.toLocaleString('ru-RU').replace(/,/g,' '); }
+  function tick(now){
+    const t = now - start - startDelay;
+    if (t < 0) { requestAnimationFrame(tick); return; }
+    const p = Math.min(1, t/dur);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = Math.floor(eased*target);
+    el.innerHTML = fmt(val) + '<span>so\'m</span>';
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+</script>
+</body></html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--primary:#4361ee;--primary-dark:#3a0ca3;--secondary:#7209b7;--accent:#f72585;}
+  html,body{margin:0;padding:0;width:608px;height:540px;overflow:hidden;background:#150b30;font-family:'Outfit',sans-serif;}
+  .stage{position:relative;width:608px;height:540px;overflow:hidden;
+    background:linear-gradient(200deg, #1b0f38 0%, #2a0e3a 55%, #3a0ca3 100%);}
+  .grid{position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size:100% 44px; opacity:0.6;}
+
+  .title{position:absolute;top:26px;left:0;right:0;text-align:center;
+    color:rgba(255,255,255,0.8);font-weight:600;font-size:14.5px;letter-spacing:1.6px;text-transform:uppercase;
+    opacity:0;animation:fadeDown .45s ease .05s forwards;}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+  .chart{position:absolute;left:0;right:0;bottom:78px;height:380px;display:flex;align-items:flex-end;justify-content:center;gap:70px;}
+  .colwrap{position:relative;width:120px;height:380px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;}
+  .barbox{position:relative;width:92px;height:380px;}
+  .val{position:absolute;left:50%;transform:translateX(-50%);
+    font-weight:800;color:#fff;font-size:26px;white-space:nowrap;text-shadow:0 4px 14px rgba(0,0,0,0.4);opacity:0;}
+  .bar{position:absolute;left:0;bottom:0;width:92px;height:100%;border-radius:14px 14px 0 0;
+    transform-origin:bottom center;transform:scaleY(0);
+    box-shadow:0 -6px 18px rgba(0,0,0,0.25);}
+  .bar1{background:linear-gradient(180deg, #8fa4ff, var(--primary));
+    animation:grow1 .85s cubic-bezier(.2,.85,.25,1) .35s forwards;}
+  .bar2{background:linear-gradient(180deg, #ff7bb0, var(--accent));
+    animation:grow2 .95s cubic-bezier(.2,.85,.25,1) .55s forwards;
+    box-shadow:0 -6px 24px rgba(247,37,133,0.45);}
+  @keyframes grow1{to{transform:scaleY(0.52);}}
+  @keyframes grow2{to{transform:scaleY(0.86);}}
+  .v1{bottom:212px;animation:fadeIn .3s ease 1.05s forwards;}
+  .v2{bottom:340px;animation:fadeIn .3s ease 1.35s forwards;}
+  @keyframes fadeIn{to{opacity:1;}}
+  .cat{margin-top:14px;color:rgba(255,255,255,0.85);font-weight:600;font-size:13px;letter-spacing:0.4px;text-align:center;
+    opacity:0;animation:fadeIn .3s ease 1.5s forwards;}
+  .cat.hot{color:#ffd1e6;}
+
+  .gap{position:absolute;top:96px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
+    background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);
+    color:#fff;font-weight:700;font-size:15px;opacity:0;
+    animation:popIn .4s cubic-bezier(.2,.9,.25,1.15) 1.7s forwards;}
+  @keyframes popIn{from{opacity:0;transform:translateX(-50%) scale(0.7);}to{opacity:1;transform:translateX(-50%) scale(1);}}
+  .gap b{color:var(--accent);}
+</style></head>
+<body>
+<div class="stage">
+  <div class="grid"></div>
+  <div class="title">Soliq bazasi: qanday bo'lishi kerak edi?</div>
+  <div class="gap">FARQ &nbsp;<b>+20 000 000</b></div>
+  <div class="chart">
+    <div class="colwrap">
+      <div class="barbox">
+        <div class="val v1">30 000 000</div>
+        <div class="bar bar1"></div>
+      </div>
+      <div class="cat">E'LON QILINGAN<br>(shartnoma)</div>
+    </div>
+    <div class="colwrap">
+      <div class="barbox">
+        <div class="val v2">50 000 000</div>
+        <div class="bar bar2"></div>
+      </div>
+      <div class="cat hot">BOZOR NARXI<br>(to'g'ri baza)</div>
+    </div>
+  </div>
+</div>
+</body></html>

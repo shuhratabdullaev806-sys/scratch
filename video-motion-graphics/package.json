@@ -1,0 +1,15 @@
+{
+  "name": "video-motion-graphics",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Motion-graphic overlay pipeline for reels: liquid-glass subtitles, name card, and 3 animated insert types (full-screen, split-screen, circle) rendered from brand-styled HTML/CSS and composited onto a talking-head video with ffmpeg.",
+  "scripts": {
+    "render": "node render.js",
+    "render:extra": "node render_extra.js",
+    "compose": "node compose.js"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0",
+    "ffmpeg-static": "^5.2.0"
+  }
+}
