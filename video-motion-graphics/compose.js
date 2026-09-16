@@ -47,7 +47,13 @@ fc.push(`[base0][ovA]overlay=0:0:enable='between(t,${A_START},${A_START + A_DUR}
 fc.push(`[15:v]tpad=stop_mode=clone:stop_duration=60,format=yuv420p[ovC]`);
 fc.push(`[s1][ovC]overlay=0:0:enable='between(t,${C_START},${C_START + C_DUR})'[s2]`);
 fc.push(`[14:v]tpad=stop_mode=clone:stop_duration=60,format=yuv420p[ovB]`);
-fc.push(`[s2][ovB]overlay=0:0:enable='between(t,${B_START},${B_START + B_DUR})'[s3]`);
+fc.push(`[s2][ovB]overlay=0:0:enable='between(t,${B_START},${B_START + B_DUR})'[s3a]`);
+
+// bottom half of the split-screen must show the presenter's actual face, not
+// whatever happens to sit in the lower half of the raw frame (chest/hands) —
+// crop a face-height slice of the source and place it in the bottom half.
+fc.push(`[0:v]crop=608:540:0:130,format=yuv420p[faceB]`);
+fc.push(`[s3a][faceB]overlay=0:540:enable='between(t,${B_START},${B_START + B_DUR})'[s3]`);
 
 // circle-masked live presenter, composited on top during the C window
 fc.push(`[0:v]crop=420:420:94:140,scale=380:380,format=rgba,geq=r='r(X\\,Y)':g='g(X\\,Y)':b='b(X\\,Y)':a='if(lte(pow(X-190\\,2)+pow(Y-190\\,2)\\,36100)\\,255\\,0)'[circle]`);
