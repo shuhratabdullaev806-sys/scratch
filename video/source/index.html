@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>001 Ijara</title>
+<style>
+@font-face{font-family:Outfit;font-weight:400;src:url(node_modules/@fontsource/outfit/files/outfit-latin-400-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:500;src:url(node_modules/@fontsource/outfit/files/outfit-latin-500-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:600;src:url(node_modules/@fontsource/outfit/files/outfit-latin-600-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:700;src:url(node_modules/@fontsource/outfit/files/outfit-latin-700-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:800;src:url(node_modules/@fontsource/outfit/files/outfit-latin-800-normal.woff2)}
+@font-face{font-family:Mono;font-weight:500;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2)}
+@font-face{font-family:Mono;font-weight:700;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2)}
+:root{
+  --p:#4361ee; --pd:#3a0ca3; --s:#7209b7; --a:#f72585; --c:#4cc9f0; --ink:#070b18; --navy:#0f172a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+body{font-family:Outfit,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--ink)}
+.abs{position:absolute}
+.full{position:absolute;inset:0}
+.mono{font-family:Mono,monospace}
+
+/* ---------- background world ---------- */
+#bg{background:radial-gradient(120% 70% at 50% 25%,#1b2160 0%,#0d1233 45%,#060913 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);mix-blend-mode:screen}
+#floor{position:absolute;left:-540px;right:-540px;bottom:-200px;height:1100px;
+  background-image:linear-gradient(rgba(124,160,255,.16) 2px,transparent 2px),linear-gradient(90deg,rgba(124,160,255,.16) 2px,transparent 2px);
+  background-size:90px 90px;transform:perspective(900px) rotateX(72deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.9),transparent 85%)}
+#dots{position:absolute;inset:0}
+.pt{position:absolute;width:6px;height:6px;border-radius:50%;background:#9fb4ff;box-shadow:0 0 12px #6f8cff}
+#vig{background:radial-gradient(130% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+/* ---------- speaker ---------- */
+#spkSplit{position:absolute;inset:0;will-change:clip-path}
+#spkCirc{position:absolute;inset:0}
+#v{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+#ring{position:absolute;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+  filter:drop-shadow(0 0 22px rgba(76,122,255,.9))}
+#ringGlow{position:absolute;border-radius:50%;box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.08)}
+#tint{position:absolute;inset:0;pointer-events:none}
+
+/* ---------- glass ---------- */
+.glass:not(.abs):not(.full):not(.sg){position:relative}
+.glass{border-radius:36px;
+  background:linear-gradient(140deg,rgba(255,255,255,.17),rgba(255,255,255,.05) 45%,rgba(255,255,255,.08));
+  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 40px rgba(255,255,255,.05),0 24px 70px rgba(0,0,0,.38)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;
+  background:linear-gradient(150deg,rgba(255,255,255,.75),rgba(255,255,255,.08) 35%,rgba(255,255,255,.02) 60%,rgba(160,190,255,.55));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.glass::after{content:"";position:absolute;left:6%;top:3px;width:55%;height:45%;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.28),transparent 70%)}
+.dark{background:linear-gradient(140deg,rgba(34,44,110,.72),rgba(10,14,42,.66) 50%,rgba(46,22,104,.66))}
+
+/* ---------- subtitles ---------- */
+#subs{position:absolute;left:0;right:0;top:0;height:0}
+.sg{position:absolute;left:50%;top:0;display:flex;gap:18px;padding:22px 38px 26px;border-radius:999px;white-space:nowrap;
+  font-weight:700;font-size:62px;letter-spacing:-.5px;line-height:1;transform-origin:50% 50%}
+.sg.glass{background:linear-gradient(140deg,rgba(34,44,110,.62),rgba(12,16,44,.56) 50%,rgba(54,22,112,.58))}
+.sw{position:relative;z-index:2;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.hl{position:absolute;z-index:1;top:14px;bottom:16px;border-radius:22px;
+  background:linear-gradient(120deg,#4361ee,#7209b7 70%,#f72585);box-shadow:0 8px 26px rgba(90,70,255,.55),inset 0 1px 0 rgba(255,255,255,.45)}
+
+/* ---------- name card ---------- */
+#nc{left:48px;top:1452px;display:flex;align-items:center;gap:26px;padding:24px 44px 24px 24px;border-radius:34px}
+#ncLogo{width:104px;height:104px;border-radius:26px;overflow:hidden;box-shadow:0 10px 30px rgba(67,97,238,.6)}
+#ncLogo img{width:100%;height:100%}
+#ncName{font-size:50px;font-weight:700;letter-spacing:-.5px;line-height:1.05}
+#ncRole{font-size:34px;font-weight:500;color:#c9d4ff;margin-top:6px;display:flex;align-items:center;gap:14px}
+#ncRole i{display:inline-block;width:34px;height:4px;border-radius:2px;background:linear-gradient(90deg,#4cc9f0,#f72585)}
+.mask{overflow:hidden;display:block}
+
+/* ---------- generic scene bits ---------- */
+.scene{position:absolute;inset:0;visibility:hidden}
+.kicker{font-size:30px;font-weight:600;letter-spacing:8px;color:#aebcff;text-transform:uppercase;display:flex;align-items:center;gap:16px}
+.kicker b{width:14px;height:14px;border-radius:50%;background:#f72585;box-shadow:0 0 16px #f72585}
+svg .ln{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.glow{filter:drop-shadow(0 0 10px rgba(96,130,255,.9)) drop-shadow(0 0 30px rgba(114,9,183,.6))}
+.pinkglow{filter:drop-shadow(0 0 12px rgba(247,37,133,.9))}
+.grad-text{background:linear-gradient(100deg,#8fdcff,#6d86ff 45%,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{display:inline-flex;align-items:center;gap:14px;padding:14px 26px;border-radius:999px;font-weight:600;font-size:32px}
+.stamp{position:absolute;padding:14px 34px;border:6px solid #ff3d8b;border-radius:18px;color:#ff3d8b;font-weight:800;font-size:76px;letter-spacing:4px;
+  text-shadow:0 0 24px rgba(247,37,133,.8);box-shadow:0 0 40px rgba(247,37,133,.5),inset 0 0 30px rgba(247,37,133,.3);background:rgba(40,0,20,.35)}
+.stamp.ok{border-color:#4cc9f0;color:#4cc9f0;text-shadow:0 0 24px rgba(76,201,240,.8);box-shadow:0 0 40px rgba(76,201,240,.5),inset 0 0 30px rgba(76,201,240,.3);background:rgba(0,30,50,.35)}
+.skel{height:22px;border-radius:11px;background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,.2),rgba(255,255,255,.10));}
+.row{display:flex;align-items:center;justify-content:space-between}
+
+/* panel for split */
+.panel{position:absolute;left:0;top:960px;width:1080px;height:960px;overflow:hidden;
+  background:radial-gradient(110% 80% at 50% 0%,#1c2366 0%,#0c1030 55%,#060913 100%)}
+.panel .seam{position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,transparent,#4cc9f0,#4361ee,#f72585,transparent);box-shadow:0 0 30px #4361ee}
+.pgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,160,255,.07) 2px,transparent 2px),linear-gradient(90deg,rgba(124,160,255,.07) 2px,transparent 2px);background-size:60px 60px;-webkit-mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent)}
+
+#grain{position:absolute;inset:-100px;opacity:.07;mix-blend-mode:overlay;pointer-events:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8fe3ff"/><stop offset=".5" stop-color="#6b86ff"/><stop offset="1" stop-color="#c76bff"/>
+    </linearGradient>
+    <linearGradient id="gp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7ab6"/><stop offset="1" stop-color="#f72585"/>
+    </linearGradient>
+    <linearGradient id="gc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a6f0ff"/><stop offset="1" stop-color="#4cc9f0"/>
+    </linearGradient>
+    <!-- reusable icons -->
+    <symbol id="i-machine" viewBox="0 0 200 150">
+      <path class="ln" pathLength="1" d="M8 138H192M30 44h100a10 10 0 0 1 10 10v74H20V54a10 10 0 0 1 10-10z"/>
+      <path class="ln" pathLength="1" d="M36 60h64v44H36z"/>
+      <path class="ln" pathLength="1" d="M68 60v20M60 80h16M68 86v8M50 104l8-8h20l8 8"/>
+      <path class="ln" pathLength="1" d="M150 58h36v70h-36z"/>
+      <path class="ln" pathLength="1" d="M157 66h22v14h-22zM156 98.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M172 98.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M156 114.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M172 114.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+      <path class="ln" pathLength="1" d="M44 44V26h72v18M96 26V12M90 12h12"/>
+      <path class="ln" pathLength="1" d="M108 116h24M108 124h24"/>
+    </symbol>
+    <symbol id="i-building" viewBox="0 0 140 150">
+      <path class="ln" pathLength="1" d="M6 140H134M20 140V34l48-22v128"/>
+      <path class="ln" pathLength="1" d="M68 52h50v88"/>
+      <path class="ln" pathLength="1" d="M34 46h20M34 64h20M34 82h20M34 100h20M82 68h22M82 86h22M82 104h22"/>
+      <path class="ln" pathLength="1" d="M36 140v-20h16v20M86 140v-18h14v18"/>
+    </symbol>
+    <symbol id="i-car" viewBox="0 0 180 110">
+      <path class="ln" pathLength="1" d="M34 82H16V64c0-7 5-12 12-13l22-4 20-22c4-4 8-6 13-6h38c6 0 10 2 13 7l15 20 14 3c7 1 12 7 12 14v19h-14M66 82h52"/>
+      <path class="ln" pathLength="1" d="M36 82a14 14 0 1 0 28 0a14 14 0 1 0-28 0M120 82a14 14 0 1 0 28 0a14 14 0 1 0-28 0"/>
+      <path class="ln" pathLength="1" d="M74 46l14-16h18v16zM114 46V30h12l12 16z"/>
+    </symbol>
+    <symbol id="i-person" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0 -40 0"/>
+      <path class="ln" pathLength="1" d="M22 106c4-20 20-30 38-30s34 10 38 30"/>
+    </symbol>
+    <symbol id="i-box" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 14l40 20v50L60 104 20 84V34z"/>
+      <path class="ln" pathLength="1" d="M20 34l40 20 40-20M60 54v50"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 12l38 14v30c0 26-16 44-38 52C38 100 22 82 22 56V26z"/>
+      <path class="ln" pathLength="1" d="M42 60l12 12 24-26"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <!-- world background -->
+  <div id="bg" class="full">
+    <div class="blob" id="b1" style="width:760px;height:760px;background:#4361ee;opacity:.55"></div>
+    <div class="blob" id="b2" style="width:680px;height:680px;background:#7209b7;opacity:.5"></div>
+    <div class="blob" id="b3" style="width:520px;height:520px;background:#f72585;opacity:.28"></div>
+    <div id="floor"></div>
+    <div id="dots"></div>
+    <div id="vig" class="full"></div>
+  </div>
+
+  <!-- speaker -->
+  <div id="spkSplit"><div id="spkCirc"><img id="v" src="../frames/0001.jpg"><div id="tint"></div></div></div>
+  <div id="ringGlow"></div>
+  <div id="ring"></div>
+
+  <!-- =============== HOOK chip (0.9 - 7.3) =============== -->
+  <div class="scene" id="sHook">
+    <div class="glass dark abs" id="hk" style="left:150px;top:150px;width:780px;height:230px;border-radius:40px;display:flex;align-items:center;gap:30px;padding:0 40px">
+      <svg viewBox="0 0 200 150" width="170" height="128" class="glow" style="stroke:url(#g1);stroke-width:6"><use href="#i-machine"/></svg>
+      <div>
+        <div style="font-size:30px;font-weight:500;color:#b9c6ff;letter-spacing:1px" id="hkLab">Ishlab turgan uskuna</div>
+        <div class="mono" style="font-size:60px;font-weight:700;margin-top:6px;letter-spacing:-1px;white-space:nowrap"><span id="hkNum">0</span> <span style="font-family:Outfit;font-size:40px;color:#9fb0ff">so‘m</span></div>
+      </div>
+      <div class="abs" id="hkStrike" style="left:30px;right:30px;top:112px;height:8px;border-radius:4px;background:linear-gradient(90deg,#ff7ab6,#f72585);box-shadow:0 0 20px #f72585;transform-origin:0 50%"></div>
+      <div class="abs chip" id="hkNo" style="right:-20px;top:-34px;background:linear-gradient(120deg,#f72585,#b5179e);box-shadow:0 10px 30px rgba(247,37,133,.6);font-size:30px">Hujjatlarda yo‘q</div>
+    </div>
+  </div>
+
+  <!-- =============== A1 : 001 — aktiv yo'q =============== -->
+  <div class="scene" id="sA1">
+    <div class="abs" id="a1Big" style="left:0;right:0;top:300px;text-align:center;font-size:460px;font-weight:800;letter-spacing:0px;line-height:1;color:transparent;-webkit-text-stroke:3px rgba(140,160,255,.16)">001</div>
+    <div class="abs kicker" id="a1Kick" style="left:0;right:0;top:190px;justify-content:center"><b></b>Hisob tekshiruvi</div>
+    <div class="abs" id="a1Mach" style="left:290px;top:330px;width:500px;height:375px">
+      <svg viewBox="0 0 200 150" width="500" height="375" class="glow" id="a1MachSvg" style="stroke:url(#g1);stroke-width:4"><use href="#i-machine"/></svg>
+    </div>
+    <div class="abs chip glass" id="a1Tag" style="left:50%;top:735px;transform:translateX(-50%);font-family:Mono;font-weight:700;font-size:40px;padding:16px 34px">500 000 000 <span style="font-family:Outfit;font-weight:500;color:#aab8ff;font-size:32px">so‘m</span></div>
+    <svg class="abs" id="a1Arrow" style="left:500px;top:835px" width="80" height="120" viewBox="0 0 80 120">
+      <path d="M40 4V96" stroke="#8fa2ff" stroke-width="6" stroke-dasharray="4 16" stroke-linecap="round" fill="none" id="a1ArrowLine"/>
+      <path d="M18 84l22 26 22-26" stroke="#8fa2ff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="abs glass dark" id="a1Card" style="left:80px;top:960px;width:920px;height:650px;padding:44px 54px;overflow:hidden">
+      <div class="row">
+        <div>
+          <div style="font-size:30px;color:#aebcff;font-weight:500;letter-spacing:2px">SCHYOT</div>
+          <div class="grad-text" style="font-size:112px;font-weight:800;line-height:1;letter-spacing:-3px">001</div>
+        </div>
+        <div style="text-align:right;font-size:30px;color:#c8d1ff;line-height:1.3;font-weight:500">Operativ ijaraga olingan<br>asosiy vositalar</div>
+      </div>
+      <div style="height:2px;background:linear-gradient(90deg,rgba(255,255,255,.35),transparent);margin:30px 0 26px"></div>
+      <div class="row" style="font-size:26px;color:#8e9bd6;letter-spacing:3px;font-weight:600"><span>AKTIV</span><span>QIYMATI</span></div>
+      <div id="a1Rows" style="margin-top:22px">
+        <div class="row" style="height:62px"><div class="skel" style="width:300px"></div><div class="skel" style="width:170px"></div></div>
+        <div class="row" style="height:62px" id="a1RowM"><div id="a1RowMtxt" style="font-size:34px;font-weight:600;color:#ff6fa8">Uskuna — topilmadi</div><div class="mono" style="font-size:34px;color:#ff6fa8" id="a1RowMv">—</div></div>
+        <div class="row" style="height:62px"><div class="skel" style="width:250px"></div><div class="skel" style="width:140px"></div></div>
+      </div>
+      <div style="height:2px;background:rgba(255,255,255,.15);margin:14px 0 18px"></div>
+      <div class="row" style="font-size:38px;font-weight:700"><span>Jami qoldiq</span><span class="mono" id="a1Tot" style="color:#ff6fa8">0 so‘m</span></div>
+      <div class="abs" id="a1Scan" style="left:0;right:0;height:120px;top:0;background:linear-gradient(180deg,transparent,rgba(76,201,240,.28) 70%,rgba(160,240,255,.9) 98%,transparent);mix-blend-mode:screen"></div>
+    </div>
+    <div class="stamp" id="a1Stamp" style="left:230px;top:1200px">AKTIV YO‘Q</div>
+    <div class="abs" id="a1Burst" style="left:540px;top:1280px;width:10px;height:10px;border-radius:50%;border:6px solid #f72585;box-shadow:0 0 40px #f72585"></div>
+  </div>
+
+  <!-- =============== B1 : BHMS 21 (split) =============== -->
+  <div class="scene" id="sB1">
+    <div class="panel" id="b1Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:500px;height:500px;left:-120px;top:300px;background:#4361ee;opacity:.35"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:120px;background:#7209b7;opacity:.4"></div>
+      <div class="abs" style="left:0;right:0;top:0;bottom:0;perspective:1400px">
+        <div class="abs glass dark" id="b1Doc" style="left:110px;top:170px;width:860px;height:640px;padding:48px 56px;border-radius:32px">
+          <div class="row" style="justify-content:flex-start;gap:34px">
+            <div class="abs" style="left:640px;top:36px;width:170px;height:170px" id="b1Seal">
+              <svg viewBox="0 0 200 200" width="170" height="170">
+                <defs><path id="sealp" d="M100 100m-76 0a76 76 0 1 1 152 0a76 76 0 1 1-152 0"/></defs>
+                <circle cx="100" cy="100" r="96" fill="none" stroke="url(#g1)" stroke-width="4"/>
+                <circle cx="100" cy="100" r="58" fill="rgba(67,97,238,.25)" stroke="url(#g1)" stroke-width="3"/>
+                <g id="b1SealRing"><text font-size="17" font-weight="600" letter-spacing="3.2" fill="#c3cdff"><textPath href="#sealp">BUXGALTERIYA HISOBI · MILLIY STANDART · </textPath></text></g>
+                <text x="100" y="120" text-anchor="middle" font-size="58" font-weight="800" fill="#fff" id="b1SealNum">21</text>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size:28px;color:#aebcff;letter-spacing:6px;font-weight:600">BHMS</div>
+              <div style="font-size:92px;font-weight:800;line-height:1;letter-spacing:-2px">№ <span class="grad-text" id="b1Num">21</span></div>
+              <div style="font-size:30px;color:#d0d8ff;margin-top:10px;font-weight:500">Buxgalteriya hisobi milliy standarti</div>
+            </div>
+          </div>
+          <div style="margin-top:56px;display:flex;flex-direction:column;gap:24px">
+            <div class="skel" style="width:92%"></div>
+            <div class="skel" style="width:78%"></div>
+            <div style="position:relative;height:100px;display:flex;align-items:center">
+              <div class="abs" id="b1Hl" style="left:-18px;right:-18px;top:0;bottom:0;border-radius:18px;background:linear-gradient(100deg,rgba(67,97,238,.75),rgba(114,9,183,.7) 60%,rgba(247,37,133,.65));transform-origin:0 50%;box-shadow:0 10px 40px rgba(90,70,255,.5)"></div>
+              <div style="position:relative;font-size:34px;font-weight:600;line-height:1.2"><span class="mono" style="font-weight:700;font-size:40px">001</span> — Operativ ijaraga olingan<br>asosiy vositalar</div>
+            </div>
+            <div class="skel" style="width:85%"></div>
+          </div>
+        </div>
+        <div class="abs chip" id="b1Badge" style="left:600px;top:112px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.5);font-size:30px">
+          <svg width="34" height="34" viewBox="0 0 34 34"><path d="M7 18l7 7 14-15" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Majburiy kirim</div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C1 : bino/uskuna/avto -> 001 (circle) =============== -->
+  <div class="scene" id="sC1">
+    <div class="abs" id="c1Tiles" style="left:0;right:0;top:720px;height:360px">
+      <div class="abs glass dark c1t" id="c1t0" style="left:60px;top:0;width:300px;height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+        <svg viewBox="0 0 140 150" width="160" height="171" class="glow" style="stroke:url(#g1);stroke-width:5"><use href="#i-building"/></svg>
+        <div style="font-size:40px;font-weight:700">Bino</div></div>
+      <div class="abs glass dark c1t" id="c1t1" style="left:390px;top:0;width:300px;height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+        <svg viewBox="0 0 200 150" width="200" height="150" class="glow" style="stroke:url(#g1);stroke-width:6"><use href="#i-machine"/></svg>
+        <div style="font-size:40px;font-weight:700">Uskuna</div></div>
+      <div class="abs glass dark c1t" id="c1t2" style="left:720px;top:0;width:300px;height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+        <svg viewBox="0 0 180 110" width="210" height="128" class="glow" style="stroke:url(#g1);stroke-width:6"><use href="#i-car"/></svg>
+        <div style="font-size:40px;font-weight:700">Avtomobil</div></div>
+    </div>
+    <svg class="abs" id="c1Paths" style="left:0;top:0" width="1080" height="1920">
+      <path id="c1p0" d="M210 1060 C 210 1200, 400 1230, 400 1410" stroke="url(#g1)" stroke-width="5" fill="none" stroke-dasharray="1" stroke-dashoffset="1" pathLength="1" class="glow"/>
+      <path id="c1p1" d="M540 1060 C 540 1200, 540 1260, 540 1410" stroke="url(#g1)" stroke-width="5" fill="none" stroke-dasharray="1" stroke-dashoffset="1" pathLength="1" class="glow"/>
+      <path id="c1p2" d="M870 1060 C 870 1200, 680 1230, 680 1410" stroke="url(#g1)" stroke-width="5" fill="none" stroke-dasharray="1" stroke-dashoffset="1" pathLength="1" class="glow"/>
+    </svg>
+    <div class="abs glass dark" id="c1Vault" style="left:130px;top:1400px;width:820px;height:360px;padding:40px 50px;border-radius:40px">
+      <div class="row">
+        <div style="display:flex;align-items:baseline;gap:22px"><span class="grad-text" style="font-size:120px;font-weight:800;letter-spacing:-4px;line-height:1">001</span><span style="font-size:34px;color:#c8d1ff;font-weight:600">schyot</span></div>
+        <div class="chip" id="c1Kirim" style="background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:38px;font-weight:800;letter-spacing:3px">+ KIRIM</div>
+      </div>
+      <div style="display:flex;gap:18px;margin-top:40px" id="c1Slots">
+        <div class="c1s chip" style="background:rgba(255,255,255,.1);font-size:32px">✓ Bino</div>
+        <div class="c1s chip" style="background:rgba(255,255,255,.1);font-size:32px">✓ Uskuna</div>
+        <div class="c1s chip" style="background:rgba(255,255,255,.1);font-size:32px">✓ Avtomobil</div>
+      </div>
+    </div>
+    <div class="abs" id="c1Flash" style="left:130px;top:1400px;width:820px;height:360px;border-radius:40px;box-shadow:0 0 0 4px #4cc9f0,0 0 80px 10px rgba(76,201,240,.7)"></div>
+  </div>
+
+  <!-- =============== Contract chip (27.1 - 29.0) =============== -->
+  <div class="scene" id="sK">
+    <div class="glass dark abs" id="kc" style="left:130px;top:150px;width:820px;height:250px;border-radius:40px;padding:34px 44px;display:flex;gap:34px;align-items:center">
+      <svg viewBox="0 0 100 120" width="120" height="144" class="glow">
+        <path d="M14 8h52l20 20v84H14z M66 8v20h20" fill="rgba(67,97,238,.18)" stroke="url(#g1)" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M28 46h44M28 60h44M28 74h30" stroke="#b9c6ff" stroke-width="4" stroke-linecap="round"/>
+        <path id="kSig" d="M28 96c8-10 12 4 18-4s10-6 14 0 8-2 12-4" stroke="#f72585" stroke-width="4" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+      </svg>
+      <div>
+        <div style="font-size:30px;color:#b9c6ff;font-weight:500">Ijara shartnomasi · <b style="color:#fff">shartnomaviy qiymat</b></div>
+        <div class="mono" style="font-size:62px;font-weight:700;margin-top:8px;letter-spacing:-1px;white-space:nowrap"><span id="kNum">0</span> <span style="font-family:Outfit;font-size:40px;color:#9fb0ff">so‘m</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== A2 : T-account Debet 001 =============== -->
+  <div class="scene" id="sA2">
+    <div class="abs kicker" id="a2Kick" style="left:0;right:0;top:165px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Provodka</div>
+    <div class="abs" id="a2Title" style="left:0;right:0;top:205px;text-align:center">
+      <span style="font-size:40px;color:#c8d1ff;font-weight:500;letter-spacing:2px">Schyot</span>
+      <span class="grad-text" style="font-size:150px;font-weight:800;letter-spacing:-5px;margin-left:16px">001</span>
+    </div>
+    <svg class="abs" style="left:0;top:0" width="1080" height="1920">
+      <path id="a2T" d="M90 545H990M540 545V1190" stroke="url(#g1)" stroke-width="8" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="glow"/>
+    </svg>
+    <div class="abs" id="a2DebBg" style="left:96px;top:553px;width:436px;height:630px;border-radius:0 0 0 30px;background:linear-gradient(180deg,rgba(67,97,238,.35),rgba(67,97,238,0))"></div>
+    <div class="abs" id="a2DebH" style="left:90px;width:450px;top:465px;text-align:center;font-size:48px;font-weight:800;letter-spacing:8px">DEBET</div>
+    <div class="abs" id="a2KrH" style="left:540px;width:450px;top:465px;text-align:center;font-size:48px;font-weight:800;letter-spacing:8px;color:#7d86b8">KREDIT</div>
+    <div class="abs mono" id="a2Amt" style="left:90px;width:450px;top:630px;text-align:center;font-size:66px;font-weight:700;letter-spacing:-2px">500 000 000</div>
+    <div class="abs" id="a2AmtS" style="left:90px;width:450px;top:720px;text-align:center;font-size:34px;color:#a9b6ff;font-weight:500">so‘m</div>
+    <svg class="abs" style="left:0;top:0" width="1080" height="1920">
+      <path id="a2Link" d="M420 800 C 560 800, 620 900, 760 900" stroke="#9aa7de" stroke-width="5" fill="none" stroke-dasharray="10 14" stroke-linecap="round"/>
+    </svg>
+    <div class="abs chip" id="a2Ghost" style="left:700px;top:870px;border:3px dashed #9aa7de;color:#c3cbee;font-size:34px;background:rgba(255,255,255,.04)">60 / 76 ?</div>
+    <svg class="abs" id="a2X" style="left:620px;top:780px" width="340" height="240" viewBox="0 0 340 240">
+      <path d="M40 30L300 210M300 30L40 210" stroke="url(#gp)" stroke-width="16" stroke-linecap="round" fill="none" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" id="a2Xp" class="pinkglow"/>
+    </svg>
+    <div class="abs" id="a2KrNo" style="left:540px;width:450px;top:1060px;text-align:center;font-size:32px;color:#ff8bbd;font-weight:600">kredit yozuvi yo‘q</div>
+    <div class="abs glass dark chip" id="a2Pill" style="left:50%;top:1290px;transform:translateX(-50%);font-size:40px;padding:26px 44px;white-space:nowrap">
+      <span style="width:18px;height:18px;border-radius:50%;background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></span>Ikkiyoqlama yozuvsiz</div>
+    <div class="abs" id="a2Sub" style="left:0;right:0;top:1420px;text-align:center;font-size:32px;color:#aab6ec;font-weight:500">balansdan tashqari schyot</div>
+  </div>
+
+  <!-- provodka bar (A2 -> TH sticker) -->
+  <div class="scene" id="sProv">
+    <div class="abs glass dark" id="prov" style="left:90px;top:1560px;width:900px;height:150px;border-radius:32px;display:flex;align-items:center;justify-content:center;gap:26px;padding:0 40px">
+      <span class="mono" style="font-size:52px;font-weight:700;letter-spacing:-1px" id="provTxt"></span><span class="mono" style="font-size:52px;font-weight:700;color:#8fe3ff" id="provCar">▍</span>
+    </div>
+  </div>
+
+  <!-- =============== B2 : chain + audit (split) =============== -->
+  <div class="scene" id="sB2">
+    <div class="panel" id="b2Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div id="b2Chain" class="full">
+        <div class="abs kicker" style="left:0;right:0;top:150px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0" id="b2Dot"></b>Moddiy javobgarlik zanjiri</div>
+        <svg class="abs" style="left:0;top:0" width="1080" height="960">
+          <g id="b2L1"><path d="M262 430H438" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" class="glow" id="b2L1p"/></g>
+          <g id="b2L2"><path d="M642 430H818" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" class="glow" id="b2L2p"/></g>
+          <circle id="b2Pulse" r="16" fill="#bff4ff" cx="160" cy="430" style="filter:drop-shadow(0 0 16px #4cc9f0) drop-shadow(0 0 30px #4cc9f0)"/>
+        </svg>
+        <div class="abs b2n" id="b2n0" style="left:60px;top:330px;width:200px;height:200px">
+          <div class="glass dark full" style="border-radius:50%"></div>
+          <svg viewBox="0 0 120 120" width="120" height="120" class="abs glow" style="left:40px;top:40px;stroke:url(#g1);stroke-width:6"><use href="#i-box"/></svg>
+          <div class="abs" style="left:-40px;right:-40px;top:222px;text-align:center;font-size:34px;font-weight:700">Aktiv <span class="mono" style="color:#8fe3ff">001</span></div>
+        </div>
+        <div class="abs b2n" id="b2n1" style="left:440px;top:330px;width:200px;height:200px">
+          <div class="glass dark full" style="border-radius:50%"></div>
+          <svg viewBox="0 0 120 120" width="120" height="120" class="abs glow" style="left:40px;top:40px;stroke:url(#g1);stroke-width:6"><use href="#i-person"/></svg>
+          <div class="abs" style="left:-40px;right:-40px;top:222px;text-align:center;font-size:34px;font-weight:700">Mas’ul xodim</div>
+        </div>
+        <div class="abs b2n" id="b2n2" style="left:820px;top:330px;width:200px;height:200px">
+          <div class="glass dark full" style="border-radius:50%"></div>
+          <svg viewBox="0 0 120 120" width="120" height="120" class="abs glow" style="left:40px;top:40px;stroke:url(#g1);stroke-width:6"><use href="#i-shield"/></svg>
+          <div class="abs" style="left:-60px;right:-60px;top:222px;text-align:center;font-size:34px;font-weight:700">Javobgarlik</div>
+        </div>
+        <div class="abs" id="b2Brk1" style="left:330px;top:395px;font-size:60px;font-weight:800;color:#ff4d97;text-shadow:0 0 20px #f72585">✕</div>
+        <div class="abs" id="b2Brk2" style="left:710px;top:395px;font-size:60px;font-weight:800;color:#ff4d97;text-shadow:0 0 20px #f72585">✕</div>
+        <div class="abs chip" id="b2Ok" style="left:50%;top:700px;transform:translateX(-50%);background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.5);font-size:34px;white-space:nowrap">Zanjir tiklandi</div>
+      </div>
+      <div id="b2Audit" class="full">
+        <div class="abs glass dark" id="b2Rep" style="left:110px;top:150px;width:860px;height:600px;padding:46px 54px;border-radius:34px;overflow:hidden">
+          <div class="row"><div><div style="font-size:28px;color:#aebcff;letter-spacing:6px;font-weight:600">AUDIT</div><div style="font-size:66px;font-weight:800;letter-spacing:-1px">Xulosa</div></div>
+            <svg width="90" height="90" viewBox="0 0 120 120" class="glow" style="stroke:url(#g1);stroke-width:6"><path d="M16 50a34 34 0 1 0 68 0a34 34 0 1 0 -68 0M74 74l30 30" fill="none" stroke-linecap="round"/></svg></div>
+          <div style="margin-top:40px;display:flex;flex-direction:column;gap:22px">
+            <div class="skel" style="width:88%"></div>
+            <div style="position:relative;height:96px">
+              <div class="abs row" id="b2Bad" style="inset:0;justify-content:flex-start;gap:20px;padding:0 24px;border-radius:18px;background:rgba(247,37,133,.18);border:2px solid rgba(247,37,133,.6)">
+                <span style="font-size:44px;color:#ff5c9e">⚠</span><span style="font-size:32px;font-weight:600;color:#ffc2dc">Ijaradagi aktivlar hisobda yo‘q</span></div>
+              <div class="abs row" id="b2Good" style="inset:0;justify-content:flex-start;gap:20px;padding:0 24px;border-radius:18px;background:rgba(76,201,240,.16);border:2px solid rgba(76,201,240,.65)">
+                <span style="font-size:40px;color:#7fe0ff">✓</span><span style="font-size:32px;font-weight:600;color:#d4f6ff">Kamchilik bartaraf etildi</span></div>
+            </div>
+            <div class="skel" style="width:72%"></div>
+            <div class="skel" style="width:80%"></div>
+          </div>
+          <div class="abs" id="b2Sweep" style="top:-100px;bottom:-100px;width:260px;left:0;background:linear-gradient(90deg,transparent,rgba(190,245,255,.55),transparent);transform:skewX(-18deg)"></div>
+        </div>
+        <div class="stamp ok" id="b2Stamp" style="left:600px;top:560px;font-size:84px">TOZA</div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C2 : 1C check (circle) =============== -->
+  <div class="scene" id="sC2">
+    <div class="abs" id="c2Icon" style="left:440px;top:1080px;width:200px;height:200px;border-radius:48px;background:linear-gradient(135deg,#ffd54a,#ff9f1c);display:flex;align-items:center;justify-content:center;box-shadow:0 20px 60px rgba(255,170,40,.45),inset 0 2px 0 rgba(255,255,255,.6);font-size:92px;font-weight:800;color:#b3261e">1C</div>
+    <div class="abs glass dark" id="c2Win" style="left:70px;top:720px;width:940px;height:800px;border-radius:30px;overflow:hidden">
+      <div class="row" style="height:84px;padding:0 30px;background:rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.12);justify-content:flex-start;gap:14px">
+        <i style="width:20px;height:20px;border-radius:50%;background:#ff5f57"></i><i style="width:20px;height:20px;border-radius:50%;background:#febc2e"></i><i style="width:20px;height:20px;border-radius:50%;background:#28c840"></i>
+        <span style="margin-left:24px;font-size:30px;font-weight:600;color:#dfe5ff">1C: Buxgalteriya — Hisoblar rejasi</span></div>
+      <div style="padding:34px 40px">
+        <div class="row" style="justify-content:flex-start;gap:20px;height:86px;padding:0 26px;border-radius:18px;background:rgba(0,0,0,.28);border:2px solid rgba(143,227,255,.5)" id="c2Search">
+          <svg width="44" height="44" viewBox="0 0 120 120" style="stroke:#8fe3ff;stroke-width:12"><path d="M16 50a34 34 0 1 0 68 0a34 34 0 1 0 -68 0M74 74l30 30" fill="none" stroke-linecap="round"/></svg>
+          <span style="font-size:32px;color:#8e9bd6">Schyot:</span><span class="mono" style="font-size:44px;font-weight:700" id="c2Typed"></span><span id="c2Caret" style="width:4px;height:46px;background:#8fe3ff"></span>
+        </div>
+        <div style="margin-top:26px;font-size:30px" id="c2List">
+          <div class="c2r row" style="height:92px;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.08);justify-content:flex-start;gap:30px"><span class="mono" style="font-weight:700;color:#8fe3ff;width:80px">001</span><span>Operativ ijaraga olingan asosiy vositalar</span></div>
+          <div class="c2r row" style="height:92px;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.08);justify-content:flex-start;gap:30px;color:#aab3de"><span class="mono" style="font-weight:700;width:80px">002</span><span>Mas’ul saqlashdagi TMZ</span></div>
+          <div class="c2r row" style="height:92px;padding:0 24px;border-bottom:1px solid rgba(255,255,255,.08);justify-content:flex-start;gap:30px;color:#aab3de"><span class="mono" style="font-weight:700;width:80px">003</span><span>Qayta ishlashga olingan materiallar</span></div>
+          <div class="c2r row" style="height:92px;padding:0 24px;justify-content:flex-start;gap:30px;color:#aab3de"><span class="mono" style="font-weight:700;width:80px">004</span><span>Komissiyaga olingan tovarlar</span></div>
+        </div>
+        <div class="abs" id="c2Sel" style="left:40px;right:40px;top:230px;height:92px;border-radius:16px;background:linear-gradient(100deg,rgba(67,97,238,.55),rgba(114,9,183,.45));box-shadow:0 0 0 2px rgba(143,227,255,.7),0 10px 40px rgba(67,97,238,.5);z-index:-1"></div>
+        <div class="row" id="c2Bal" style="margin-top:34px;height:130px;padding:0 34px;border-radius:22px;background:rgba(247,37,133,.14);border:2px solid rgba(247,37,133,.6)">
+          <span style="font-size:34px;font-weight:600;color:#ffc2dc">Qoldiq (Dt)</span><span class="mono" style="font-size:54px;font-weight:700;color:#ff5c9e">0,00</span>
+        </div>
+      </div>
+    </div>
+    <div class="abs chip" id="c2Warn" style="left:640px;top:1560px;background:linear-gradient(120deg,#f72585,#b5179e);box-shadow:0 10px 30px rgba(247,37,133,.6);font-size:34px">Tekshiring!</div>
+    <svg class="abs" id="c2Cur" style="left:0;top:0" width="70" height="90" viewBox="0 0 70 90">
+      <path d="M6 4l56 44-26 4 14 30-12 6-14-30-18 18z" fill="#fff" stroke="#0b1022" stroke-width="4" stroke-linejoin="round" style="filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))"/>
+    </svg>
+    <div class="abs" id="c2Click" style="width:30px;height:30px;border-radius:50%;border:5px solid #8fe3ff"></div>
+  </div>
+
+  <!-- =============== CTA =============== -->
+  <div class="scene" id="sCTA">
+    <div class="abs glass dark" id="cta" style="left:70px;top:1400px;width:940px;height:170px;border-radius:44px;display:flex;align-items:center;gap:28px;padding:0 30px">
+      <div style="width:110px;height:110px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.2)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      <div style="flex:1">
+        <div style="font-size:26px;color:#aebcff;font-weight:500">Izoh qoldiring</div>
+        <div style="display:flex;align-items:center;gap:6px;height:66px"><span id="ctaPh" style="font-size:40px;color:#7f8bc0">Izoh...</span><span id="ctaTyped" class="grad-text" style="font-size:60px;font-weight:800;letter-spacing:2px"></span><span id="ctaCaret" style="width:4px;height:54px;background:#8fe3ff"></span></div>
+      </div>
+      <div id="ctaSend" style="width:100px;height:100px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(67,97,238,.6)">
+        <svg width="50" height="50" viewBox="0 0 50 50"><path d="M6 24L44 6 32 44l-8-15z" fill="#fff"/></svg></div>
+    </div>
+    <div class="abs" id="ctaBrand" style="left:0;right:0;top:120px;display:flex;justify-content:center">
+      <div class="glass dark chip" style="font-size:30px;padding:16px 30px 16px 16px;letter-spacing:3px;font-weight:700"><img src="logo.svg" style="width:54px;height:54px;border-radius:14px">FAXR MADAD KONSALT</div>
+    </div>
+  </div>
+
+  <!-- subtitles -->
+  <div id="subs"></div>
+
+  <!-- name card -->
+  <div class="abs glass" id="nc" style="background:linear-gradient(140deg,rgba(34,44,110,.62),rgba(12,16,44,.55) 50%,rgba(54,22,112,.58))">
+    <div id="ncLogo"><img src="logo.svg"></div>
+    <div>
+      <span class="mask"><div id="ncName">Shuxrat Abdullaev</div></span>
+      <span class="mask"><div id="ncRole"><i></i>Buxgalter</div></span>
+    </div>
+  </div>
+
+  <canvas id="grain" width="640" height="1140"></canvas>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script src="data.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
