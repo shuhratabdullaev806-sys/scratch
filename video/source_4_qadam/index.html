@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>001 Ijara 4 qadam</title>
+<style>
+@font-face{font-family:Outfit;font-weight:400;src:url(node_modules/@fontsource/outfit/files/outfit-latin-400-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:500;src:url(node_modules/@fontsource/outfit/files/outfit-latin-500-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:600;src:url(node_modules/@fontsource/outfit/files/outfit-latin-600-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:700;src:url(node_modules/@fontsource/outfit/files/outfit-latin-700-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:800;src:url(node_modules/@fontsource/outfit/files/outfit-latin-800-normal.woff2)}
+@font-face{font-family:Mono;font-weight:500;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2)}
+@font-face{font-family:Mono;font-weight:700;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2)}
+:root{
+  --p:#4361ee; --pd:#3a0ca3; --s:#7209b7; --a:#f72585; --c:#4cc9f0; --ink:#070b18; --navy:#0f172a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+body{font-family:Outfit,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--ink)}
+.abs{position:absolute}
+.full{position:absolute;inset:0}
+.mono{font-family:Mono,monospace}
+
+/* ---------- background world ---------- */
+#bg{background:radial-gradient(120% 70% at 50% 25%,#1b2160 0%,#0d1233 45%,#060913 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);mix-blend-mode:screen}
+#floor{position:absolute;left:-540px;right:-540px;bottom:-200px;height:1100px;
+  background-image:linear-gradient(rgba(124,160,255,.16) 2px,transparent 2px),linear-gradient(90deg,rgba(124,160,255,.16) 2px,transparent 2px);
+  background-size:90px 90px;transform:perspective(900px) rotateX(72deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.9),transparent 85%)}
+#dots{position:absolute;inset:0}
+.pt{position:absolute;width:6px;height:6px;border-radius:50%;background:#9fb4ff;box-shadow:0 0 12px #6f8cff}
+#vig{background:radial-gradient(130% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+/* ---------- speaker ---------- */
+#spkSplit{position:absolute;inset:0;will-change:clip-path}
+#spkCirc{position:absolute;inset:0}
+#v{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+#ring{position:absolute;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+  filter:drop-shadow(0 0 22px rgba(76,122,255,.9))}
+#ringGlow{position:absolute;border-radius:50%;box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.08)}
+#tint{position:absolute;inset:0;pointer-events:none}
+
+/* ---------- glass ---------- */
+.glass:not(.abs):not(.full):not(.sg){position:relative}
+.glass{border-radius:36px;
+  background:linear-gradient(140deg,rgba(255,255,255,.17),rgba(255,255,255,.05) 45%,rgba(255,255,255,.08));
+  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 40px rgba(255,255,255,.05),0 24px 70px rgba(0,0,0,.38)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;
+  background:linear-gradient(150deg,rgba(255,255,255,.75),rgba(255,255,255,.08) 35%,rgba(255,255,255,.02) 60%,rgba(160,190,255,.55));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.glass::after{content:"";position:absolute;left:6%;top:3px;width:55%;height:45%;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.28),transparent 70%)}
+.dark{background:linear-gradient(140deg,rgba(34,44,110,.72),rgba(10,14,42,.66) 50%,rgba(46,22,104,.66))}
+
+/* ---------- subtitles ---------- */
+#subs{position:absolute;left:0;right:0;top:0;height:0}
+.sg{position:absolute;left:50%;top:0;display:flex;gap:18px;padding:22px 38px 26px;border-radius:999px;white-space:nowrap;
+  font-weight:700;font-size:62px;letter-spacing:-.5px;line-height:1;transform-origin:50% 50%}
+.sg.glass{background:linear-gradient(140deg,rgba(34,44,110,.62),rgba(12,16,44,.56) 50%,rgba(54,22,112,.58))}
+.sw{position:relative;z-index:2;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.hl{position:absolute;z-index:1;top:14px;bottom:16px;border-radius:22px;
+  background:linear-gradient(120deg,#4361ee,#7209b7 70%,#f72585);box-shadow:0 8px 26px rgba(90,70,255,.55),inset 0 1px 0 rgba(255,255,255,.45)}
+
+/* ---------- name card ---------- */
+#nc{left:48px;top:1452px;display:flex;align-items:center;gap:26px;padding:24px 44px 24px 24px;border-radius:34px}
+#ncLogo{width:104px;height:104px;border-radius:26px;overflow:hidden;box-shadow:0 10px 30px rgba(67,97,238,.6)}
+#ncLogo img{width:100%;height:100%}
+#ncName{font-size:50px;font-weight:700;letter-spacing:-.5px;line-height:1.05}
+#ncRole{font-size:34px;font-weight:500;color:#c9d4ff;margin-top:6px;display:flex;align-items:center;gap:14px}
+#ncRole i{display:inline-block;width:34px;height:4px;border-radius:2px;background:linear-gradient(90deg,#4cc9f0,#f72585)}
+.mask{overflow:hidden;display:block}
+
+/* ---------- generic scene bits ---------- */
+.scene{position:absolute;inset:0;visibility:hidden}
+.kicker{font-size:30px;font-weight:600;letter-spacing:8px;color:#aebcff;text-transform:uppercase;display:flex;align-items:center;gap:16px}
+.kicker b{width:14px;height:14px;border-radius:50%;background:#f72585;box-shadow:0 0 16px #f72585}
+svg .ln{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.glow{filter:drop-shadow(0 0 10px rgba(96,130,255,.9)) drop-shadow(0 0 30px rgba(114,9,183,.6))}
+.pinkglow{filter:drop-shadow(0 0 12px rgba(247,37,133,.9))}
+.grad-text{background:linear-gradient(100deg,#8fdcff,#6d86ff 45%,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{display:inline-flex;align-items:center;gap:14px;padding:14px 26px;border-radius:999px;font-weight:600;font-size:32px}
+.stamp{position:absolute;padding:14px 34px;border:6px solid #ff3d8b;border-radius:18px;color:#ff3d8b;font-weight:800;font-size:76px;letter-spacing:4px;
+  text-shadow:0 0 24px rgba(247,37,133,.8);box-shadow:0 0 40px rgba(247,37,133,.5),inset 0 0 30px rgba(247,37,133,.3);background:rgba(40,0,20,.35)}
+.stamp.ok{border-color:#4cc9f0;color:#4cc9f0;text-shadow:0 0 24px rgba(76,201,240,.8);box-shadow:0 0 40px rgba(76,201,240,.5),inset 0 0 30px rgba(76,201,240,.3);background:rgba(0,30,50,.35)}
+.skel{height:22px;border-radius:11px;background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,.2),rgba(255,255,255,.10));}
+.row{display:flex;align-items:center;justify-content:space-between}
+
+/* panel for split */
+.panel{position:absolute;left:0;top:960px;width:1080px;height:960px;overflow:hidden;
+  background:radial-gradient(110% 80% at 50% 0%,#1c2366 0%,#0c1030 55%,#060913 100%)}
+.panel .seam{position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,transparent,#4cc9f0,#4361ee,#f72585,transparent);box-shadow:0 0 30px #4361ee}
+.pgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,160,255,.07) 2px,transparent 2px),linear-gradient(90deg,rgba(124,160,255,.07) 2px,transparent 2px);background-size:60px 60px;-webkit-mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent)}
+
+.hks{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:32px;border:3px solid rgba(160,180,255,.4);color:#aab6ec}
+.shav{width:64px;height:64px;border-radius:50%;border:3px solid #1a1f55}
+.mon{height:74px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;background:rgba(255,255,255,.07);border:2px solid rgba(160,180,255,.25);color:#aab6ec}
+#grain{position:absolute;inset:-100px;opacity:.07;mix-blend-mode:overlay;pointer-events:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8fe3ff"/><stop offset=".5" stop-color="#6b86ff"/><stop offset="1" stop-color="#c76bff"/>
+    </linearGradient>
+    <linearGradient id="gp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7ab6"/><stop offset="1" stop-color="#f72585"/>
+    </linearGradient>
+    <linearGradient id="gc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a6f0ff"/><stop offset="1" stop-color="#4cc9f0"/>
+    </linearGradient>
+    <!-- reusable icons -->
+    <symbol id="i-machine" viewBox="0 0 200 150">
+      <path class="ln" pathLength="1" d="M8 138H192M30 44h100a10 10 0 0 1 10 10v74H20V54a10 10 0 0 1 10-10z"/>
+      <path class="ln" pathLength="1" d="M36 60h64v44H36z"/>
+      <path class="ln" pathLength="1" d="M68 60v20M60 80h16M68 86v8M50 104l8-8h20l8 8"/>
+      <path class="ln" pathLength="1" d="M150 58h36v70h-36z"/>
+      <path class="ln" pathLength="1" d="M157 66h22v14h-22zM156 98.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M172 98.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M156 114.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M172 114.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+      <path class="ln" pathLength="1" d="M44 44V26h72v18M96 26V12M90 12h12"/>
+      <path class="ln" pathLength="1" d="M108 116h24M108 124h24"/>
+    </symbol>
+    <symbol id="i-building" viewBox="0 0 140 150">
+      <path class="ln" pathLength="1" d="M6 140H134M20 140V34l48-22v128"/>
+      <path class="ln" pathLength="1" d="M68 52h50v88"/>
+      <path class="ln" pathLength="1" d="M34 46h20M34 64h20M34 82h20M34 100h20M82 68h22M82 86h22M82 104h22"/>
+      <path class="ln" pathLength="1" d="M36 140v-20h16v20M86 140v-18h14v18"/>
+    </symbol>
+    <symbol id="i-car" viewBox="0 0 180 110">
+      <path class="ln" pathLength="1" d="M34 82H16V64c0-7 5-12 12-13l22-4 20-22c4-4 8-6 13-6h38c6 0 10 2 13 7l15 20 14 3c7 1 12 7 12 14v19h-14M66 82h52"/>
+      <path class="ln" pathLength="1" d="M36 82a14 14 0 1 0 28 0a14 14 0 1 0-28 0M120 82a14 14 0 1 0 28 0a14 14 0 1 0-28 0"/>
+      <path class="ln" pathLength="1" d="M74 46l14-16h18v16zM114 46V30h12l12 16z"/>
+    </symbol>
+    <symbol id="i-person" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0 -40 0"/>
+      <path class="ln" pathLength="1" d="M22 106c4-20 20-30 38-30s34 10 38 30"/>
+    </symbol>
+    <symbol id="i-box" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 14l40 20v50L60 104 20 84V34z"/>
+      <path class="ln" pathLength="1" d="M20 34l40 20 40-20M60 54v50"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 12l38 14v30c0 26-16 44-38 52C38 100 22 82 22 56V26z"/>
+      <path class="ln" pathLength="1" d="M42 60l12 12 24-26"/>
+    </symbol>
+    <symbol id="i-doc" viewBox="0 0 100 120">
+      <path class="ln" pathLength="1" d="M14 8h50l22 22v82H14zM64 8v22h22"/>
+      <path class="ln" pathLength="1" d="M28 54h44M28 70h44M28 86h30"/>
+    </symbol>
+    <symbol id="i-scales" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 12v90M36 106h48M18 30h84M60 12l-4 6h8z"/>
+      <path class="ln" pathLength="1" d="M18 30L6 66M18 30l12 36M102 30l-12 36M102 30l12 36"/>
+      <path class="ln" pathLength="1" d="M4 66c2 12 26 12 28 0zM88 66c2 12 26 12 28 0z"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M24 22h72a8 8 0 0 1 8 8v72a8 8 0 0 1-8 8H24a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8zM16 48h88M40 12v20M80 12v20"/>
+      <path class="ln" pathLength="1" d="M34 66h10M56 66h10M78 66h10M34 88h10M56 88h10M78 88h10"/>
+    </symbol>
+    <symbol id="i-bookmark" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M32 10h56v100L60 86 32 110z"/>
+    </symbol>
+    <symbol id="i-share" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M72 26a14 14 0 1 0 28 0a14 14 0 1 0-28 0M16 60a14 14 0 1 0 28 0a14 14 0 1 0-28 0M72 94a14 14 0 1 0 28 0a14 14 0 1 0-28 0"/>
+      <path class="ln" pathLength="1" d="M43 53l30-20M43 67l30 20"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <!-- world background -->
+  <div id="bg" class="full">
+    <div class="blob" id="b1" style="width:760px;height:760px;background:#4361ee;opacity:.55"></div>
+    <div class="blob" id="b2" style="width:680px;height:680px;background:#7209b7;opacity:.5"></div>
+    <div class="blob" id="b3" style="width:520px;height:520px;background:#f72585;opacity:.28"></div>
+    <div id="floor"></div>
+    <div id="dots"></div>
+    <div id="vig" class="full"></div>
+  </div>
+
+  <!-- speaker -->
+  <div id="spkSplit"><div id="spkCirc"><img id="v" src="../frames/0001.jpg"><div id="tint"></div></div></div>
+  <div id="ringGlow"></div>
+  <div id="ring"></div>
+
+  <!-- =============== HOOK 0.3 → 4.4  "4 qadam · saqlab qo'ying" =============== -->
+  <div class="scene" id="sHook">
+    <div class="glass dark abs" id="hk" style="left:130px;top:70px;width:820px;height:220px;border-radius:40px;padding:28px 40px">
+      <div class="row">
+        <div class="kicker" style="font-size:26px;letter-spacing:6px"><b></b>Operativ ijara</div>
+        <svg id="hkBm" viewBox="0 0 120 120" width="64" height="64" class="glow" style="stroke:url(#g1);stroke-width:8"><use href="#i-bookmark"/></svg>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <div style="font-size:80px;font-weight:800;letter-spacing:-2px;line-height:1"><span class="grad-text">4</span> qadam</div>
+        <div style="display:flex;gap:16px">
+          <div class="hks" id="hkS0">1</div><div class="hks" id="hkS1">2</div><div class="hks" id="hkS2">3</div><div class="hks" id="hkS3">4</div>
+        </div>
+      </div>
+      <div class="abs chip" id="hkSave" style="right:-10px;top:-30px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:28px">Saqlab qo‘ying</div>
+    </div>
+  </div>
+
+  <!-- =============== WARN 4.7 → 10.2  "faqat ESF xarajatga, 001 unutildi" =============== -->
+  <div class="scene" id="sWarn">
+    <div class="glass dark abs" id="wc" style="left:110px;top:60px;width:860px;height:250px;border-radius:40px;padding:26px 36px;display:flex;flex-direction:column;justify-content:center;gap:18px">
+      <div class="row" id="w1" style="justify-content:flex-start;gap:18px">
+        <svg viewBox="0 0 100 120" width="46" height="55" style="stroke:url(#g1);stroke-width:7"><use href="#i-doc"/></svg>
+        <span style="font-size:34px;font-weight:600">Elektron hisob-faktura</span>
+        <svg width="60" height="30" viewBox="0 0 60 30"><path d="M4 15h46M40 5l12 10-12 10" stroke="#9fb0ff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="chip" id="w1c" style="background:rgba(76,201,240,.18);border:2px solid rgba(76,201,240,.7);font-size:30px;padding:8px 20px">Xarajat ✓</span>
+      </div>
+      <div class="row" id="w2" style="justify-content:flex-start;gap:18px;position:relative">
+        <span class="chip mono" style="border:3px dashed #ff5c9e;color:#ff8bbd;font-size:34px;padding:8px 22px;font-weight:700">001</span>
+        <span style="font-size:34px;font-weight:600;color:#ffc2dc">hisob raqami</span>
+        <span class="chip" id="w2c" style="background:linear-gradient(120deg,#f72585,#b5179e);font-size:30px;padding:8px 20px;box-shadow:0 8px 24px rgba(247,37,133,.5)">unutildi ✕</span>
+        <div class="abs" id="w2s" style="left:-6px;right:420px;top:50%;height:6px;border-radius:3px;background:#ff4d97;box-shadow:0 0 16px #f72585;transform-origin:0 50%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== A1 10.7 → 16.3  MJtK 175¹-modda =============== -->
+  <div class="scene" id="sA1">
+    <div class="abs kicker" id="a1Kick" style="left:0;right:0;top:190px;justify-content:center"><b></b>Qonunchilik</div>
+    <div class="abs" id="a1Num" style="left:0;right:0;top:250px;text-align:center;font-size:300px;font-weight:800;line-height:1;letter-spacing:-8px;color:transparent;-webkit-text-stroke:3px rgba(140,160,255,.2)">175<span style="font-size:150px;vertical-align:top">1</span></div>
+    <div class="abs" style="left:0;right:0;top:0;bottom:0;perspective:2000px">
+      <div class="abs glass dark" id="a1Page" style="left:190px;top:560px;width:700px;height:820px;border-radius:26px;padding:60px 56px">
+        <div style="font-size:28px;color:#aebcff;letter-spacing:6px;font-weight:600">MJtK</div>
+        <div id="a1Art" style="position:relative;margin-top:20px;padding:26px 28px;border-radius:20px">
+          <div class="abs" id="a1Hl" style="inset:0;border-radius:20px;background:linear-gradient(100deg,rgba(67,97,238,.75),rgba(114,9,183,.7) 60%,rgba(247,37,133,.65));transform-origin:0 50%;box-shadow:0 10px 40px rgba(90,70,255,.5)"></div>
+          <div style="position:relative;font-size:84px;font-weight:800;letter-spacing:-2px;line-height:1">175<sup style="font-size:44px">1</sup>-modda</div>
+          <div style="position:relative;font-size:32px;font-weight:500;margin-top:12px;color:#e6eaff">Buxgalteriya hisobi qoidalarini buzish</div>
+        </div>
+        <div style="margin-top:44px;display:flex;flex-direction:column;gap:24px">
+          <div class="skel" style="width:94%"></div><div class="skel" style="width:82%"></div><div class="skel" style="width:88%"></div><div class="skel" style="width:60%"></div><div class="skel" style="width:76%"></div>
+        </div>
+      </div>
+      <div class="abs" id="a1Cover" style="left:190px;top:560px;width:700px;height:820px;border-radius:26px;transform-origin:0 50%;
+          background:linear-gradient(150deg,#27307a,#141a4a 55%,#2a1160);box-shadow:inset 0 0 0 3px rgba(160,180,255,.35),inset 18px 0 0 rgba(0,0,0,.25),0 40px 90px rgba(0,0,0,.55);
+          display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;backface-visibility:hidden">
+        <svg viewBox="0 0 120 120" width="220" height="220" class="glow" style="stroke:url(#g1);stroke-width:4"><use href="#i-scales"/></svg>
+        <div style="text-align:center;font-size:40px;font-weight:700;line-height:1.25;letter-spacing:1px;padding:0 60px">MA’MURIY JAVOBGARLIK TO‘G‘RISIDAGI<br><span class="grad-text" style="font-size:64px;font-weight:800">KODEKS</span></div>
+      </div>
+    </div>
+    <div class="abs" id="a1Block" style="left:464px;top:1464px;width:220px;height:60px;border-radius:14px;background:linear-gradient(180deg,#3a2f8f,#1b1650);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 20px 40px rgba(0,0,0,.5)"></div>
+    <div class="abs" id="a1Gavel" style="left:480px;top:1250px;width:480px;height:280px"><svg width="480" height="280" viewBox="0 0 240 140">
+      <path d="M22 12h50v96H22zM22 32h50M22 88h50" fill="rgba(67,97,238,.35)" stroke="url(#g1)" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M72 60H232" stroke="#8fa2ff" stroke-width="14" stroke-linecap="round"/>
+    </svg></div>
+    <div class="abs" id="a1Burst" style="left:574px;top:1464px;width:10px;height:10px;border-radius:50%;border:6px solid #f72585;box-shadow:0 0 40px #f72585"></div>
+  </div>
+
+  <!-- =============== C1 16.2 → 20.3  JARIMA 2 200 000 =============== -->
+  <div class="scene" id="sC1">
+    <div class="abs" id="c1AmtW" style="left:0;right:0;top:720px;text-align:center">
+      <div class="mono" id="c1Amt" style="font-size:118px;font-weight:700;letter-spacing:-4px;background:linear-gradient(100deg,#ff9cc4,#f72585 60%,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 24px rgba(247,37,133,.5))">0</div>
+      <div style="font-size:42px;font-weight:600;color:#ffc2dc;margin-top:-6px">so‘m jarima</div>
+    </div>
+    <div class="abs" style="left:170px;top:1010px;width:740px;height:12px;border-radius:6px;background:#0a0d24;box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 0 0 2px rgba(160,180,255,.25)"></div>
+    <div class="abs" style="left:210px;top:1016px;width:660px;height:760px;overflow:hidden">
+      <div class="abs glass dark" id="c1Rec" style="left:0;top:0;width:660px;height:700px;border-radius:0 0 26px 26px;padding:50px 50px">
+        <div class="row"><span style="font-size:30px;letter-spacing:6px;color:#aebcff;font-weight:600">QAROR</span><span class="mono" style="font-size:26px;color:#8e9bd6">№ 175¹</span></div>
+        <div style="height:2px;background:rgba(255,255,255,.18);margin:26px 0"></div>
+        <div style="display:flex;flex-direction:column;gap:22px;font-size:30px">
+          <div class="row"><span style="color:#aab3de">Modda</span><span style="font-weight:600">MJtK 175¹</span></div>
+          <div class="row"><span style="color:#aab3de">Sabab</span><span style="font-weight:600">001-hisob yuritilmagan</span></div>
+          <div class="row"><span style="color:#aab3de">Summa</span><span class="mono" style="font-weight:700;color:#ff8bbd">2 200 000 so‘m</span></div>
+        </div>
+        <div style="height:2px;background:rgba(255,255,255,.18);margin:30px 0 24px"></div>
+        <div style="height:90px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.8) 0 4px,transparent 4px 9px,rgba(255,255,255,.8) 9px 11px,transparent 11px 18px);opacity:.55;border-radius:4px"></div>
+      </div>
+    </div>
+    <div class="stamp" id="c1Stamp" style="left:330px;top:1390px">JARIMA</div>
+    <svg class="abs" id="c1Warn" style="left:470px;top:1745px" width="140" height="124" viewBox="0 0 140 124">
+      <path d="M70 8L134 116H6z" fill="rgba(247,37,133,.2)" stroke="#ff4d97" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M70 44v34M70 94v2" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- =============== B1 21.0 → 24.9  QADAM 1: shartnoma + dalolatnoma (split) =============== -->
+  <div class="scene" id="sB1">
+    <div class="panel" id="b1Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:500px;height:500px;left:-150px;top:320px;background:#4361ee;opacity:.35"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:100px;background:#7209b7;opacity:.4"></div>
+      <div class="abs kicker" style="left:0;right:0;top:100px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Qadam 1 / 4</div>
+      <div class="abs" style="inset:0;perspective:1600px">
+        <div class="abs glass dark b1d" id="b1d0" style="left:80px;top:170px;width:430px;height:560px;border-radius:28px;padding:40px 38px">
+          <svg viewBox="0 0 100 120" width="70" height="84" class="glow" style="stroke:url(#g1);stroke-width:6"><use href="#i-doc"/></svg>
+          <div style="font-size:40px;font-weight:800;margin-top:18px;letter-spacing:1px">SHARTNOMA</div>
+          <div style="font-size:24px;color:#aebcff;margin-top:4px">operativ ijara</div>
+          <div style="margin-top:28px;display:flex;flex-direction:column;gap:18px"><div class="skel" style="width:95%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:88%"></div></div>
+          <svg class="abs" style="left:38px;top:420px" width="240" height="90" viewBox="0 0 240 90"><path id="b1sig0" d="M8 60c20-40 34-40 30-6s18 20 30-10 20-10 22 12 30-8 44-20 22 10 40 8 30-14 52-10" stroke="#8fe3ff" stroke-width="5" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path d="M8 78H230" stroke="rgba(255,255,255,.3)" stroke-width="2"/></svg>
+          <div class="abs b1st" id="b1st0" style="right:30px;top:390px;width:130px;height:130px;border-radius:50%;border:5px solid #4cc9f0;color:#4cc9f0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:2px;text-align:center;box-shadow:0 0 30px rgba(76,201,240,.5),inset 0 0 20px rgba(76,201,240,.3)">IMZO<br>MUHR</div>
+        </div>
+        <div class="abs glass dark b1d" id="b1d1" style="left:570px;top:170px;width:430px;height:560px;border-radius:28px;padding:40px 38px">
+          <svg viewBox="0 0 100 120" width="70" height="84" class="glow" style="stroke:url(#g1);stroke-width:6"><use href="#i-doc"/></svg>
+          <div style="font-size:40px;font-weight:800;margin-top:18px;letter-spacing:1px">DALOLATNOMA</div>
+          <div style="font-size:24px;color:#aebcff;margin-top:4px">qabul-topshirish</div>
+          <div style="margin-top:28px;display:flex;flex-direction:column;gap:18px"><div class="skel" style="width:90%"></div><div class="skel" style="width:84%"></div><div class="skel" style="width:70%"></div></div>
+          <svg class="abs" style="left:38px;top:420px" width="240" height="90" viewBox="0 0 240 90"><path id="b1sig1" d="M8 50c14 20 26-30 40-20s0 34 18 26 16-34 34-30 8 30 26 26 20-24 40-18 24 16 44 6" stroke="#8fe3ff" stroke-width="5" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path d="M8 78H230" stroke="rgba(255,255,255,.3)" stroke-width="2"/></svg>
+          <div class="abs b1st" id="b1st1" style="right:30px;top:390px;width:130px;height:130px;border-radius:50%;border:5px solid #4cc9f0;color:#4cc9f0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;letter-spacing:2px;text-align:center;box-shadow:0 0 30px rgba(76,201,240,.5),inset 0 0 20px rgba(76,201,240,.3)">IMZO<br>MUHR</div>
+        </div>
+      </div>
+      <div class="abs chip" id="b1Ok" style="left:50%;top:790px;transform:translateX(-50%);background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.5);font-size:34px;white-space:nowrap">✓ Rasmiylashtirildi</div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== A2 26.5 → 31.35  QADAM 2: Dt 001 balansdan tashqari =============== -->
+  <div class="scene" id="sA2">
+    <div class="abs kicker" id="a2Kick" style="left:0;right:0;top:170px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Qadam 2 / 4</div>
+    <div class="abs glass dark" id="a2Bal" style="left:90px;top:250px;width:900px;height:520px;padding:44px 50px;border-radius:32px">
+      <div class="row"><div><div style="font-size:26px;color:#aebcff;letter-spacing:6px;font-weight:600">BUXGALTERIYA</div><div style="font-size:64px;font-weight:800;letter-spacing:-1px">Balans</div></div>
+        <div class="chip" id="a2Same" style="background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);font-size:28px">= o‘zgarmaydi</div></div>
+      <div style="display:flex;gap:40px;margin-top:40px">
+        <div style="flex:1"><div style="font-size:26px;letter-spacing:4px;color:#8e9bd6;font-weight:600;margin-bottom:22px">AKTIV</div><div style="display:flex;flex-direction:column;gap:20px"><div class="skel" style="width:90%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:60%"></div></div></div>
+        <div style="width:2px;background:rgba(255,255,255,.15)"></div>
+        <div style="flex:1"><div style="font-size:26px;letter-spacing:4px;color:#8e9bd6;font-weight:600;margin-bottom:22px">PASSIV</div><div style="display:flex;flex-direction:column;gap:20px"><div class="skel" style="width:85%"></div><div class="skel" style="width:65%"></div><div class="skel" style="width:75%"></div><div class="skel" style="width:55%"></div></div></div>
+      </div>
+    </div>
+    <div class="abs" id="a2Line" style="left:40px;right:40px;top:850px;height:0;border-top:4px dashed rgba(160,180,255,.55)"></div>
+    <div class="abs chip" id="a2LineLab" style="left:50%;top:822px;transform:translateX(-50%);background:#101540;border:2px solid rgba(160,180,255,.55);font-size:28px;letter-spacing:5px;font-weight:700;color:#c8d1ff;white-space:nowrap">BALANSDAN TASHQARI</div>
+    <div class="abs glass dark" id="a2Slot" style="left:90px;top:930px;width:900px;height:300px;padding:40px 50px;border-radius:32px">
+      <div class="row"><span class="grad-text" style="font-size:120px;font-weight:800;letter-spacing:-4px;line-height:1">001</span>
+        <div style="text-align:right;font-size:30px;color:#c8d1ff;line-height:1.3;font-weight:500">Operativ ijaraga olingan<br>asosiy vositalar</div></div>
+      <div class="row" id="a2Val" style="margin-top:30px;height:70px;padding:0 26px;border-radius:16px;background:rgba(76,201,240,.16);border:2px solid rgba(76,201,240,.6)">
+        <span style="font-size:32px;font-weight:700;color:#bff0ff">Dt 001</span><span style="font-size:30px;color:#d4f6ff;font-weight:500">shartnoma qiymatida</span></div>
+    </div>
+    <div class="abs chip glass" id="a2Chip" style="left:50%;top:1420px;transform:translateX(-50%);font-size:44px;padding:22px 40px;white-space:nowrap;font-weight:700">
+      <span class="mono" style="color:#8fe3ff">Dt 001</span><span id="a2ChipTag" style="font-size:32px;font-weight:500;color:#c8d1ff">· shartnoma qiymati</span></div>
+    <div class="abs chip" id="a2Ok" style="left:50%;top:1300px;transform:translateX(-50%);background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:40px;font-weight:800;letter-spacing:3px;white-space:nowrap">+ KIRIM</div>
+    <div class="abs" id="a2Flash" style="left:90px;top:930px;width:900px;height:300px;border-radius:32px;box-shadow:0 0 0 4px #4cc9f0,0 0 80px 10px rgba(76,201,240,.7)"></div>
+  </div>
+
+  <!-- =============== chip QADAM 3 (31.4 → 35.2) =============== -->
+  <div class="scene" id="sK3">
+    <div class="glass dark abs" id="k3" style="left:130px;top:70px;width:820px;height:220px;border-radius:40px;padding:30px 40px;display:flex;gap:34px;align-items:center">
+      <svg viewBox="0 0 120 120" width="130" height="130" class="glow" style="stroke:url(#g1);stroke-width:6"><use href="#i-calendar"/></svg>
+      <div>
+        <div class="kicker" style="font-size:24px;letter-spacing:5px"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Qadam 3 / 4</div>
+        <div style="font-size:52px;font-weight:800;margin-top:8px;letter-spacing:-1px;white-space:nowrap">Har oy · <span class="grad-text">ESF</span> bo‘yicha</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== C2 35.2 → 40.7  Dt 9420 — Kt 6910 ijara haqi =============== -->
+  <div class="scene" id="sC2">
+    <div class="abs glass dark c2c" id="c2a" style="left:60px;top:730px;width:450px;height:320px;border-radius:32px;padding:36px 40px">
+      <div class="chip" style="background:linear-gradient(120deg,#4361ee,#7209b7);font-size:28px;padding:8px 20px;font-weight:800;letter-spacing:3px">DEBET</div>
+      <div class="mono grad-text" style="font-size:108px;font-weight:700;letter-spacing:-3px;margin-top:14px;line-height:1">9420</div>
+      <div style="font-size:30px;color:#d0d8ff;margin-top:12px;font-weight:500">Ijara xarajati</div>
+    </div>
+    <div class="abs glass dark c2c" id="c2b" style="left:570px;top:730px;width:450px;height:320px;border-radius:32px;padding:36px 40px">
+      <div class="chip" style="background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);font-size:28px;padding:6px 18px;font-weight:800;letter-spacing:3px">KREDIT</div>
+      <div class="mono grad-text" style="font-size:108px;font-weight:700;letter-spacing:-3px;margin-top:14px;line-height:1">6910</div>
+      <div style="font-size:30px;color:#d0d8ff;margin-top:12px;font-weight:500">Ijara beruvchiga qarz</div>
+    </div>
+    <svg class="abs" style="left:0;top:0" width="1080" height="1920">
+      <path id="c2Arr" d="M795 1060 C 795 1170, 285 1170, 285 1066" stroke="url(#g1)" stroke-width="6" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="glow"/>
+      <path id="c2Head" d="M265 1090l20-26 20 26" stroke="#9fb8ff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle id="c2Coin" r="16" fill="#bff4ff" style="filter:drop-shadow(0 0 14px #4cc9f0) drop-shadow(0 0 28px #4cc9f0)"/>
+    </svg>
+    <div class="abs chip glass" id="c2Tag" style="left:50%;top:1160px;transform:translateX(-50%);font-size:36px;padding:16px 34px;white-space:nowrap;font-weight:700">ijara haqi</div>
+    <div class="abs" id="c2MonL" style="left:0;right:0;top:1290px;text-align:center;font-size:28px;letter-spacing:6px;color:#aebcff;font-weight:600">HAR OY TAKRORLANADI</div>
+    <div class="abs" id="c2Mon" style="left:70px;top:1350px;width:940px;display:grid;grid-template-columns:repeat(6,1fr);gap:16px"></div>
+  </div>
+
+  <!-- =============== B2 40.7 → 46.5  QQS: Dt 4410 — Kt 6910 (split) =============== -->
+  <div class="scene" id="sB2">
+    <div class="panel" id="b2Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs kicker" style="left:0;right:0;top:100px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Qadam 3 / 4 · QQS</div>
+      <div class="abs glass dark" id="b2Esf" style="left:90px;top:160px;width:900px;height:320px;border-radius:30px;padding:34px 44px">
+        <div class="row"><div style="display:flex;align-items:center;gap:16px"><svg viewBox="0 0 100 120" width="44" height="53" style="stroke:url(#g1);stroke-width:7"><use href="#i-doc"/></svg><span style="font-size:34px;font-weight:700">Elektron hisob-faktura</span></div><span class="mono" style="font-size:24px;color:#8e9bd6">ESF</span></div>
+        <div class="row" style="margin-top:28px;font-size:30px;height:60px;padding:0 20px"><span style="color:#c8d1ff">Ijara xizmati</span><div class="skel" style="width:180px"></div></div>
+        <div style="position:relative;margin-top:14px;height:74px">
+          <div class="abs" id="b2Hl" style="inset:0;border-radius:16px;background:linear-gradient(100deg,rgba(67,97,238,.75),rgba(114,9,183,.7) 60%,rgba(247,37,133,.65));transform-origin:0 50%;box-shadow:0 10px 30px rgba(90,70,255,.5)"></div>
+          <div class="row" style="position:relative;height:74px;padding:0 20px;font-size:32px;font-weight:700"><span>Qo‘shilgan qiymat solig‘i</span><span class="mono">QQS</span></div>
+        </div>
+      </div>
+      <svg class="abs" style="left:0;top:0" width="1080" height="960"><path id="b2Arr" d="M300 490 C 300 540, 300 560, 300 600" stroke="url(#g1)" stroke-width="6" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="glow"/><path id="b2Arr2" d="M780 600 C 780 560, 780 540, 780 490" stroke="#8e9bd6" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="6 12"/></svg>
+      <div class="abs glass dark" id="b2a" style="left:90px;top:610px;width:420px;height:210px;border-radius:28px;padding:28px 34px">
+        <div class="chip" style="background:linear-gradient(120deg,#4361ee,#7209b7);font-size:24px;padding:6px 16px;font-weight:800;letter-spacing:3px">DEBET</div>
+        <div class="mono grad-text" style="font-size:84px;font-weight:700;letter-spacing:-2px;line-height:1.1;margin-top:6px">4410</div>
+        <div style="font-size:26px;color:#d0d8ff;font-weight:500">QQS (hisobga olinadi)</div>
+      </div>
+      <div class="abs glass dark" id="b2b" style="left:570px;top:610px;width:420px;height:210px;border-radius:28px;padding:28px 34px">
+        <div class="chip" style="background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);font-size:24px;padding:4px 14px;font-weight:800;letter-spacing:3px">KREDIT</div>
+        <div class="mono grad-text" style="font-size:84px;font-weight:700;letter-spacing:-2px;line-height:1.1;margin-top:6px">6910</div>
+        <div style="font-size:26px;color:#d0d8ff;font-weight:500">Ijara beruvchiga qarz</div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C3 47.8 → 52.7  QADAM 4: Kt 001 hisobdan chiqarish =============== -->
+  <div class="scene" id="sC3">
+    <div class="abs glass dark" id="c3Con" style="left:90px;top:720px;width:900px;height:250px;border-radius:32px;padding:34px 44px">
+      <div class="row"><div style="display:flex;align-items:center;gap:18px"><svg viewBox="0 0 100 120" width="50" height="60" style="stroke:url(#g1);stroke-width:7"><use href="#i-doc"/></svg><span style="font-size:36px;font-weight:700">Ijara shartnomasi</span></div>
+        <span class="kicker" style="font-size:22px;letter-spacing:4px"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Qadam 4 / 4</span></div>
+      <div style="margin-top:34px;height:18px;border-radius:9px;background:rgba(255,255,255,.1);position:relative;overflow:hidden">
+        <div id="c3Bar" style="position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:9px;background:linear-gradient(90deg,#4cc9f0,#4361ee,#f72585);transform-origin:0 50%"></div></div>
+      <div class="row mono" style="margin-top:14px;font-size:26px;color:#8e9bd6"><span>boshlanish</span><span id="c3EndLab">tugash</span></div>
+    </div>
+    <div class="abs chip" id="c3End" style="left:680px;top:690px;background:linear-gradient(120deg,#f72585,#b5179e);box-shadow:0 10px 30px rgba(247,37,133,.55);font-size:30px;white-space:nowrap">Muddat tugadi</div>
+    <div class="abs" id="c3Title" style="left:0;right:0;top:1030px;text-align:center"><span style="font-size:34px;color:#c8d1ff;font-weight:500;letter-spacing:2px">Schyot</span> <span class="grad-text" style="font-size:100px;font-weight:800;letter-spacing:-3px">001</span></div>
+    <div class="abs" id="c3DH" style="left:90px;width:450px;top:1170px;text-align:center;font-size:40px;font-weight:800;letter-spacing:7px;color:#8fe3ff">DEBET</div>
+    <div class="abs" id="c3KH" style="left:540px;width:450px;top:1170px;text-align:center;font-size:40px;font-weight:800;letter-spacing:7px;color:#ff8bbd">KREDIT</div>
+    <svg class="abs" style="left:0;top:0" width="1080" height="1920"><path id="c3T" d="M90 1235H990M540 1235V1560" stroke="url(#g1)" stroke-width="7" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="glow"/></svg>
+    <div class="abs" id="c3Dr" style="left:90px;width:450px;top:1275px;text-align:center"><div style="font-size:40px;font-weight:700">+ kirim</div><div style="font-size:26px;color:#aab6ec">shartnoma qiymati</div></div>
+    <div class="abs" id="c3Cr" style="left:540px;width:450px;top:1275px;text-align:center"><div style="font-size:40px;font-weight:700;color:#ffc2dc">− chiqim</div><div style="font-size:26px;color:#ffa3c8">xuddi shu qiymat</div></div>
+    <div class="abs" id="c3Asset" style="left:150px;top:1400px;width:280px;height:130px">
+      <svg viewBox="0 0 200 150" width="170" height="128" class="glow" style="stroke:url(#g1);stroke-width:6;margin-left:55px"><use href="#i-machine"/></svg></div>
+    <div class="abs chip glass" id="c3Sal" style="left:50%;top:1600px;transform:translateX(-50%);font-size:38px;padding:18px 38px;white-space:nowrap;font-weight:700">Qoldiq: <span class="mono" style="color:#8fe3ff">0</span></div>
+    <div class="abs chip" id="c3Ok" style="left:50%;top:1720px;transform:translateX(-50%);background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:34px;white-space:nowrap">✓ Hisobdan chiqarildi</div>
+  </div>
+
+  <!-- =============== SHARE 52.8 → 54.7 =============== -->
+  <div class="scene" id="sShare">
+    <div class="glass dark abs" id="sh" style="left:170px;top:80px;width:740px;height:190px;border-radius:40px;padding:0 40px;display:flex;align-items:center;gap:30px">
+      <svg viewBox="0 0 120 120" width="100" height="100" class="glow" style="stroke:url(#g1);stroke-width:7"><use href="#i-share"/></svg>
+      <div style="flex:1"><div style="font-size:26px;color:#aebcff;font-weight:500">Hamkasblarga</div><div style="font-size:54px;font-weight:800;letter-spacing:-1px">ulashing</div></div>
+      <div style="display:flex">
+        <div class="shav" style="background:linear-gradient(135deg,#4cc9f0,#4361ee)"></div><div class="shav" style="background:linear-gradient(135deg,#7209b7,#f72585);margin-left:-22px"></div><div class="shav" style="background:linear-gradient(135deg,#4361ee,#7209b7);margin-left:-22px"></div>
+      </div>
+    </div>
+    <svg class="abs" id="shPlane" style="left:0;top:0" width="90" height="90" viewBox="0 0 50 50"><path d="M6 24L44 6 32 44l-8-15z" fill="#fff" style="filter:drop-shadow(0 0 12px #8fe3ff)"/></svg>
+  </div>
+
+  <!-- =============== CTA 54.6 → end =============== -->
+  <div class="scene" id="sCTA">
+    <div class="abs glass dark" id="cta" style="left:70px;top:1420px;width:940px;height:170px;border-radius:44px;display:flex;align-items:center;gap:28px;padding:0 30px">
+      <div style="width:110px;height:110px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.2)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      <div style="flex:1">
+        <div style="font-size:26px;color:#aebcff;font-weight:500">Savol bo‘lsa — izoh qoldiring</div>
+        <div style="display:flex;align-items:center;gap:6px;height:66px"><span id="ctaPh" style="font-size:40px;color:#7f8bc0">Izoh...</span><span id="ctaTyped" class="grad-text" style="font-size:60px;font-weight:800;letter-spacing:2px"></span><span id="ctaCaret" style="width:4px;height:54px;background:#8fe3ff"></span></div>
+      </div>
+      <div id="ctaSend" style="width:100px;height:100px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(67,97,238,.6)">
+        <svg width="50" height="50" viewBox="0 0 50 50"><path d="M6 24L44 6 32 44l-8-15z" fill="#fff"/></svg></div>
+    </div>
+    <div class="abs" id="ctaBrand" style="left:0;right:0;top:110px;display:flex;justify-content:center">
+      <div class="glass dark chip" style="font-size:30px;padding:16px 30px 16px 16px;letter-spacing:3px;font-weight:700"><img src="logo.svg" style="width:54px;height:54px;border-radius:14px">FAXR MADAD KONSALT</div>
+    </div>
+  </div>
+
+  <!-- subtitles -->
+  <div id="subs"></div>
+
+  <!-- name card -->
+  <div class="abs glass" id="nc" style="background:linear-gradient(140deg,rgba(34,44,110,.62),rgba(12,16,44,.55) 50%,rgba(54,22,112,.58))">
+    <div id="ncLogo"><img src="logo.svg"></div>
+    <div>
+      <span class="mask"><div id="ncName">Shuxrat Abdullaev</div></span>
+      <span class="mask"><div id="ncRole"><i></i>Buxgalter</div></span>
+    </div>
+  </div>
+
+  <canvas id="grain" width="640" height="1140"></canvas>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script src="data.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
