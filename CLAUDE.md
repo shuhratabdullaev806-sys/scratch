@@ -36,6 +36,22 @@ stavkasi, soliq foizlari, modda raqamlari) har videoda qayta tekshiriladi.
 Ishonch hosil qilib bo'lmagan faktni videoga qo'yish o'rniga, o'sha savolni
 boshqasiga almashtirish kerak.
 
+### Ochiq masala — orqa fonni kesish
+
+Hozirgi rang almashishi "sahna yorug'ligi" tarzida ishlaydi: chetlarda
+kuchli, markazda kuchsiz. Kamchiligi — rang diktorning kiyimiga ham
+tushadi. Namuna videolarda esa faqat fon rang o'zgaradi, chunki u yerda
+boshlovchi kesib olingan.
+
+Keyingi qadam: HeyGen'dan **transparent** yoki **yashil fonli** video
+olishga harakat qilinadi. Olinsa — fonni to'liq almashtirib, rang faqat
+fonda o'zgaradigan qilinadi.
+
+Agar HeyGen bermasa, zaxira yo'l — MediaPipe segmentatsiyasi (internetsiz
+ishlaydi). Lekin bu videoda mikrofon, harakatlanuvchi qo'llar va qora shim
+chegaralarida artefakt beradi. Avval sinov kadri ko'rsatilsin, keyin
+qaror qilinsin.
+
 ### Renderlangan videolar
 
 `.mp4` fayllar `.gitignore` da — ular artefakt. Manba `montaj-src/` da

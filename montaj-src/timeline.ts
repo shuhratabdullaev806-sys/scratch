@@ -1,6 +1,6 @@
 // Barcha vaqtlar soniyada, manba videodan silencedetect orqali olingan.
 export const FPS = 30;
-export const DURATION_S = 71.02;
+export const DURATION_S = 68.05;
 export const WIDTH = 1080;
 export const HEIGHT = 1920;
 
@@ -28,45 +28,61 @@ export const QUESTIONS: Question[] = [
     answer: "YOLGON",
     labelAt: 4.69,
     textFrom: 5.95,
-    pauseFrom: 11.73,
-    pauseTo: 14.96,
+    pauseFrom: 11.74,
+    pauseTo: 13.94,
     screenText: ["Foizsiz qarz —", "qaytariladigan pul.", "Soliq chiqmaydi."],
-    explainFrom: 17.0,
-    explainTo: 21.78,
+    explainFrom: 16.0,
+    explainTo: 20.78,
     explain: "Buxgalteriyada daromad yo'q — soliq hisobida bor",
   },
   {
     n: 2,
     answer: "ROST",
-    labelAt: 23.03,
-    textFrom: 24.21,
-    pauseFrom: 32.81,
-    pauseTo: 36.0,
+    labelAt: 22.03,
+    textFrom: 23.21,
+    pauseFrom: 31.82,
+    pauseTo: 34.0,
     screenText: ["100 mln foizsiz qarz.", "MB stavkasi 14%.", "Daromadga 14 mln."],
-    explainFrom: 38.1,
-    explainTo: 41.94,
+    explainFrom: 36.1,
+    explainTo: 39.94,
     explain: "15% foyda solig'i — 2 100 000 so'm",
     calc: {
       lines: ["100 mln × 14% = 14 mln", "14 mln × 15% = 2,1 mln"],
-      from: 38.1,
-      to: 42.6,
+      from: 36.1,
+      to: 40.6,
     },
   },
   {
     n: 3,
     answer: "YOLGON",
-    labelAt: 43.06,
-    textFrom: 44.3,
-    pauseFrom: 53.06,
-    pauseTo: 56.53,
+    labelAt: 41.06,
+    textFrom: 42.3,
+    pauseFrom: 51.06,
+    pauseTo: 53.54,
     screenText: ["2026-yildan nazorat", "bitimidan chiqdi —", "299-modda bekor."],
-    explainFrom: 60.39,
-    explainTo: 65.85,
+    explainFrom: 57.39,
+    explainTo: 62.87,
     explain: "Transfert narx ketdi, 299-modda qoldi",
   },
 ];
 
-export const OUTRO = { from: 67.0, to: DURATION_S };
+export const OUTRO = { from: 64.0, to: DURATION_S };
+
+// Fon kayfiyati: savol berilayotganda sariq, javob ochilgach ko'k.
+// Ko'k oyna: javob ochilgan paytdan keyingi savol boshlanishigacha.
+export const BLUE_WINDOWS: [number, number][] = QUESTIONS.map((q, i) => [
+  q.pauseTo,
+  i + 1 < QUESTIONS.length ? QUESTIONS[i + 1].labelAt - 0.5 : DURATION_S,
+]);
+
+export const MOOD = {
+  // sariq — savol va o'ylash payti
+  warmA: "#FFC21A",
+  warmB: "#FF8A00",
+  // ko'k — javob va izoh payti
+  coolA: "#12A0C4",
+  coolB: "#06394B",
+};
 
 // Ranglar
 export const C = {

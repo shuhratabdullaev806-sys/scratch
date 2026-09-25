@@ -1,6 +1,12 @@
 import React from "react";
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { C, FPS, sec } from "./timeline";
+import {
+  AbsoluteFill,
+  interpolate,
+  spring,
+  useCurrentFrame,
+  useVideoConfig,
+} from "remotion";
+import { BLUE_WINDOWS, C, FPS, MOOD, sec } from "./timeline";
 import type { Answer } from "./timeline";
 
 const FONT = "Montserrat, Arial Black, sans-serif";
@@ -412,6 +418,93 @@ export const CalcCard: React.FC<{
         );
       })}
     </div>
+  );
+};
+
+/* ------------------------------------------------------------- fon rangi */
+
+/** Ko'klik darajasi 0..1. Savolda 0 (sariq), javobda 1 (ko'k). */
+export const blueAmount = (t: number) => {
+  const FADE = 0.45;
+  let v = 0;
+  for (const [a, b] of BLUE_WINDOWS) {
+    const rise = interpolate(t, [a - FADE, a], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    const fall = interpolate(t, [b, b + FADE], [1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    v = Math.max(v, Math.min(rise, fall));
+  }
+  return v;
+};
+
+/** Sekin suzuvchi yumshoq dog'lar — kadr jonlanib tursin. */
+const BLOBS = [
+  { x: 8, y: 14, r: 420, sx: 46, sy: 30, sp: 0.055, ph: 0 },
+  { x: 88, y: 26, r: 360, sx: -38, sy: 44, sp: 0.041, ph: 1.7 },
+  { x: 16, y: 74, r: 480, sx: 52, sy: -36, sp: 0.033, ph: 3.1 },
+  { x: 92, y: 82, r: 400, sx: -44, sy: -28, sp: 0.047, ph: 4.4 },
+];
+
+const MoodLayer: React.FC<{ a: string; b: string; opacity: number; t: number }> = ({
+  a,
+  b,
+  opacity,
+  t,
+}) => (
+  <div style={{ position: "absolute", inset: 0, opacity }}>
+    {/* chetlardan rang, markaz toza — yuz tabiiy qolsin */}
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: `radial-gradient(80% 56% at 50% 46%, ${b}00 0%, ${b}00 46%, ${b}CC 100%)`,
+      }}
+    />
+    {/* suzuvchi dog'lar */}
+    {BLOBS.map((o, i) => (
+      <div
+        key={i}
+        style={{
+          position: "absolute",
+          left: `${o.x}%`,
+          top: `${o.y}%`,
+          width: o.r,
+          height: o.r,
+          marginLeft: -o.r / 2,
+          marginTop: -o.r / 2,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${a}77 0%, ${a}00 70%)`,
+          transform: `translate(${Math.sin(t * o.sp * Math.PI * 2 + o.ph) * o.sx}px, ${
+            Math.cos(t * o.sp * Math.PI * 2 + o.ph) * o.sy
+          }px)`,
+        }}
+      />
+    ))}
+    {/* yuqori va past chekka — matn uchun kontrast */}
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: `linear-gradient(180deg, ${b}99 0%, ${b}00 22%, ${b}00 74%, ${b}AA 100%)`,
+      }}
+    />
+  </div>
+);
+
+export const MoodBackground: React.FC = () => {
+  const frame = useCurrentFrame();
+  const t = frame / FPS;
+  const blue = blueAmount(t);
+
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <MoodLayer a={MOOD.warmA} b={MOOD.warmB} opacity={1 - blue} t={t} />
+      <MoodLayer a={MOOD.coolA} b={MOOD.coolB} opacity={blue} t={t} />
+    </AbsoluteFill>
   );
 };
 

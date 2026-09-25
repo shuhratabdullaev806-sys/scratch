@@ -14,6 +14,7 @@ import {
   Confetti,
   Countdown,
   ExplainCard,
+  MoodBackground,
   Progress,
   QuestionText,
   between,
@@ -215,13 +216,8 @@ export const Main: React.FC = () => {
           filter: "brightness(1.06) saturate(1.06) contrast(1.03)",
         }}
       />
-      {/* fonni bosadigan qatlam — grafika ajralib tursin */}
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(135% 78% at 50% 55%, rgba(0,0,0,0) 55%, rgba(8,10,16,.34) 100%)",
-        }}
-      />
+      {/* rang kayfiyati: savolda sariq, javobda ko'k */}
+      <MoodBackground />
 
       <Intro />
 
