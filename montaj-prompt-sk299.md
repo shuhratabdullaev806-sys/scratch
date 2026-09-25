@@ -1,5 +1,11 @@
 # Montaj prompti — SK 299-modda viktorinasi
 
+> **Bajarildi.** Birinchi video shu prompt bo'yicha montaj qilindi.
+> Aniqlangan pauzalar: P1 11.73–14.96, P2 32.81–36.00, P3 53.06–56.53.
+> Manba: 608×1080, 25fps, 71.02s. Chiqish: 1080×1920, 30fps.
+> Keyingi videolar uchun quyidagi promptni javoblar kaliti bilan
+> almashtirib ishlatavering.
+
 HeyGen videosi tayyor bo'lgach, quyidagi matnni nusxalab, video fayl bilan
 birga Cowork'ga yuboring.
 
