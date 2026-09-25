@@ -14,25 +14,24 @@ JAVOBLAR KALITI
 {
   "savollar": [
     {"n": 1, "javob": "YOLGON", "ekran_matn": "Foizsiz qarzdan soliq chiqmaydi"},
-    {"n": 2, "javob": "ROST",   "ekran_matn": "Buxgalteriyada daromad provodkasi yo'q"},
-    {"n": 3, "javob": "YOLGON", "ekran_matn": "2026-yildan 299-modda bekor"},
-    {"n": 4, "javob": "ROST",   "ekran_matn": "100 mln x 14% = jami daromadga"},
-    {"n": 5, "javob": "YOLGON", "ekran_matn": "5% li qarzda hech narsa hisoblanmaydi"}
+    {"n": 2, "javob": "ROST",   "ekran_matn": "100 mln x 14% = jami daromadga"},
+    {"n": 3, "javob": "YOLGON", "ekran_matn": "2026-yildan 299-modda bekor"}
   ]
 }
 
 BIRINCHI QADAM — PAUZALARNI AVTOMATIK TOPISH
 Videoning audiosini tahlil qil va 3 soniyalik jimliklarni top
 (ffmpeg silencedetect: noise=-35dB, d=2.0).
-Aynan 5 ta shunday jimlik bo'lishi kerak. Ularni P1...P5 deb belgila.
-5 tadan farq chiqsa — menga ayt, o'zing taxmin qilma.
+Aynan 3 ta shunday jimlik bo'lishi kerak. Ularni P1, P2, P3 deb belgila.
+3 tadan farq chiqsa — menga ayt, o'zing taxmin qilma.
 
 Har bir jimlikning TUGASH vaqti = o'sha savolning javob momenti.
-Javob animatsiyasi P1_end, P2_end, ... P5_end da boshlanadi.
+Javob animatsiyasi P1_end, P2_end, P3_end da boshlanadi.
 
 FORMAT
   1080x1920, 9:16, 30fps, MP4 (H.264 + AAC)
   Avatar ovozi va lip-sync o'zgarmaydi. Videoni kesma, qisqartirma.
+  Kutilayotgan uzunlik: ~40 soniya.
 
 VIZUAL QATLAMLAR
 
@@ -49,7 +48,7 @@ VIZUAL QATLAMLAR
 
 3) Savol raqami
    Har savol boshida katta raqam markazga sakrab chiqadi (bounce),
-   0.6s turadi, keyin yuqoridagi "N/5" indikatoriga kichrayib kiradi.
+   0.6s turadi, keyin yuqoridagi "N/3" indikatoriga kichrayib kiradi.
 
 4) Savol matni
    Ekranning yuqori-o'rta qismida, JSON'dagi "ekran_matn".
@@ -72,11 +71,11 @@ VIZUAL QATLAMLAR
      - NOTO'G'RI tugma: 40% shaffoflikka o'tadi, biroz kichrayadi
    Keyingi savol boshlanganda ikkala tugma normal holatga qaytadi.
 
-7) Raqamli savollar uchun qo'shimcha (4 va 5-savol)
-   Javob paytida o'ng tomonda kichik hisob kartochkasi chiqadi:
-     4-savol: "100 mln x 14% = 14 mln" keyin "x 15% = 2,1 mln"
-     5-savol: "14 mln - 5 mln = 9 mln"
-   Raqamlar birin-ketin chiqsin, oxirgi natija sariq bilan ajralsin.
+7) Hisob kartochkasi — faqat 2-savolda
+   Javob paytida o'ng tomonda hisob birin-ketin chiqadi:
+     "100 mln x 14% = 14 mln"
+     "14 mln x 15% = 2,1 mln"
+   Oxirgi natija sariq bilan ajralsin, 2 soniya ekranda tursin.
 
 8) Subtitrlar
    Avatar aytayotgan hamma narsa pastki uchdan birida, 2-4 so'zdan,
@@ -84,11 +83,11 @@ VIZUAL QATLAMLAR
 
 9) Intro (birinchi 3 soniya)
    "FOIZSIZ QARZ = SOLIQ?" sakrab chiqadi,
-   ostida kichikroq: "SK 299-modda — 5 savol"
+   ostida kichikroq: "SK 299-modda — 3 savol"
 
 10) Outro (oxirgi 3 soniya)
-   "Nechta to'g'ri topding? Izohda yoz!"
-   + pulsatsiyalanuvchi "Obuna bo'l" tugmasi va qo'ng'iroq ikonkasi
+   "Nechta to'g'ri topdingiz? Izohda yozing!"
+   + pulsatsiyalanuvchi "Obuna bo'ling" tugmasi va qo'ng'iroq ikonkasi
 
 SHRIFT VA HARAKAT
   Shrift: Montserrat ExtraBold yoki shunga o'xshash qalin yumaloq sans.
