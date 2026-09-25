@@ -12,21 +12,38 @@ npx remotion render src/index.ts Quiz out/quiz.mp4 \
   --codec=h264 --crf=20 --concurrency=4
 ```
 
-## Yangi video uchun nima o'zgartiriladi
+## Yangi video uchun
 
-Faqat `src/timeline.ts`:
+### 1. Pauzalarni qisqartir (majburiy)
 
-1. Pauzalarni top:
-   ```bash
-   ffmpeg -i public/source.mp4 -af silencedetect=noise=-35dB:d=3.0 -f null -
-   ```
-2. `DURATION_S` ni manba uzunligiga qo'y.
-3. Har savol uchun `pauseFrom` / `pauseTo` ni aniqlangan jimlikdan ol.
-4. Jumla chegaralari uchun mayda jimliklarni ko'r
-   (`d=0.35`) va `labelAt`, `textFrom`, `explainFrom`, `explainTo` ni belgila.
-5. `answer`, `screenText`, `explain` ni yangi savollarga moslashtir.
+Diktor 4 soniyalik pauza bilan yozadi, videoda esa 3 soniya bo'lishi kerak.
+Sabablari `../CLAUDE.md` da.
 
-Qolgan hamma narsa — tugmalar, taymer, konfetti, kartochkalar — o'zgarmaydi.
+```bash
+./pauzani-qisqartir.sh <heygen-video>.mp4 public/source.mp4
+```
+
+Skript har jimlikning o'rtasidan 1 soniya kesadi, so'ng `timeline.ts` uchun
+kerakli hamma vaqtni chop etadi. Nechta pauza topilganini tekshiring —
+savollar soniga teng bo'lishi shart.
+
+### 2. `src/timeline.ts` ni yangila
+
+Skript bergan qiymatlardan:
+
+- `DURATION_S` — yangi uzunlik
+- `pauseFrom` / `pauseTo` — uzun jimliklardan, har savolga bittadan
+- `labelAt`, `textFrom`, `explainFrom`, `explainTo` — mayda jimliklar
+  ro'yxatidan. Tartib: savol raqami aytiladi → savol matni → PAUZA →
+  "Javob — ..." → izoh.
+
+Keyin `answer`, `screenText`, `explain` va kerak bo'lsa `calc` ni yangi
+savollarga moslashtiring.
+
+### 3. Render
+
+Qolgan hamma narsa — tugmalar, taymer, konfetti, kartochkalar, intro,
+outro — o'zgarmaydi.
 
 ## Tuzilishi
 
