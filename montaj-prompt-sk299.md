@@ -20,8 +20,8 @@ JAVOBLAR KALITI
 }
 
 BIRINCHI QADAM — PAUZALARNI AVTOMATIK TOPISH
-Videoning audiosini tahlil qil va 3 soniyalik jimliklarni top
-(ffmpeg silencedetect: noise=-35dB, d=2.0).
+Videoning audiosini tahlil qil va 4 soniyalik jimliklarni top
+(ffmpeg silencedetect: noise=-35dB, d=3.0).
 Aynan 3 ta shunday jimlik bo'lishi kerak. Ularni P1, P2, P3 deb belgila.
 3 tadan farq chiqsa — menga ayt, o'zing taxmin qilma.
 
@@ -31,7 +31,7 @@ Javob animatsiyasi P1_end, P2_end, P3_end da boshlanadi.
 FORMAT
   1080x1920, 9:16, 30fps, MP4 (H.264 + AAC)
   Avatar ovozi va lip-sync o'zgarmaydi. Videoni kesma, qisqartirma.
-  Kutilayotgan uzunlik: ~40 soniya.
+  Kutilayotgan uzunlik: ~43 soniya.
 
 VIZUAL QATLAMLAR
 
@@ -59,8 +59,9 @@ VIZUAL QATLAMLAR
 5) PAUZA paytidagi taymer
    Har bir aniqlangan jimlik boshlanganda:
      - savol matni ekranda qoladi
-     - o'ng tomonda doiraviy taymer: 3 -> 2 -> 1
-     - har raqamda yumshoq "tik" ovozi
+     - o'ng tomonda doiraviy taymer: 4 -> 3 -> 2 -> 1
+       (doira chetidagi chiziq 4 soniyada to'liq aylanib tugaydi)
+     - har raqamda yumshoq "tik" ovozi, oxirgi soniyada tezroq
      - ikkala tugma navbatma-navbat sekin yonib-o'chadi (ikkilanish effekti)
 
 6) Javob ochilishi — jimlik TUGAGAN soniyada, aniq
