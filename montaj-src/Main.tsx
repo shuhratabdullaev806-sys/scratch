@@ -66,7 +66,7 @@ const Intro: React.FC = () => {
         style={{
           marginTop: 22,
           transform: `scale(${0.8 + popIn(frame, 0.5, fps) * 0.2})`,
-          background: "rgba(10,12,18,.85)",
+          background: "rgba(8,10,16,.93)",
           color: "#fff",
           borderRadius: 18,
           padding: "14px 30px",
@@ -106,7 +106,7 @@ const Outro: React.FC = () => {
         <div
           style={{
             transform: `translateY(${(1 - s) * 60}px) scale(${0.85 + s * 0.15})`,
-            background: "rgba(10,12,18,.88)",
+            background: "rgba(8,10,16,.93)",
             color: "#fff",
             borderRadius: 24,
             padding: "22px 36px",
@@ -212,14 +212,14 @@ export const Main: React.FC = () => {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          filter: "brightness(.72) saturate(.9) blur(0px)",
+          filter: "brightness(1.06) saturate(1.06) contrast(1.03)",
         }}
       />
       {/* fonni bosadigan qatlam — grafika ajralib tursin */}
       <AbsoluteFill
         style={{
           background:
-            "radial-gradient(120% 70% at 50% 92%, rgba(0,0,0,0) 30%, rgba(8,10,16,.55) 100%)",
+            "radial-gradient(135% 78% at 50% 55%, rgba(0,0,0,0) 55%, rgba(8,10,16,.34) 100%)",
         }}
       />
 

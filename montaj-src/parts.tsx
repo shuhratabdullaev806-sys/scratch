@@ -30,7 +30,7 @@ export const AnswerButton: React.FC<{
   const breathe = 1 + Math.sin((frame / FPS) * Math.PI) * 0.015;
   const blink =
     state === "thinking"
-      ? 0.75 + 0.25 * Math.sin((frame / FPS) * Math.PI * 2 + (kind === "ROST" ? 0 : Math.PI))
+      ? 0.9 + 0.1 * Math.sin((frame / FPS) * Math.PI * 2 + (kind === "ROST" ? 0 : Math.PI))
       : 1;
 
   let scale = breathe;
@@ -139,7 +139,7 @@ export const Countdown: React.FC<{ from: number; to: number }> = ({ from, to }) 
       }}
     >
       <svg width={200} height={200} style={{ position: "absolute", inset: 0 }}>
-        <circle cx={100} cy={100} r={R} fill="rgba(10,12,18,.72)" />
+        <circle cx={100} cy={100} r={R} fill="rgba(8,10,16,.88)" />
         <circle
           cx={100}
           cy={100}
@@ -220,7 +220,7 @@ export const QuestionText: React.FC<{
             style={{
               transform: `translateY(${(1 - s) * 40}px) scale(${0.85 + s * 0.15})`,
               opacity: Math.min(1, s * 1.4),
-              background: "rgba(10,12,18,.82)",
+              background: "rgba(8,10,16,.93)",
               borderRadius: 18,
               padding: "12px 26px",
               fontFamily: FONT,
@@ -397,7 +397,7 @@ export const CalcCard: React.FC<{
             style={{
               transform: `translateY(${(1 - s) * 40}px) scale(${0.9 + s * 0.1})`,
               opacity: Math.min(1, s * 1.6),
-              background: last ? C.accent : "rgba(10,12,18,.85)",
+              background: last ? C.accent : "rgba(8,10,16,.93)",
               color: last ? C.ink : "#fff",
               borderRadius: 16,
               padding: "16px 26px",
