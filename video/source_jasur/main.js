@@ -1,0 +1,294 @@
+/* ------------------------------------------------------------------
+   001 Ijara — deterministic frame renderer (GSAP timeline + tick fn)
+------------------------------------------------------------------- */
+const FPS = 25, W = 1080, H = 1920;
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const eIO = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const fmt = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+/* inline <use> symbols so every icon can be animated on its own */
+$$('svg use').forEach(u => {
+  const sym = document.getElementById(u.getAttribute('href').slice(1));
+  const svg = u.closest('svg');
+  svg.setAttribute('viewBox', sym.getAttribute('viewBox'));
+  svg.innerHTML = sym.innerHTML;
+});
+
+/* ---------------- camera (speaker) ---------------- */
+const cam = { k: 0, tx: 540, ty: 500, s: 1, zoom: 1, cr: 1400, ccx: 540, ccy: 760, inset: 0, ringA: 0, tint: 0 };
+const tl = gsap.timeline({ paused: true });
+gsap.defaults({ ease: 'expo.out' });
+
+const IRIS = { ccx: 628, ccy: 832 };
+const CIRC = { cr: 250, ccx: 540, ccy: 400, tx: 540, ty: 425, s: 1.0 };
+const SPLIT = { tx: 540, ty: 480, s: 1.2 };
+
+function toA(t) {
+  tl.set(cam, { ccx: IRIS.ccx, ccy: IRIS.ccy }, t);
+  tl.to(cam, { cr: 0, duration: .55, ease: 'power3.in' }, t);
+  tl.to(cam, { ringA: 1, duration: .12, ease: 'none' }, t);
+  tl.to(cam, { ringA: 0, duration: .12, ease: 'none' }, t + .45);
+}
+function fromA(t) {
+  tl.set(cam, { ccx: IRIS.ccx, ccy: IRIS.ccy, k: 0 }, t);
+  tl.to(cam, { cr: 1650, duration: .7, ease: 'power3.inOut' }, t);
+  tl.to(cam, { ringA: 1, duration: .1, ease: 'none' }, t);
+  tl.to(cam, { ringA: 0, duration: .25, ease: 'none' }, t + .4);
+}
+function toC(t, fromSplit) {
+  tl.to(cam, { ...CIRC, k: 1, inset: 0, duration: .75, ease: 'power3.inOut' }, t);
+  tl.to(cam, { ringA: 1, duration: .4, ease: 'none' }, t + .2);
+}
+function fromC(t) {
+  tl.to(cam, { cr: 1400, ccx: 540, ccy: 760, k: 0, duration: .75, ease: 'power3.inOut' }, t);
+  tl.to(cam, { ringA: 0, duration: .3, ease: 'none' }, t);
+}
+function toB(t, panel) {
+  tl.to(cam, { ...SPLIT, k: 1, inset: 960, duration: .65, ease: 'power3.inOut' }, t);
+  tl.fromTo(panel, { yPercent: 100 }, { yPercent: 0, duration: .65, ease: 'power3.inOut' }, t);
+}
+function fromB(t, panel) {
+  tl.to(cam, { k: 0, inset: 0, duration: .6, ease: 'power3.inOut' }, t);
+  tl.to(panel, { yPercent: 100, duration: .6, ease: 'power3.inOut' }, t);
+}
+const draw = (sel, t, d = .9, st = .06, ease = 'power2.inOut') =>
+  tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, stagger: st, ease }, t);
+const popIn = (sel, t, from = {}, d = .6, ease = 'back.out(1.6)') =>
+  tl.fromTo(sel, { opacity: 0, scale: .6, ...from }, { opacity: 1, scale: 1, x: 0, y: 0, rotation: 0, filter: 'blur(0px)', duration: d, ease }, t);
+const riseIn = (sel, t, d = .7, dy = 60) =>
+  tl.fromTo(sel, { opacity: 0, y: dy, filter: 'blur(12px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: d }, t);
+const out = (sel, t, to = {}, d = .3) => tl.to(sel, { opacity: 0, duration: d, ease: 'power2.in', ...to }, t);
+
+
+/* ---------------- NAME CARD 0.3 → 10.3 ---------------- */
+tl.fromTo('#nc', { opacity: 0, x: -90, filter: 'blur(14px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: .9 }, .3);
+tl.fromTo('#ncLogo', { scale: 0, rotation: -35 }, { scale: 1, rotation: 0, duration: .8, ease: 'back.out(1.8)' }, .45);
+tl.fromTo('#ncName', { yPercent: 115 }, { yPercent: 0, duration: .8 }, .6);
+tl.fromTo('#ncRole', { yPercent: 115 }, { yPercent: 0, duration: .8 }, .75);
+tl.fromTo('#ncRole i', { scaleX: 0, transformOrigin: '0 50%' }, { scaleX: 1, duration: .7 }, 1.0);
+tl.to(['#ncName', '#ncRole'], { yPercent: -115, duration: .45, ease: 'power3.in', stagger: .05 }, 9.75);
+tl.to('#nc', { opacity: 0, x: -60, filter: 'blur(10px)', duration: .4, ease: 'power3.in' }, 9.95);
+
+/* ================= VIDEO 6 : Jasur — o'quvchi fikri ================= */
+function toCfromB(t, panel) {
+  tl.to(panel, { yPercent: 100, duration: .65, ease: 'power3.inOut' }, t);
+  toC(t);
+}
+const STAR = '<svg viewBox="0 0 100 100" width="W" height="W"><path d="M50 6l13 28 30 3-23 20 7 30-27-16-27 16 7-30L7 37l30-3z" fill="F" stroke="#ffd98a" stroke-width="4" stroke-linejoin="round"/></svg>';
+const bigStars = [0, 1, 2, 3, 4].map(() => { const d = document.createElement('div'); d.className = 'bstar'; d.innerHTML = STAR.replace(/W/g, 110).replace('F', 'url(#gstar)'); $('#b1Stars').appendChild(d); return d; });
+[0, 1, 2, 3, 4].forEach(() => { const d = document.createElement('div'); d.className = 'sstar'; d.innerHTML = STAR.replace(/W/g, 38).replace('F', 'url(#gstar)'); $('#rcStars').appendChild(d); });
+
+/* speaker zoom */
+tl.fromTo(cam, { zoom: 1 }, { zoom: 1.05, duration: 10.5, ease: 'none' }, 0);
+tl.set(cam, { zoom: 1.0 }, 32.2);
+tl.to(cam, { zoom: 1.06, duration: 4.4, ease: 'none' }, 32.3);
+
+const chipIn = (s, t) => tl.fromTo(s, { opacity: 0, y: -70, scale: .9, filter: 'blur(14px)' }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: .8 }, t);
+
+/* ---------------- EDU ---------------- */
+chipIn('#edu', 2.95);
+draw('#edu .ln', 3.1, .8, .08);
+out('#edu', 6.25, { y: -50, filter: 'blur(10px)' }, .3);
+
+/* ---------------- BRAND ---------------- */
+chipIn('#br', 6.6);
+tl.fromTo('#brLogo', { scale: 0, rotation: -30 }, { scale: 1, rotation: 0, duration: .8, ease: 'back.out(1.8)' }, 6.7);
+popIn('#brChip', 7.45, { x: -20 }, .5, 'back.out(2)');
+tl.fromTo('#brShine', { x: -300 }, { x: 1100, duration: .9, ease: 'power2.inOut' }, 7.9);
+out('#br', 10.1, { y: -50, filter: 'blur(10px)' }, .3);
+
+/* ---------------- A1 10.7 → 17.9 ---------------- */
+toA(10.5);
+riseIn('#a1Kick', 10.95, .5, 20);
+[['#m0', 12.1], ['#m1', 12.55], ['#m2', 14.05], ['#m3', 15.85]].forEach(([s, t]) => {
+  tl.fromTo(s, { opacity: 0, scale: .7, y: 40, filter: 'blur(12px)' }, { opacity: 1, scale: 1, y: 0, filter: 'blur(0px)', duration: .6, ease: 'back.out(1.7)' }, t);
+  draw(s + ' .ln', t + .1, .6, .05);
+  tl.to(s, { boxShadow: '0 0 0 3px rgba(76,201,240,.75), 0 0 50px rgba(76,201,240,.35)', duration: .3, ease: 'none' }, t + .25);
+});
+tl.fromTo('#a1Road', { opacity: 0 }, { opacity: 1, duration: .5, ease: 'none' }, 11.2);
+popIn('#a1Ok', 17.2, { y: 20 }, .5, 'back.out(2.2)');
+tl.fromTo('#sA1', { opacity: 1, scale: 1 }, { opacity: 0, scale: 1.05, duration: .35, ease: 'power2.in', immediateRender: false }, 17.85);
+fromA(17.9);
+toB(17.9, '#b1Panel');
+
+/* ---------------- B1 18.1 → 26.2 ---------------- */
+riseIn('#b1Res', 18.2, .6, 60);
+tl.fromTo('.bstar', { opacity: .15, scale: .6, rotation: -30 }, { opacity: 1, scale: 1, rotation: 0, duration: .45, stagger: .16, ease: 'back.out(2.6)' }, 18.6);
+popIn('#b1Good', 19.9, { x: 20 }, .5, 'back.out(2.2)');
+riseIn('#b1Now', 21.3, .7, 60);
+popIn('#b1Prac', 23.5, { x: -20 }, .5, 'back.out(2)');
+draw('#b1Prac .ln', 23.55, .5, 0);
+
+/* split → circle */
+toCfromB(26.2, '#b1Panel');
+
+/* ---------------- C1 27.0 → 32.2 ---------------- */
+riseIn('#c1Search', 26.95, .6, 40);
+riseIn('#c1Map', 27.5, .7, 60);
+draw('#c1Roads', 27.7, .9, 0, 'power2.out');
+tl.fromTo('#c1Pin', { opacity: 0, y: -160 }, { opacity: 1, y: 0, duration: .5, ease: 'bounce.out' }, 28.3);
+tl.fromTo('#c1Ping', { opacity: 0, width: 10, height: 10, x: 0, y: 0 }, { keyframes: [{ opacity: 1, duration: .01 }, { width: 260, height: 260, x: -125, y: -125, opacity: 0, duration: .8, ease: 'power2.out' }] }, 28.75);
+popIn('#c1City', 28.8, { x: -20 }, .5, 'back.out(2.2)');
+riseIn('#c1Job', 30.3, .6, 50);
+draw('#c1Job .ln', 30.4, .6, 0);
+tl.fromTo('#sC1', { opacity: 1 }, { opacity: 0, duration: .3, ease: 'power2.in', immediateRender: false }, 32.1);
+fromC(32.15);
+
+/* ---------------- END ---------------- */
+chipIn('#rc', 32.5);
+tl.fromTo('.sstar', { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: .35, stagger: .1, ease: 'back.out(2.8)' }, 33.7);
+tl.fromTo('#rcShine', { x: -300 }, { x: 1100, duration: .9, ease: 'power2.inOut' }, 34.4);
+tl.fromTo('#loc', { opacity: 0, y: 90, filter: 'blur(14px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .8 }, 34.0);
+
+tl.to({}, { duration: .01 }, 36.8);
+
+/* ---------------- windows ---------------- */
+const WIN = { sEdu: [2.9, 6.65], sBrand: [6.55, 10.5], sA1: [10.5, 18.3], sB1: [17.85, 26.95], sC1: [26.1, 32.5], sEnd: [32.4, 99] };
+const SUB_HIDE = [[10.75, 18.05], [26.9, 32.3]];
+const inWin = (t, ws) => ws.some(([a, b]) => t >= a && t < b);
+const SPLIT_WIN = [[18.05, 26.3]];
+const SIZES = [1, 3, 2, 2, 2, 1, 1, 1, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3, 2, 2, 1, 2, 2, 1, 2, 2, 2, 1, 3];
+
+const PATH_KEYS = [[11.4, 0], [12.2, .02], [12.65, .33], [14.15, .66], [15.95, 1]];
+function sceneTick(t, blink) {
+  let p = 0;
+  for (let i = 1; i < PATH_KEYS.length; i++) {
+    const [ta, pa] = PATH_KEYS[i - 1], [tb, pb] = PATH_KEYS[i];
+    const d = Math.max(.01, Math.min(.6, tb - ta));
+    if (t >= tb - d) p = lerp(pa, pb, eIO((t - (tb - d)) / d));
+  }
+  const pth = $('#a1Path'), L = pth.getTotalLength();
+  pth.style.strokeDasharray = L; pth.style.strokeDashoffset = L * (1 - p);
+  typed($('#c1Typed'), t, 27.2, 28.3, 'Jizzax · o‘quv markazi');
+  $('#c1Caret').style.opacity = t > 28.5 ? 0 : blink;
+  for (const [id, [a, b]] of Object.entries(WIN)) $('#' + id).style.visibility = (t >= a && t < b) ? 'visible' : 'hidden';
+  $('#nc').style.visibility = (t >= .25 && t < 10.5) ? 'visible' : 'hidden';
+}
+
+/* ---------------- subtitles ---------------- */
+const groups = [];
+{
+  let i = 0;
+  for (const n of SIZES) {
+    const ws = WORDS.slice(i, i + n); i += n;
+    const el = document.createElement('div');
+    el.className = 'sg glass';
+    const hl = document.createElement('div'); hl.className = 'hl'; el.appendChild(hl);
+    const spans = ws.map(w => { const s = document.createElement('span'); s.className = 'sw'; s.textContent = w.w; el.appendChild(s); return s; });
+    $('#subs').appendChild(el);
+    groups.push({ el, hl, ws, spans, a: ws[0].a - .06, b: ws[ws.length - 1].b });
+  }
+  groups.forEach((g, j) => {
+    const nx = groups[j + 1];
+    g.end = Math.min(nx ? nx.a : 99, g.b + .55);
+  });
+}
+function layoutSubs() {
+  groups.forEach(g => {
+    g.w = g.el.offsetWidth; g.h = g.el.offsetHeight;
+    g.rects = g.spans.map(s => [s.offsetLeft - 14, s.offsetWidth + 28]);
+  });
+}
+function subs(t) {
+  const hide = inWin(t, SUB_HIDE);
+  const yC = inWin(t, SPLIT_WIN) ? 960 : 1250;
+  groups.forEach(g => {
+    const on = !hide && t >= g.a && t < g.end;
+    if (!on) { g.el.style.visibility = 'hidden'; return; }
+    g.el.style.visibility = 'visible';
+    const age = t - g.a, left = g.end - t;
+    const pin = clamp(age / .22), pout = clamp(left / .1);
+    const sc = .86 + .14 * (1 + 2.2 * Math.pow(pin - 1, 3) + 1.2 * Math.pow(pin - 1, 2)); // back-out
+    g.el.style.opacity = Math.min(pin * 1.6, 1) * pout;
+    g.el.style.filter = `blur(${(1 - pin) * 8}px)`;
+    g.el.style.transform = `translate(-50%, ${yC - g.h / 2 + (1 - pin) * 26}px) scale(${sc})`;
+    let k = 0; g.ws.forEach((w, i) => { if (t >= w.a) k = i; });
+    const cur = g.rects[k], prev = g.rects[Math.max(0, k - 1)];
+    const m = k === 0 ? 1 : eOut((t - g.ws[k].a) / .16);
+    g.hl.style.left = lerp(prev[0], cur[0], m) + 'px';
+    g.hl.style.width = lerp(prev[1], cur[1], m) + 'px';
+    g.spans.forEach((s, i) => s.style.opacity = i <= k ? 1 : .55);
+  });
+}
+
+if (SIZES.reduce((a,b)=>a+b,0)!==WORDS.length) console.log('SIZE MISMATCH', SIZES.reduce((a,b)=>a+b,0), WORDS.length);
+/* ---------------- ambience ---------------- */
+const dots = [];
+for (let i = 0; i < 38; i++) {
+  const d = document.createElement('div'); d.className = 'pt';
+  const r = (i * 9301 + 49297) % 233280 / 233280, r2 = (i * 7919 + 1237) % 1000 / 1000, r3 = (i * 3571 + 17) % 997 / 997;
+  dots.push({ d, x: r * W, y: r2 * 2000, sp: 20 + r3 * 60, sz: .4 + r3 * 1.1, ph: r * 6.28 });
+  $('#dots').appendChild(d);
+}
+const gctx = $('#grain').getContext('2d');
+const gimg = gctx.createImageData(640, 1140);
+function grain(frame) {
+  let s = (frame * 2654435761) >>> 0;
+  const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) {
+    s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0;
+    const v = s & 255; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+  }
+  gctx.putImageData(gimg, 0, 0);
+  $('#grain').style.width = '1280px'; $('#grain').style.height = '2120px';
+}
+
+function counter(el, t, a, b, to) { const k = eOut((t - a) / (b - a)); el.textContent = fmt(to * k); }
+function typed(el, t, a, b, str) { const n = Math.floor(clamp((t - a) / (b - a)) * str.length + (t >= b ? 0 : 0)); el.textContent = str.slice(0, t >= b ? str.length : n); }
+
+function ambience(t, frame) {
+  $('#b1').style.transform = `translate(${-120 + 160 * Math.sin(t * .31)}px, ${120 + 120 * Math.cos(t * .23)}px)`;
+  $('#b2').style.transform = `translate(${520 + 140 * Math.cos(t * .27)}px, ${760 + 160 * Math.sin(t * .19)}px)`;
+  $('#b3').style.transform = `translate(${200 + 200 * Math.sin(t * .17 + 1)}px, ${1300 + 140 * Math.cos(t * .29)}px)`;
+  $('#floor').style.backgroundPosition = `0 ${t * 60}px`;
+  dots.forEach(p => {
+    const y = ((p.y - t * p.sp) % 2000 + 2000) % 2000 - 40;
+    p.d.style.transform = `translate(${p.x + 30 * Math.sin(t * .6 + p.ph)}px, ${y}px) scale(${p.sz})`;
+    p.d.style.opacity = .25 + .35 * Math.sin(t * 1.3 + p.ph) ** 2;
+  });
+  grain(frame);
+  const blink = Math.floor(t * 2.6) % 2 ? 0 : 1;
+
+  sceneTick(t, blink);
+}
+
+/* ---------------- speaker compositing ---------------- */
+const FMEAN = FACE.reduce((a, f) => [a[0] + f[0] / FACE.length, a[1] + f[1] / FACE.length], [0, 0]);
+function applyCam(frame) {
+  const f = FACE[Math.min(frame, FACE.length - 1)];
+  const fx = f[0], fy = f[1];
+  const sc = lerp(cam.zoom, cam.s, cam.k);
+  // in target modes keep half of the natural head motion so it still feels alive
+  const px = lerp(fx, cam.tx + (fx - FMEAN[0]) * .45, cam.k);
+  const py = lerp(fy, cam.ty + (fy - FMEAN[1]) * .45, cam.k);
+  $('#v').style.transform = `translate(${px - sc * fx}px, ${py - sc * fy}px) scale(${sc})`;
+  $('#spkCirc').style.clipPath = `circle(${Math.max(cam.cr, 0)}px at ${cam.ccx}px ${cam.ccy}px)`;
+  $('#spkSplit').style.clipPath = `inset(0 0 ${cam.inset}px 0)`;
+  const r = Math.max(cam.cr, 0) + 6;
+  for (const id of ['#ring', '#ringGlow']) {
+    const e = $(id);
+    e.style.left = (cam.ccx - r) + 'px'; e.style.top = (cam.ccy - r) + 'px';
+    e.style.width = e.style.height = 2 * r + 'px';
+  }
+  $('#ring').style.opacity = cam.ringA;
+  $('#ringGlow').style.opacity = cam.ringA;
+  $('#ring').style.transform = `rotate(${frame * 1.2}deg)`;
+}
+
+/* ---------------- public API ---------------- */
+const img = $('#v');
+window.renderFrame = async (frame) => {
+  const t = frame / FPS;
+  const src = `../frames/${String(frame + 1).padStart(4, '0')}.jpg`;
+  if (!img.src.endsWith(src.slice(2))) { img.src = src; await img.decode().catch(() => { }); }
+  tl.seek(t, false);
+  ambience(t, frame);
+  applyCam(frame);
+  subs(t);
+  return t;
+};
+window.ready = (async () => { await document.fonts.ready; layoutSubs(); return true; })();
