@@ -1,12 +1,16 @@
 import React from "react";
 import {
   AbsoluteFill,
+  Img,
+  OffthreadVideo,
+  Sequence,
   interpolate,
   spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { BLUE_WINDOWS, C, FPS, MOOD, sec } from "./timeline";
+import { BLUE_WINDOWS, C, FPS, FREEZES, MOOD, SOURCE_S, sec } from "./timeline";
 import type { Answer } from "./timeline";
 
 const FONT = "Montserrat, Arial Black, sans-serif";
@@ -456,12 +460,14 @@ const MoodLayer: React.FC<{ a: string; b: string; opacity: number; t: number }> 
   t,
 }) => (
   <div style={{ position: "absolute", inset: 0, opacity }}>
-    {/* chetlardan rang, markaz toza — yuz tabiiy qolsin */}
+    {/* to'liq rangli fon — boshlovchi kesib olingani uchun butun kadr rangda */}
+    <div style={{ position: "absolute", inset: 0, background: b }} />
+    {/* bosh orqasidagi yorug'lik */}
     <div
       style={{
         position: "absolute",
         inset: 0,
-        background: `radial-gradient(80% 56% at 50% 46%, ${b}00 0%, ${b}00 46%, ${b}CC 100%)`,
+        background: `radial-gradient(58% 34% at 50% 34%, ${a} 0%, ${a}00 72%)`,
       }}
     />
     {/* suzuvchi dog'lar */}
@@ -477,19 +483,19 @@ const MoodLayer: React.FC<{ a: string; b: string; opacity: number; t: number }> 
           marginLeft: -o.r / 2,
           marginTop: -o.r / 2,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${a}77 0%, ${a}00 70%)`,
+          background: `radial-gradient(circle, ${a}99 0%, ${a}00 70%)`,
           transform: `translate(${Math.sin(t * o.sp * Math.PI * 2 + o.ph) * o.sx}px, ${
             Math.cos(t * o.sp * Math.PI * 2 + o.ph) * o.sy
           }px)`,
         }}
       />
     ))}
-    {/* yuqori va past chekka — matn uchun kontrast */}
+    {/* chekkalarni quyuqlashtirish — chuqurlik va matn kontrasti */}
     <div
       style={{
         position: "absolute",
         inset: 0,
-        background: `linear-gradient(180deg, ${b}99 0%, ${b}00 22%, ${b}00 74%, ${b}AA 100%)`,
+        background: `radial-gradient(96% 62% at 50% 46%, rgba(0,0,0,0) 40%, rgba(0,0,0,.26) 100%)`,
       }}
     />
   </div>
@@ -506,6 +512,70 @@ export const MoodBackground: React.FC = () => {
       <MoodLayer a={MOOD.coolA} b={MOOD.coolB} opacity={blue} t={t} />
     </AbsoluteFill>
   );
+};
+
+/* ------------------------------------------------------------- boshlovchi */
+
+/**
+ * Shaffof WebM'ni bo'laklab ko'rsatadi va pauzalarga muzlatilgan kadr
+ * qo'shadi. HeyGen pauzalari qisqa chiqqani uchun shu yo'l bilan
+ * 3 soniyaga cho'ziladi; ustidagi taymer harakati muzlashni yashiradi.
+ */
+export const Speaker: React.FC = () => {
+  // Manbadagi kesim 85.4% da tugaydi — sonlar tepasida. Kattalashtirib
+  // pastga suramiz, shunda kesim kadr tashqarisiga chiqadi va oyoqlar
+  // ramkaga yetib boradi. Chapga surish o'ng qo'l chetga urilmasligi uchun.
+  //   tepa  413px -> 448px  (savol matni ostida qoladi)
+  //   past 1640px -> 1986px (kadrdan tashqarida)
+  const look = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover" as const,
+    transform: "translate(-8%, 9.2%) scale(1.25)",
+    transformOrigin: "50% 50%",
+    filter: "drop-shadow(0 18px 38px rgba(0,0,0,.42))",
+  };
+
+  const blocks: React.ReactNode[] = [];
+  let srcFrom = 0;
+  let out = 0;
+
+  FREEZES.forEach((f, i) => {
+    const segDur = f.at - srcFrom;
+    blocks.push(
+      <Sequence key={`v${i}`} from={sec(out)} durationInFrames={sec(segDur)}>
+        <OffthreadVideo
+          src={staticFile("source.webm")}
+          transparent
+          startFrom={sec(srcFrom)}
+          style={look}
+        />
+      </Sequence>
+    );
+    out += segDur;
+
+    blocks.push(
+      <Sequence key={`f${i}`} from={sec(out)} durationInFrames={sec(f.hold)}>
+        <Img src={staticFile(f.img)} style={look} />
+      </Sequence>
+    );
+    out += f.hold;
+    srcFrom = f.at;
+  });
+
+  const tail = SOURCE_S - srcFrom;
+  blocks.push(
+    <Sequence key="vlast" from={sec(out)} durationInFrames={sec(tail) + 2}>
+      <OffthreadVideo
+        src={staticFile("source.webm")}
+        transparent
+        startFrom={sec(srcFrom)}
+        style={look}
+      />
+    </Sequence>
+  );
+
+  return <AbsoluteFill>{blocks}</AbsoluteFill>;
 };
 
 /* -------------------------------------------------------------- konfetti */

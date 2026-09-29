@@ -1,9 +1,7 @@
 import React from "react";
 import {
   AbsoluteFill,
-  OffthreadVideo,
   interpolate,
-  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
@@ -16,11 +14,12 @@ import {
   ExplainCard,
   MoodBackground,
   Progress,
+  Speaker,
   QuestionText,
   between,
   popIn,
 } from "./parts";
-import { C, FPS, INTRO, OUTRO, QUESTIONS } from "./timeline";
+import { C, FPS, INTRO, OUTRO, QUESTIONS, TITLES } from "./timeline";
 
 const FONT = "Montserrat, Arial Black, sans-serif";
 
@@ -60,8 +59,9 @@ const Intro: React.FC = () => {
           boxShadow: "0 16px 40px rgba(0,0,0,.5)",
         }}
       >
-        FOIZSIZ QARZ
-        <br />= SOLIQ?
+        {TITLES.introBig[0]}
+        <br />
+        {TITLES.introBig[1]}
       </div>
       <div
         style={{
@@ -76,7 +76,7 @@ const Intro: React.FC = () => {
           fontSize: 44,
         }}
       >
-        SK 299-modda — 3 savol
+        {TITLES.introSmall}
       </div>
     </AbsoluteFill>
   );
@@ -119,9 +119,9 @@ const Outro: React.FC = () => {
             boxShadow: "0 16px 40px rgba(0,0,0,.5)",
           }}
         >
-          Nechta to'g'ri
+          {TITLES.outroBig[0]}
           <br />
-          topdingiz?
+          {TITLES.outroBig[1]}
         </div>
       </div>
 
@@ -151,7 +151,7 @@ const Outro: React.FC = () => {
             boxShadow: "0 10px 28px rgba(0,0,0,.45)",
           }}
         >
-          Izohda yozing
+          {TITLES.outroCta}
         </div>
         <div
           style={{
@@ -166,7 +166,7 @@ const Outro: React.FC = () => {
             boxShadow: "0 10px 28px rgba(0,0,0,.45)",
           }}
         >
-          🔔 Obuna bo'ling
+          {TITLES.outroSub}
         </div>
       </div>
     </AbsoluteFill>
@@ -205,19 +205,11 @@ export const Main: React.FC = () => {
   const quizOn = t >= INTRO.to && t < OUTRO.from;
 
   return (
-    <AbsoluteFill style={{ background: "#000" }}>
-      {/* manba video */}
-      <OffthreadVideo
-        src={staticFile("source.mp4")}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter: "brightness(1.06) saturate(1.06) contrast(1.03)",
-        }}
-      />
-      {/* rang kayfiyati: savolda sariq, javobda ko'k */}
+    <AbsoluteFill style={{ background: "#06394B" }}>
+      {/* rang kayfiyati: savolda sariq, javobda ko'k — boshlovchi ORQASIDA */}
       <MoodBackground />
+      {/* shaffof fonli boshlovchi */}
+      <Speaker />
 
       <Intro />
 
