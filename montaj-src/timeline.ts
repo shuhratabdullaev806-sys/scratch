@@ -100,9 +100,12 @@ export const BLUE_WINDOWS: [number, number][] = QUESTIONS.map((q, i) => [
   i + 1 < QUESTIONS.length ? QUESTIONS[i + 1].labelAt - 0.5 : DURATION_S,
 ]);
 
+// Sariq pasaytirilgan — yorqin to'q sariq yuzni sarg'aytirar va Instagram
+// siqilishida dog'lanardi. Ko'k esa yorqinligicha qoldirildi: u siqilishda
+// toza chiqadi va lentada e'tiborni tortadi.
 export const MOOD = {
-  warmA: "#FFC21A",
-  warmB: "#FF8A00",
+  warmA: "#D9942E",
+  warmB: "#A8600F",
   coolA: "#12A0C4",
   coolB: "#06394B",
 };
