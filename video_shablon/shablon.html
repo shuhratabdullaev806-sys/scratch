@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Video shablon</title>
+<style>
+  :root{--navy:#0f1b4d;--navy2:#1b2f86;--blue:#4361ee;--red:#e5233b;--paper:#ffffff}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:transparent;
+    font-family:"Liberation Sans",Arial,Helvetica,sans-serif}
+  body.preview{background:#0b0f1f}
+  /* --- sarlavha paneli (1 s dan yakuniy ekrangacha) --- */
+  #head{position:absolute;left:0;top:0;width:1080px;height:300px;padding:48px 48px 0;
+    display:flex;align-items:center;gap:32px;opacity:0;
+    background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);
+    border-bottom:6px solid var(--blue);overflow:hidden}
+  #head img{width:132px;height:132px;flex:none;border-radius:30px}
+  #head h1{color:#fff;font-size:58px;line-height:1.14;font-weight:700;letter-spacing:-.5px}
+  #shine{position:absolute;top:-20px;left:0;width:220px;height:340px;
+    background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.0) 20%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 80%,transparent 100%);
+    transform:translateX(-400px) skewX(-18deg);mix-blend-mode:screen;pointer-events:none}
+  /* --- preview uchun joy egalari --- */
+  .slot{position:absolute;left:40px;width:1000px;border-radius:28px;display:none;
+    align-items:center;justify-content:center;color:#7f8bb8;font-size:44px;border:3px dashed #2b3670}
+  body.preview .slot{display:flex}
+  #s1{top:340px;height:760px}
+  #s2{top:1140px;height:740px}
+  /* --- yakuniy ekran --- */
+  #end{position:absolute;inset:0;opacity:0;
+    background:radial-gradient(120% 80% at 50% 0%,var(--navy2) 0%,var(--navy) 60%,#080f33 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 90px}
+  #end .it{opacity:0;transform:translateY(26px)}
+  #end img{width:260px;height:260px;border-radius:58px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  #role{color:#b9c6ff;font-size:46px;margin-top:70px;letter-spacing:1px}
+  #name{color:#fff;font-size:92px;font-weight:700;line-height:1.05;margin-top:16px}
+  #bar{width:180px;height:8px;border-radius:4px;background:var(--blue);margin:64px 0 56px}
+  #firm{color:#fff;font-size:70px;font-weight:700;letter-spacing:.5px}
+  .row{display:flex;align-items:flex-start;gap:26px;color:#e6ebff;font-size:44px;line-height:1.3;text-align:left;margin-top:56px}
+  .row svg{flex:none;margin-top:2px}
+  #tel{color:#fff;font-weight:700;font-size:62px;align-items:center;margin-top:48px}
+</style>
+</head>
+<body>
+  <div id="s1" class="slot">Diktor (HeyGen)</div>
+  <div id="s2" class="slot">Hisob-kitob (Instadoodle)</div>
+
+  <div id="head">
+    <img src="logo.svg" alt="">
+    <h1 id="title">Qo‘shilgan qiymat solig‘ini budjetga qancha to‘laysiz?</h1>
+    <div id="shine"></div>
+  </div>
+
+  <div id="end">
+    <img class="it" src="logo.svg" alt="">
+    <div id="role" class="it">Buxgalter konsultant</div>
+    <div id="name" class="it">Shuxrat Abdullaev</div>
+    <div id="bar" class="it"></div>
+    <div id="firm" class="it">Faxr Madad Konsalt</div>
+    <div class="row it" id="addr">
+      <svg width="56" height="72" viewBox="0 0 56 72" aria-hidden="true">
+        <path d="M28 2C14 2 3 13 3 27c0 19 25 43 25 43s25-24 25-43C53 13 42 2 28 2z" fill="#e5233b"/>
+        <circle cx="28" cy="27" r="10" fill="#fff"/>
+      </svg>
+      <div>Manzil: Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi,&nbsp;1&#8209;uy</div>
+    </div>
+    <div class="row it" id="tel">
+      <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4361ee" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/>
+      </svg>
+      <div>Tel: +998 97 644 88 00</div>
+    </div>
+  </div>
+
+<script>
+const P = new URLSearchParams(location.search);
+const TOTAL = 45, HEAD_IN = 1, END_AT = 40;           // soniyalar
+if (P.get('mode') !== 'overlay') document.body.classList.add('preview');
+if (P.get('title')) document.getElementById('title').textContent = P.get('title');
+const $ = id => document.getElementById(id);
+const clamp = (x,a=0,b=1) => Math.min(b,Math.max(a,x));
+const ease = x => 1-Math.pow(1-x,3);
+
+window.renderAt = function(t){
+  // sarlavha: 1 s dan boshlab, yakuniy ekran ustini yopguncha ko'rinadi
+  $('head').style.opacity = t >= HEAD_IN ? ease(clamp((t-HEAD_IN)/0.4)) : 0;
+  // yorug'lik chizig'i: har 3 soniyada 1 marta o'tadi
+  const c = (t-HEAD_IN) % 3, run = clamp(c/1.0);
+  $('shine').style.transform = t>=HEAD_IN+0.6 && c<1
+    ? `translateX(${-300 + run*1600}px) skewX(-18deg)` : 'translateX(-600px) skewX(-18deg)';
+  // yakuniy ekran: to'liq ekran, 40 s da kiradi, 42.5 s da hammasi to'liq ko'rinadi
+  const e = t - END_AT;
+  $('end').style.opacity = clamp(e/0.4);
+  ['end'].forEach(()=>{});
+  [...document.querySelectorAll('#end .it')].forEach((el,i)=>{
+    const p = ease(clamp((e-0.2-i*0.3)/0.5));
+    el.style.opacity = p; el.style.transform = `translateY(${(1-p)*26}px)`;
+  });
+  $('head').style.visibility = e >= 0.4 ? 'hidden' : 'visible';
+};
+window.renderAt(+(P.get('t')||0));
+</script>
+</body>
+</html>
