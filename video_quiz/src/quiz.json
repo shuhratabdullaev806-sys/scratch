@@ -1,0 +1,21 @@
+{
+  "video": null,
+  "options": [
+    {"id": "togri", "label": "To'g'ri", "color": "#22c55e"},
+    {"id": "notogri", "label": "Noto'g'ri", "color": "#ef4444"},
+    {"id": "ahmoqlik", "label": "Ahmoqlik", "color": "#a855f7"},
+    {"id": "risk", "label": "Risk", "color": "#f59e0b"}
+  ],
+  "questions": [
+    {"topic": "Onlayn-NKM", "text": "Qaytarish cheki sotish chekiga bog'lanadimi?", "answer": "togri"},
+    {"topic": "Onlayn-NKM", "text": "Bog'langan qaytarish tushumni kamaytiradimi?", "answer": "togri"},
+    {"topic": "Onlayn-NKM", "text": "Bog'lash muddati: keyingi oy 10-sana?", "answer": "togri"},
+    {"topic": "Onlayn-NKM", "text": "Xaridorning arizasisiz tovar qaytaramizmi?", "answer": "risk"},
+    {"topic": "Onlayn-NKM", "text": "Chek nusxasini muhr bilan tasdiqlaymizmi?", "answer": "togri"},
+    {"topic": "Onlayn-NKM", "text": "Xato qaytarish chekini bekor qilamizmi?", "answer": "notogri"},
+    {"topic": "Onlayn-NKM", "text": "Xato sotish chekini yashiramizmi?", "answer": "ahmoqlik"},
+    {"topic": "Onlayn-NKM", "text": "Kassirdan tushuntirish xati olamizmi?", "answer": "togri"},
+    {"topic": "Onlayn-NKM", "text": "Bitta chekka ikkita qaytarish biriktiramizmi?", "answer": "notogri"},
+    {"topic": "Onlayn-NKM", "text": "Qisman qaytarishda hammasini qaytaramizmi?", "answer": "togri"}
+  ]
+}
