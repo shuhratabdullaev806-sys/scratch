@@ -18,7 +18,8 @@ to'g'ri javob yonib belgi bilan ko'rsatiladi. Format: 1080x1920 (9:16).
 - `questions[].audio`: `"audio/q01.wav"` (davomiylik avtomatik o'qiladi)
 - `questions[].at`: savol chiqadigan soniya (yo'q bo'lsa ketma-ket)
 - `questions[].answerAt`: javob yonadigan soniya (yo'q bo'lsa audio tugagach 1 s)
-- `questions[].answer`: `togri | notogri | ahmoqlik | risk`
+- `questions[].answer`: `togri | notogri | rost | yolgon | risk | ahmoqlik`
+- `questions[].choices`: ekranda ko'rinadigan ikki variant, masalan `["risk", "ahmoqlik"]`
 - `totalSeconds`: jami davomiylik (yo'q bo'lsa avtomatik)
 
 ## Buyruqlar

@@ -4,6 +4,8 @@ export type Question = {
   text: string;
   topic?: string;
   answer: string;
+  /** ekranda ko'rinadigan ikki variant (options id), masalan ["togri", "notogri"] */
+  choices?: string[];
   /** public/ ichidagi savol audiosi, masalan "audio/q01.mp3" */
   audio?: string;
   /** audio bo'lmaganda savol davomiyligi (soniya) */

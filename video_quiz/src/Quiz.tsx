@@ -18,6 +18,7 @@ import {fontFamily} from './font';
 import {OutroScene} from './Scenes';
 
 const PILL_H = 116;
+const PAIR_H = 150;
 const PILL_GAP = 22;
 const EXIT_FRAMES = 12;
 
@@ -140,7 +141,7 @@ const QuestionCard: React.FC<{
     <div
       style={{
         position: 'absolute',
-        bottom: 410,
+        bottom: 330,
         left: 50,
         right: 50,
         transform: `translateY(${y}px)`,
@@ -228,7 +229,8 @@ const OptionPill: React.FC<{
   chosen: boolean;
   answerFrame: number;
   exit: number;
-}> = ({option, index, chosen, answerFrame, exit}) => {
+  big: boolean;
+}> = ({option, index, chosen, answerFrame, exit, big}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
 
@@ -262,7 +264,7 @@ const OptionPill: React.FC<{
     <div
       style={{
         position: 'relative',
-        height: PILL_H,
+        height: big ? PAIR_H : PILL_H,
         transform: `translateY(${interpolate(enter, [0, 1], [220, 0]) + exit * 80}px) scale(${scale})`,
         opacity: enter * dim * (1 - exit),
       }}
@@ -285,12 +287,13 @@ const OptionPill: React.FC<{
           borderRadius: 40,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
           padding: '0 30px',
+          gap: 16,
           fontFamily,
           fontWeight: 800,
-          fontSize: 46,
+          fontSize: big ? 56 : 46,
           color: '#f8fafc',
+          justifyContent: big ? 'center' : 'space-between',
           background: lit
             ? `linear-gradient(90deg, ${option.color}, ${option.color}cc)`
             : 'rgba(10,16,38,0.82)',
@@ -322,7 +325,13 @@ const QuestionScene: React.FC<{
   index: number;
   total: number;
   options: Option[];
-}> = ({q, index, total, options}) => {
+}> = ({q, index, total, options: allOptions}) => {
+  const options = q.choices
+    ? q.choices
+        .map((id) => allOptions.find((o) => o.id === id))
+        .filter((o): o is Option => Boolean(o))
+    : allOptions;
+  const big = options.length <= 2;
   const frame = useCurrentFrame();
   const {fps, durationInFrames} = useVideoConfig();
   const answerFrame = Math.round((q.answerAt - q.at) * fps);
@@ -355,6 +364,7 @@ const QuestionScene: React.FC<{
             chosen={o.id === q.answer}
             answerFrame={answerFrame}
             exit={exit}
+            big={big}
           />
         ))}
       </div>

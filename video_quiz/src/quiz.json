@@ -23,44 +23,74 @@
       "color": "#ef4444"
     },
     {
-      "id": "ahmoqlik",
-      "label": "Ahmoqlik",
-      "color": "#a855f7"
+      "id": "rost",
+      "label": "Rost",
+      "color": "#22c55e"
+    },
+    {
+      "id": "yolgon",
+      "label": "Yolg'on",
+      "color": "#ef4444"
     },
     {
       "id": "risk",
       "label": "Risk",
       "color": "#f59e0b"
+    },
+    {
+      "id": "ahmoqlik",
+      "label": "Ahmoqlik",
+      "color": "#a855f7"
     }
   ],
   "questions": [
     {
       "text": "Qaytarish cheki sotish chekiga bog'lanadimi?",
       "answer": "togri",
+      "choices": [
+        "togri",
+        "notogri"
+      ],
       "audio": "audio/q01.wav",
       "videoAnswerAt": 0.15
     },
     {
       "text": "Xaridor arizasisiz pul qaytaramizmi?",
       "answer": "risk",
+      "choices": [
+        "risk",
+        "ahmoqlik"
+      ],
       "audio": "audio/q02.wav",
       "videoAnswerAt": 6.9
     },
     {
       "text": "Xato qaytarish chekini bekor qilamizmi?",
       "answer": "notogri",
+      "choices": [
+        "togri",
+        "notogri"
+      ],
       "audio": "audio/q03.wav",
       "videoAnswerAt": 14.4
     },
     {
       "text": "Xato sotish chekini yashiramizmi?",
       "answer": "ahmoqlik",
+      "choices": [
+        "risk",
+        "ahmoqlik"
+      ],
       "audio": "audio/q04.wav",
       "videoAnswerAt": 23.15
     },
     {
       "text": "Bitta chekka ikki qaytarish biriktiriladimi?",
       "answer": "notogri",
+      "choices": [
+        "togri",
+        "notogri"
+      ],
       "audio": "audio/q05.wav",
       "videoAnswerAt": 34.4
     }

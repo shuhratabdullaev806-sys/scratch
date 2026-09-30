@@ -11,6 +11,18 @@ birinchi soniyadan yakuniy ekrangacha turadi.
 - **q04.mp3** — Xato sotish chekini yashiramizmi?
 - **q05.mp3** — Bitta chekka ikki qaytarish biriktiriladimi?
 
+## Ekrandagi ikkilik variantlar
+
+| Savol | Juftlik | Javob |
+|---|---|---|
+| 1 | To'g'ri / Noto'g'ri | To'g'ri |
+| 2 | Risk / Ahmoqlik | Risk |
+| 3 | To'g'ri / Noto'g'ri | Noto'g'ri |
+| 4 | Risk / Ahmoqlik | Ahmoqlik |
+| 5 | To'g'ri / Noto'g'ri | Noto'g'ri |
+
+Boshqa juftlik: Rost / Yolg'on (videoda javob shu so'z bilan boshlanishi kerak).
+
 ## 2. VIDEO matni (HeyGen, javoblar)
 
 Har bir javobdan oldin 3–4 soniya pauza qoldiring.
