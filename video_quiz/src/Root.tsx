@@ -23,15 +23,7 @@ const probe = async (audio: string | undefined, fallback: number) => {
 };
 
 const resolve = async (props: QuizProps): Promise<ResolvedProps> => {
-  let cursor = 0.5;
-  let intro = props.intro;
-  if (intro) {
-    const a = await probe(intro.audio, intro.audioSeconds ?? 9);
-    intro = {...intro, audio: a.audio, audioSeconds: a.seconds};
-    cursor = a.seconds + (intro.holdSeconds ?? 3.5);
-  }
-  const introEnd = intro ? cursor : 0;
-
+  let cursor = 1.0;
   const questions: ResolvedQuestion[] = [];
   for (const q of props.questions) {
     const a = await probe(q.audio, q.audioSeconds ?? 3.5);
@@ -44,7 +36,7 @@ const resolve = async (props: QuizProps): Promise<ResolvedProps> => {
 
   const outroAt = cursor;
   const outroEnd = outroAt + (props.outro ? props.outro.seconds ?? OUTRO_SECONDS : 1);
-  return {...props, intro, questions, introEnd, outroAt, outroEnd};
+  return {...props, questions, outroAt, outroEnd};
 };
 
 export const Root: React.FC = () => (

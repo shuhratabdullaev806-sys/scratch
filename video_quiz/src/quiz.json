@@ -1,31 +1,61 @@
 {
   "video": null,
-  "intro": {
-    "company": "Faxr Madad Konsalt",
-    "name": "Shuxrat Abdullaev",
-    "role": "\"Faxr Madad Konsalt\" rahbari",
-    "topic": "Onlayn kassada tovarni qaytarish",
-    "audio": "audio/q00.mp3",
-    "audioSeconds": 9,
-    "holdSeconds": 3.5
-  },
+  "title": "Onlayn kassada tovarni qaytarish",
   "outro": {
+    "name": "Shuxrat Abdullaev",
+    "role": "Buxgalter konsultant",
     "company": "Faxr Madad Konsalt",
     "address": "Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi, 1-uy",
     "phone": "+998 97 644 88 00",
     "seconds": 5
   },
   "options": [
-    {"id": "togri", "label": "To'g'ri", "color": "#22c55e"},
-    {"id": "notogri", "label": "Noto'g'ri", "color": "#ef4444"},
-    {"id": "ahmoqlik", "label": "Ahmoqlik", "color": "#a855f7"},
-    {"id": "risk", "label": "Risk", "color": "#f59e0b"}
+    {
+      "id": "togri",
+      "label": "To'g'ri",
+      "color": "#22c55e"
+    },
+    {
+      "id": "notogri",
+      "label": "Noto'g'ri",
+      "color": "#ef4444"
+    },
+    {
+      "id": "ahmoqlik",
+      "label": "Ahmoqlik",
+      "color": "#a855f7"
+    },
+    {
+      "id": "risk",
+      "label": "Risk",
+      "color": "#f59e0b"
+    }
   ],
   "questions": [
-    {"topic": "Onlayn-NKM", "text": "Qaytarish cheki sotish chekiga bog'lanadimi?", "answer": "togri", "audio": "audio/q01.mp3"},
-    {"topic": "Onlayn-NKM", "text": "Xaridor arizasisiz pul qaytaramizmi?", "answer": "risk", "audio": "audio/q02.mp3"},
-    {"topic": "Onlayn-NKM", "text": "Xato qaytarish chekini bekor qilamizmi?", "answer": "notogri", "audio": "audio/q03.mp3"},
-    {"topic": "Onlayn-NKM", "text": "Xato sotish chekini yashiramizmi?", "answer": "ahmoqlik", "audio": "audio/q04.mp3"},
-    {"topic": "Onlayn-NKM", "text": "Bitta chekka ikki qaytarish biriktiriladimi?", "answer": "notogri", "audio": "audio/q05.mp3"}
+    {
+      "text": "Qaytarish cheki sotish chekiga bog'lanadimi?",
+      "answer": "togri",
+      "audio": "audio/q01.mp3"
+    },
+    {
+      "text": "Xaridor arizasisiz pul qaytaramizmi?",
+      "answer": "risk",
+      "audio": "audio/q02.mp3"
+    },
+    {
+      "text": "Xato qaytarish chekini bekor qilamizmi?",
+      "answer": "notogri",
+      "audio": "audio/q03.mp3"
+    },
+    {
+      "text": "Xato sotish chekini yashiramizmi?",
+      "answer": "ahmoqlik",
+      "audio": "audio/q04.mp3"
+    },
+    {
+      "text": "Bitta chekka ikki qaytarish biriktiriladimi?",
+      "answer": "notogri",
+      "audio": "audio/q05.mp3"
+    }
   ]
 }

@@ -14,18 +14,9 @@ export type Question = {
   answerAt?: number;
 };
 
-export type Intro = {
-  company: string;
+export type Outro = {
   name: string;
   role: string;
-  topic: string;
-  audio?: string;
-  audioSeconds?: number;
-  /** audio tugagach video alik olishi uchun vaqt (soniya) */
-  holdSeconds?: number;
-};
-
-export type Outro = {
   company: string;
   address: string;
   phone: string;
@@ -36,7 +27,8 @@ export type Outro = {
 export type QuizProps = {
   /** public/ ichidagi javob videosi, masalan "video/javoblar.mp4" */
   video?: string | null;
-  intro?: Intro;
+  /** video oxirigacha tepada turadigan sarlavha */
+  title?: string;
   outro?: Outro;
   options: Option[];
   questions: Question[];
@@ -51,7 +43,6 @@ export type ResolvedQuestion = Question & {
 
 export type ResolvedProps = Omit<QuizProps, 'questions'> & {
   questions: ResolvedQuestion[];
-  introEnd: number;
   outroAt: number;
   outroEnd: number;
 };

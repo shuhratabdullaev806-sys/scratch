@@ -9,90 +9,12 @@ import {
   useVideoConfig,
 } from 'remotion';
 import {fontFamily} from './font';
-import type {Intro, Outro} from './types';
+import type {Outro} from './types';
 
 const useEnter = (delay: number, damping = 15) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   return spring({frame: frame - delay, fps, config: {damping, stiffness: 110}});
-};
-
-const useExit = (frames = 12) => {
-  const frame = useCurrentFrame();
-  const {durationInFrames} = useVideoConfig();
-  return interpolate(frame, [durationInFrames - frames, durationInFrames], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-};
-
-export const IntroScene: React.FC<{intro: Intro}> = ({intro}) => {
-  const logo = useEnter(0, 12);
-  const company = useEnter(8);
-  const name = useEnter(16);
-  const role = useEnter(24);
-  const topic = useEnter(40);
-  const exit = useExit();
-
-  const rise = (p: number, from: number) => ({
-    opacity: p * (1 - exit),
-    transform: `translateY(${interpolate(p, [0, 1], [from, 0]) - exit * 60}px)`,
-  });
-
-  return (
-    <AbsoluteFill>
-      <div style={{position: 'absolute', top: 120, left: 60, right: 60}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: 24, ...rise(logo, -120)}}>
-          <Img
-            src={staticFile('logo.svg')}
-            style={{width: 96, height: 96, transform: `scale(${logo})`}}
-          />
-          <div style={{fontFamily, fontWeight: 800, fontSize: 42, color: '#e2e8f0', letterSpacing: 2, ...rise(company, -40)}}>
-            {intro.company.toUpperCase()}
-          </div>
-        </div>
-        <div
-          style={{
-            marginTop: 40,
-            padding: '44px 52px',
-            borderRadius: 44,
-            background: 'rgba(10,16,38,0.78)',
-            border: '2px solid rgba(148,163,184,0.28)',
-            boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
-            ...rise(name, -200),
-          }}
-        >
-          <div style={{fontFamily, fontWeight: 800, fontSize: 84, color: '#f8fafc', lineHeight: 1.1}}>
-            {intro.name}
-          </div>
-          <div style={{fontFamily, fontWeight: 600, fontSize: 40, color: '#93c5fd', marginTop: 14, ...rise(role, 20)}}>
-            {intro.role}
-          </div>
-        </div>
-      </div>
-      <div style={{position: 'absolute', left: 80, right: 80, bottom: 170, ...rise(topic, 240)}}>
-        <div style={{fontFamily, fontWeight: 600, fontSize: 34, color: '#94a3b8', letterSpacing: 3, marginBottom: 18}}>
-          BUGUNGI MAVZU
-        </div>
-        <div
-          style={{
-            padding: '38px 48px',
-            borderRadius: 40,
-            background: 'linear-gradient(90deg, #4361ee, #3a0ca3)',
-            border: '3px solid #ffffff55',
-            boxShadow: '0 0 60px #4361ee88',
-            fontFamily,
-            fontWeight: 800,
-            fontSize: 60,
-            color: '#fff',
-            lineHeight: 1.15,
-          }}
-        >
-          {intro.topic}
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
 };
 
 const PinIcon: React.FC = () => (
@@ -117,7 +39,8 @@ const PhoneIcon: React.FC = () => (
 export const OutroScene: React.FC<{outro: Outro}> = ({outro}) => {
   const bg = useEnter(0, 20);
   const logo = useEnter(6, 11);
-  const title = useEnter(14);
+  const person = useEnter(14);
+  const title = useEnter(20);
   const addr = useEnter(24);
   const phone = useEnter(32);
 
@@ -139,8 +62,8 @@ export const OutroScene: React.FC<{outro: Outro}> = ({outro}) => {
       <Img
         src={staticFile('logo.svg')}
         style={{
-          width: 260,
-          height: 260,
+          width: 200,
+          height: 200,
           transform: `scale(${logo})`,
           filter: 'drop-shadow(0 0 50px #4361eeaa)',
         }}
@@ -148,18 +71,32 @@ export const OutroScene: React.FC<{outro: Outro}> = ({outro}) => {
       <div
         style={{
           fontFamily,
+          fontWeight: 600,
+          fontSize: 40,
+          color: '#93c5fd',
+          textAlign: 'center',
+          marginTop: 56,
+          ...rise(person),
+        }}
+      >
+        {outro.role}
+        <div style={{fontWeight: 800, fontSize: 72, color: '#fff', marginTop: 8}}>{outro.name}</div>
+      </div>
+      <div
+        style={{
+          fontFamily,
           fontWeight: 800,
-          fontSize: 88,
+          fontSize: 76,
           color: '#fff',
           textAlign: 'center',
           lineHeight: 1.1,
-          marginTop: 56,
+          marginTop: 28,
           ...rise(title),
         }}
       >
         {outro.company}
       </div>
-      <div style={{width: '100%', marginTop: 80, display: 'flex', flexDirection: 'column', gap: 32}}>
+      <div style={{width: '100%', marginTop: 64, display: 'flex', flexDirection: 'column', gap: 32}}>
         <div style={{...card, ...rise(addr)}}>
           <PinIcon />
           <div>

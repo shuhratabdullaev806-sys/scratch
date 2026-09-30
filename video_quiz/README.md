@@ -4,7 +4,7 @@ Savol tepada animatsiya bilan chiqadi, javob variantlari pastda chiqadi,
 to'g'ri javob yonib belgi bilan ko'rsatiladi. Format: 1080x1920 (9:16).
 
 ## Fayllar
-- `public/audio/q00.mp3` kirish, `q01.mp3 ... q05.mp3` savol audiolari
+- `public/audio/q01.mp3 ... q05.mp3` savol audiolari
 - `SSENARIY.md` audio va video matni
 - `public/video/javoblar.mp4` HeyGen javob videosi (pauzalar bilan)
 - `src/quiz.json` savollar, javoblar va vaqtlar

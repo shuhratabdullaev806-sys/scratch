@@ -3,6 +3,7 @@ import {
   AbsoluteFill,
   Audio,
   Easing,
+  Img,
   OffthreadVideo,
   Sequence,
   interpolate,
@@ -14,7 +15,7 @@ import {
 import type {Option, QuizProps, ResolvedProps, ResolvedQuestion} from './types';
 
 import {fontFamily} from './font';
-import {IntroScene, OutroScene} from './Scenes';
+import {OutroScene} from './Scenes';
 
 const PILL_H = 130;
 const PILL_GAP = 24;
@@ -52,6 +53,54 @@ const Shade: React.FC = () => (
   />
 );
 
+const Header: React.FC<{title: string}> = ({title}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const enter = spring({frame, fps, config: {damping: 15, stiffness: 100}});
+  const shine = interpolate((frame % 150) / 150, [0, 1], [-30, 130]);
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 90,
+        left: 50,
+        right: 50,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 26,
+        padding: '26px 34px',
+        borderRadius: 36,
+        overflow: 'hidden',
+        background: `linear-gradient(100deg, #4361ee 0%, #3a0ca3 100%)`,
+        border: '3px solid #ffffff44',
+        boxShadow: '0 0 50px #4361ee77, 0 20px 50px rgba(0,0,0,0.45)',
+        transform: `translateY(${interpolate(enter, [0, 1], [-240, 0])}px)`,
+        opacity: enter,
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `linear-gradient(100deg, transparent ${shine - 12}%, rgba(255,255,255,0.22) ${shine}%, transparent ${shine + 12}%)`,
+        }}
+      />
+      <Img src={staticFile('logo.svg')} style={{width: 88, height: 88, flexShrink: 0}} />
+      <div
+        style={{
+          fontFamily,
+          fontWeight: 800,
+          fontSize: 54,
+          lineHeight: 1.12,
+          color: '#fff',
+        }}
+      >
+        {title}
+      </div>
+    </div>
+  );
+};
+
 const QuestionCard: React.FC<{
   q: ResolvedQuestion;
   index: number;
@@ -69,7 +118,7 @@ const QuestionCard: React.FC<{
     <div
       style={{
         position: 'absolute',
-        top: 120,
+        top: 330,
         left: 60,
         right: 60,
         transform: `translateY(${y}px)`,
@@ -77,9 +126,6 @@ const QuestionCard: React.FC<{
       }}
     >
       <div style={{display: 'flex', gap: 16, marginBottom: 22}}>
-        {q.topic ? (
-          <div style={chip('#38bdf8')}>{q.topic}</div>
-        ) : null}
         <div style={chip('#94a3b8')}>
           Savol {index + 1} / {total}
         </div>
@@ -186,6 +232,7 @@ const OptionPill: React.FC<{
   const pulse = chosen && hit ? 0.55 + 0.45 * Math.sin((frame - answerFrame) / 4) : 0;
   const glow = chosen ? a * (40 + pulse * 40) : 0;
 
+  const lit = chosen && hit;
   const ringT = chosen && hit ? (frame - answerFrame) / 26 : 2;
   const ringVisible = ringT >= 0 && ringT <= 1;
 
@@ -222,11 +269,11 @@ const OptionPill: React.FC<{
           fontWeight: 800,
           fontSize: 56,
           color: '#f8fafc',
-          background: chosen
+          background: lit
             ? `linear-gradient(90deg, ${option.color}, ${option.color}cc)`
             : 'rgba(10,16,38,0.82)',
-          border: `3px solid ${chosen ? '#ffffffaa' : option.color + '77'}`,
-          boxShadow: chosen
+          border: `3px solid ${lit ? '#ffffffaa' : option.color + '77'}`,
+          boxShadow: lit
             ? `0 0 ${glow}px ${option.color}, 0 20px 50px rgba(0,0,0,0.45)`
             : '0 16px 40px rgba(0,0,0,0.4)',
         }}
@@ -237,7 +284,7 @@ const OptionPill: React.FC<{
               width: 26,
               height: 26,
               borderRadius: 999,
-              background: chosen ? '#fff' : option.color,
+              background: lit ? '#fff' : option.color,
             }}
           />
           {option.label}
@@ -296,24 +343,16 @@ const QuestionScene: React.FC<{
 export const Quiz: React.FC<QuizProps> = (rawProps) => {
   const props = rawProps as ResolvedProps;
   const {fps} = useVideoConfig();
-  const introEnd = Math.round(props.introEnd * fps);
   const outroAt = Math.round(props.outroAt * fps);
 
   return (
     <AbsoluteFill style={{backgroundColor: '#05070f'}}>
       <Background video={props.video} muteFrom={outroAt} />
       <Shade />
-      {props.intro ? (
-        <>
-          {props.intro.audio ? (
-            <Sequence from={0} layout="none">
-              <Audio src={staticFile(props.intro.audio)} />
-            </Sequence>
-          ) : null}
-          <Sequence from={0} durationInFrames={Math.max(1, introEnd)} layout="none">
-            <IntroScene intro={props.intro} />
-          </Sequence>
-        </>
+      {props.title ? (
+        <Sequence from={0} durationInFrames={Math.max(1, outroAt)} layout="none">
+          <Header title={props.title} />
+        </Sequence>
       ) : null}
       {props.questions.map((q, i) => {
         const from = Math.round(q.at * fps);
