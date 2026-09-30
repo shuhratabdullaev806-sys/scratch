@@ -1,5 +1,7 @@
 {
-  "video": null,
+  "video": "video/javoblar.mp4",
+  "videoSeconds": 41.49,
+  "videoIdleFrom": 30.85,
   "title": "Onlayn kassada tovarni qaytarish",
   "outro": {
     "name": "Shuxrat Abdullaev",
@@ -35,27 +37,32 @@
     {
       "text": "Qaytarish cheki sotish chekiga bog'lanadimi?",
       "answer": "togri",
-      "audio": "audio/q01.mp3"
+      "audio": "audio/q01.wav",
+      "videoAnswerAt": 0.15
     },
     {
       "text": "Xaridor arizasisiz pul qaytaramizmi?",
       "answer": "risk",
-      "audio": "audio/q02.mp3"
+      "audio": "audio/q02.wav",
+      "videoAnswerAt": 6.9
     },
     {
       "text": "Xato qaytarish chekini bekor qilamizmi?",
       "answer": "notogri",
-      "audio": "audio/q03.mp3"
+      "audio": "audio/q03.wav",
+      "videoAnswerAt": 14.4
     },
     {
       "text": "Xato sotish chekini yashiramizmi?",
       "answer": "ahmoqlik",
-      "audio": "audio/q04.mp3"
+      "audio": "audio/q04.wav",
+      "videoAnswerAt": 23.15
     },
     {
       "text": "Bitta chekka ikki qaytarish biriktiriladimi?",
       "answer": "notogri",
-      "audio": "audio/q05.mp3"
+      "audio": "audio/q05.wav",
+      "videoAnswerAt": 34.4
     }
   ]
 }

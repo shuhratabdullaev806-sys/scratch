@@ -12,6 +12,8 @@ export type Question = {
   at?: number;
   /** javob yonadigan vaqt (soniya). Bo'lmasa savol audiosi tugagach */
   answerAt?: number;
+  /** javob videoda boshlanadigan soniya (video ichidagi vaqt) */
+  videoAnswerAt?: number;
 };
 
 export type Outro = {
@@ -27,6 +29,10 @@ export type Outro = {
 export type QuizProps = {
   /** public/ ichidagi javob videosi, masalan "video/javoblar.mp4" */
   video?: string | null;
+  /** javob videosining davomiyligi (soniya) */
+  videoSeconds?: number;
+  /** 1-savol paytida ko'rsatiladigan videoning jim qismi (video ichidagi soniya) */
+  videoIdleFrom?: number;
   /** video oxirigacha tepada turadigan sarlavha */
   title?: string;
   outro?: Outro;
@@ -43,6 +49,8 @@ export type ResolvedQuestion = Question & {
 
 export type ResolvedProps = Omit<QuizProps, 'questions'> & {
   questions: ResolvedQuestion[];
+  /** video 0-soniyasi o'ynaydigan vaqt */
+  videoStart: number;
   outroAt: number;
   outroEnd: number;
 };

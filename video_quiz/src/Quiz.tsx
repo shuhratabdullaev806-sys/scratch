@@ -17,23 +17,12 @@ import type {Option, QuizProps, ResolvedProps, ResolvedQuestion} from './types';
 import {fontFamily} from './font';
 import {OutroScene} from './Scenes';
 
-const PILL_H = 130;
-const PILL_GAP = 24;
+const PILL_H = 116;
+const PILL_GAP = 22;
 const EXIT_FRAMES = 12;
 
-const Background: React.FC<{video?: string | null; muteFrom: number}> = ({video, muteFrom}) => {
+const Gradient: React.FC = () => {
   const frame = useCurrentFrame();
-  if (video) {
-    return (
-      <AbsoluteFill>
-        <OffthreadVideo
-          src={staticFile(video)}
-          volume={(f) => (f >= muteFrom ? 0 : 1)}
-          style={{width: '100%', height: '100%', objectFit: 'cover'}}
-        />
-      </AbsoluteFill>
-    );
-  }
   const shift = interpolate(frame % 600, [0, 300, 600], [0, 40, 0]);
   return (
     <AbsoluteFill
@@ -44,11 +33,44 @@ const Background: React.FC<{video?: string | null; muteFrom: number}> = ({video,
   );
 };
 
+const videoStyle: React.CSSProperties = {width: '100%', height: '100%', objectFit: 'cover'};
+
+/**
+ * Javob videosi. videoStart soniyagacha videoning jim qismi (idleFrom dan) ovozsiz
+ * ko'rsatiladi, keyin video 0-soniyadan uzluksiz o'ynaydi.
+ */
+const Background: React.FC<{props: ResolvedProps}> = ({props}) => {
+  const {fps} = useVideoConfig();
+  if (!props.video) return <Gradient />;
+  const start = Math.round(props.videoStart * fps);
+  return (
+    <AbsoluteFill>
+      {start > 0 ? (
+        <Sequence from={0} durationInFrames={start} layout="none">
+          <AbsoluteFill>
+            <OffthreadVideo
+              src={staticFile(props.video)}
+              trimBefore={Math.round((props.videoIdleFrom ?? 0) * fps)}
+              muted
+              style={videoStyle}
+            />
+          </AbsoluteFill>
+        </Sequence>
+      ) : null}
+      <Sequence from={start} durationInFrames={Math.max(1, Math.round(props.outroAt * fps) - start)} layout="none">
+        <AbsoluteFill>
+          <OffthreadVideo src={staticFile(props.video)} style={videoStyle} />
+        </AbsoluteFill>
+      </Sequence>
+    </AbsoluteFill>
+  );
+};
+
 const Shade: React.FC = () => (
   <AbsoluteFill
     style={{
       background:
-        'linear-gradient(180deg, rgba(3,6,18,0.78) 0%, rgba(3,6,18,0) 32%, rgba(3,6,18,0) 55%, rgba(3,6,18,0.82) 100%)',
+        'linear-gradient(180deg, rgba(3,6,18,0.7) 0%, rgba(3,6,18,0) 16%, rgba(3,6,18,0) 50%, rgba(3,6,18,0.55) 68%, rgba(3,6,18,0.85) 100%)',
     }}
   />
 );
@@ -62,13 +84,13 @@ const Header: React.FC<{title: string}> = ({title}) => {
     <div
       style={{
         position: 'absolute',
-        top: 90,
+        top: 56,
         left: 50,
         right: 50,
         display: 'flex',
         alignItems: 'center',
         gap: 26,
-        padding: '26px 34px',
+        padding: '20px 30px',
         borderRadius: 36,
         overflow: 'hidden',
         background: `linear-gradient(100deg, #4361ee 0%, #3a0ca3 100%)`,
@@ -85,12 +107,12 @@ const Header: React.FC<{title: string}> = ({title}) => {
           background: `linear-gradient(100deg, transparent ${shine - 12}%, rgba(255,255,255,0.22) ${shine}%, transparent ${shine + 12}%)`,
         }}
       />
-      <Img src={staticFile('logo.svg')} style={{width: 88, height: 88, flexShrink: 0}} />
+      <Img src={staticFile('logo.svg')} style={{width: 76, height: 76, flexShrink: 0}} />
       <div
         style={{
           fontFamily,
           fontWeight: 800,
-          fontSize: 54,
+          fontSize: 48,
           lineHeight: 1.12,
           color: '#fff',
         }}
@@ -111,30 +133,30 @@ const QuestionCard: React.FC<{
   const {fps} = useVideoConfig();
 
   const enter = spring({frame, fps, config: {damping: 16, stiffness: 110}});
-  const y = interpolate(enter, [0, 1], [-320, 0]) - exit * 60;
+  const y = interpolate(enter, [0, 1], [-160, 0]) - exit * 40;
   const words = q.text.split(' ');
 
   return (
     <div
       style={{
         position: 'absolute',
-        top: 330,
-        left: 60,
-        right: 60,
+        bottom: 410,
+        left: 50,
+        right: 50,
         transform: `translateY(${y}px)`,
         opacity: enter * (1 - exit),
       }}
     >
-      <div style={{display: 'flex', gap: 16, marginBottom: 22}}>
+      <div style={{display: 'flex', gap: 16, marginBottom: 16}}>
         <div style={chip('#94a3b8')}>
           Savol {index + 1} / {total}
         </div>
       </div>
       <div
         style={{
-          padding: '48px 52px',
-          borderRadius: 44,
-          background: 'rgba(10,16,38,0.78)',
+          padding: '34px 44px',
+          borderRadius: 40,
+          background: 'rgba(10,16,38,0.86)',
           border: '2px solid rgba(148,163,184,0.28)',
           boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
           display: 'flex',
@@ -154,7 +176,7 @@ const QuestionCard: React.FC<{
               style={{
                 fontFamily,
                 fontWeight: 800,
-                fontSize: 78,
+                fontSize: 62,
                 lineHeight: 1.18,
                 color: '#f8fafc',
                 display: 'inline-block',
@@ -185,7 +207,7 @@ const chip = (color: string): React.CSSProperties => ({
 });
 
 const Check: React.FC<{progress: number}> = ({progress}) => (
-  <svg width="64" height="64" viewBox="0 0 64 64">
+  <svg width="52" height="52" viewBox="0 0 64 64" style={{flexShrink: 0}}>
     <circle cx="32" cy="32" r="30" fill="rgba(255,255,255,0.95)" />
     <path
       d="M18 33 L28 43 L47 22"
@@ -264,10 +286,10 @@ const OptionPill: React.FC<{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 48px',
+          padding: '0 30px',
           fontFamily,
           fontWeight: 800,
-          fontSize: 56,
+          fontSize: 46,
           color: '#f8fafc',
           background: lit
             ? `linear-gradient(90deg, ${option.color}, ${option.color}cc)`
@@ -278,11 +300,11 @@ const OptionPill: React.FC<{
             : '0 16px 40px rgba(0,0,0,0.4)',
         }}
       >
-        <span style={{display: 'flex', alignItems: 'center', gap: 28}}>
+        <span style={{display: 'flex', alignItems: 'center', gap: 18}}>
           <span
             style={{
-              width: 26,
-              height: 26,
+              width: 20,
+              height: 20,
               borderRadius: 999,
               background: lit ? '#fff' : option.color,
             }}
@@ -317,11 +339,11 @@ const QuestionScene: React.FC<{
       <div
         style={{
           position: 'absolute',
-          left: 80,
-          right: 80,
-          bottom: 130,
-          display: 'flex',
-          flexDirection: 'column',
+          left: 50,
+          right: 50,
+          bottom: 120,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           gap: PILL_GAP,
         }}
       >
@@ -347,7 +369,7 @@ export const Quiz: React.FC<QuizProps> = (rawProps) => {
 
   return (
     <AbsoluteFill style={{backgroundColor: '#05070f'}}>
-      <Background video={props.video} muteFrom={outroAt} />
+      <Background props={props} />
       <Shade />
       {props.title ? (
         <Sequence from={0} durationInFrames={Math.max(1, outroAt)} layout="none">
