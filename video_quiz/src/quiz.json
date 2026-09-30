@@ -1,5 +1,20 @@
 {
   "video": null,
+  "intro": {
+    "company": "Faxr Madad Konsalt",
+    "name": "Shuxrat Abdullaev",
+    "role": "\"Faxr Madad Konsalt\" rahbari",
+    "topic": "Onlayn kassada tovarni qaytarish",
+    "audio": "audio/q00.mp3",
+    "audioSeconds": 9,
+    "holdSeconds": 3.5
+  },
+  "outro": {
+    "company": "Faxr Madad Konsalt",
+    "address": "Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi, 1-uy",
+    "phone": "+998 97 644 88 00",
+    "seconds": 5
+  },
   "options": [
     {"id": "togri", "label": "To'g'ri", "color": "#22c55e"},
     {"id": "notogri", "label": "Noto'g'ri", "color": "#ef4444"},
@@ -7,15 +22,10 @@
     {"id": "risk", "label": "Risk", "color": "#f59e0b"}
   ],
   "questions": [
-    {"topic": "Onlayn-NKM", "text": "Qaytarish cheki sotish chekiga bog'lanadimi?", "answer": "togri"},
-    {"topic": "Onlayn-NKM", "text": "Bog'langan qaytarish tushumni kamaytiradimi?", "answer": "togri"},
-    {"topic": "Onlayn-NKM", "text": "Bog'lash muddati: keyingi oy 10-sana?", "answer": "togri"},
-    {"topic": "Onlayn-NKM", "text": "Xaridorning arizasisiz tovar qaytaramizmi?", "answer": "risk"},
-    {"topic": "Onlayn-NKM", "text": "Chek nusxasini muhr bilan tasdiqlaymizmi?", "answer": "togri"},
-    {"topic": "Onlayn-NKM", "text": "Xato qaytarish chekini bekor qilamizmi?", "answer": "notogri"},
-    {"topic": "Onlayn-NKM", "text": "Xato sotish chekini yashiramizmi?", "answer": "ahmoqlik"},
-    {"topic": "Onlayn-NKM", "text": "Kassirdan tushuntirish xati olamizmi?", "answer": "togri"},
-    {"topic": "Onlayn-NKM", "text": "Bitta chekka ikkita qaytarish biriktiramizmi?", "answer": "notogri"},
-    {"topic": "Onlayn-NKM", "text": "Qisman qaytarishda hammasini qaytaramizmi?", "answer": "togri"}
+    {"topic": "Onlayn-NKM", "text": "Qaytarish cheki sotish chekiga bog'lanadimi?", "answer": "togri", "audio": "audio/q01.mp3"},
+    {"topic": "Onlayn-NKM", "text": "Xaridor arizasisiz pul qaytaramizmi?", "answer": "risk", "audio": "audio/q02.mp3"},
+    {"topic": "Onlayn-NKM", "text": "Xato qaytarish chekini bekor qilamizmi?", "answer": "notogri", "audio": "audio/q03.mp3"},
+    {"topic": "Onlayn-NKM", "text": "Xato sotish chekini yashiramizmi?", "answer": "ahmoqlik", "audio": "audio/q04.mp3"},
+    {"topic": "Onlayn-NKM", "text": "Bitta chekka ikki qaytarish biriktiriladimi?", "answer": "notogri", "audio": "audio/q05.mp3"}
   ]
 }

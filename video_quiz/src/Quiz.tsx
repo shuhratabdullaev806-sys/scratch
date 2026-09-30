@@ -2,9 +2,6 @@ import React from 'react';
 import {
   AbsoluteFill,
   Audio,
-  cancelRender,
-  continueRender,
-  delayRender,
   Easing,
   OffthreadVideo,
   Sequence,
@@ -16,43 +13,21 @@ import {
 } from 'remotion';
 import type {Option, QuizProps, ResolvedProps, ResolvedQuestion} from './types';
 
-const fontFamily = 'Montserrat, sans-serif';
-
-const loadFonts = () => {
-  const handle = delayRender('Shriftlar yuklanmoqda');
-  const files: [string, string, string][] = [
-    ['600', 'latin', 'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122'],
-    ['600', 'latin-ext', 'U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF'],
-    ['800', 'latin', 'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122'],
-    ['800', 'latin-ext', 'U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF'],
-  ];
-  Promise.all(
-    files.map(async ([weight, subset, range]) => {
-      const face = new FontFace(
-        'Montserrat',
-        `url(${staticFile(`fonts/montserrat-${subset}-${weight}-normal.woff2`)}) format('woff2')`,
-        {weight, unicodeRange: range},
-      );
-      await face.load();
-      (document.fonts as unknown as {add: (f: FontFace) => void}).add(face);
-    }),
-  )
-    .then(() => continueRender(handle))
-    .catch((e) => cancelRender(e));
-};
-loadFonts();
+import {fontFamily} from './font';
+import {IntroScene, OutroScene} from './Scenes';
 
 const PILL_H = 130;
 const PILL_GAP = 24;
 const EXIT_FRAMES = 12;
 
-const Background: React.FC<{video?: string | null}> = ({video}) => {
+const Background: React.FC<{video?: string | null; muteFrom: number}> = ({video, muteFrom}) => {
   const frame = useCurrentFrame();
   if (video) {
     return (
       <AbsoluteFill>
         <OffthreadVideo
           src={staticFile(video)}
+          volume={(f) => (f >= muteFrom ? 0 : 1)}
           style={{width: '100%', height: '100%', objectFit: 'cover'}}
         />
       </AbsoluteFill>
@@ -321,11 +296,25 @@ const QuestionScene: React.FC<{
 export const Quiz: React.FC<QuizProps> = (rawProps) => {
   const props = rawProps as ResolvedProps;
   const {fps} = useVideoConfig();
+  const introEnd = Math.round(props.introEnd * fps);
+  const outroAt = Math.round(props.outroAt * fps);
 
   return (
     <AbsoluteFill style={{backgroundColor: '#05070f'}}>
-      <Background video={props.video} />
+      <Background video={props.video} muteFrom={outroAt} />
       <Shade />
+      {props.intro ? (
+        <>
+          {props.intro.audio ? (
+            <Sequence from={0} layout="none">
+              <Audio src={staticFile(props.intro.audio)} />
+            </Sequence>
+          ) : null}
+          <Sequence from={0} durationInFrames={Math.max(1, introEnd)} layout="none">
+            <IntroScene intro={props.intro} />
+          </Sequence>
+        </>
+      ) : null}
       {props.questions.map((q, i) => {
         const from = Math.round(q.at * fps);
         const duration = Math.max(1, Math.round((q.endAt - q.at) * fps));
@@ -347,6 +336,11 @@ export const Quiz: React.FC<QuizProps> = (rawProps) => {
           </React.Fragment>
         );
       })}
+      {props.outro ? (
+        <Sequence from={outroAt} layout="none">
+          <OutroScene outro={props.outro} />
+        </Sequence>
+      ) : null}
     </AbsoluteFill>
   );
 };

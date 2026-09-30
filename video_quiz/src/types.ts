@@ -14,11 +14,30 @@ export type Question = {
   answerAt?: number;
 };
 
+export type Intro = {
+  company: string;
+  name: string;
+  role: string;
+  topic: string;
+  audio?: string;
+  audioSeconds?: number;
+  /** audio tugagach video alik olishi uchun vaqt (soniya) */
+  holdSeconds?: number;
+};
+
+export type Outro = {
+  company: string;
+  address: string;
+  phone: string;
+  /** yakuniy ekran davomiyligi (soniya) */
+  seconds?: number;
+};
+
 export type QuizProps = {
   /** public/ ichidagi javob videosi, masalan "video/javoblar.mp4" */
-  video?: string;
-  /** jami davomiylik (soniya). Bo'lmasa oxirgi savoldan keyin avtomatik */
-  totalSeconds?: number;
+  video?: string | null;
+  intro?: Intro;
+  outro?: Outro;
   options: Option[];
   questions: Question[];
 };
@@ -32,4 +51,7 @@ export type ResolvedQuestion = Question & {
 
 export type ResolvedProps = Omit<QuizProps, 'questions'> & {
   questions: ResolvedQuestion[];
+  introEnd: number;
+  outroAt: number;
+  outroEnd: number;
 };
