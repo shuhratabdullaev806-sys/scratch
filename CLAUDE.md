@@ -5,6 +5,28 @@
 Bu yerda HeyGen avatar videolaridan "ROST yoki YOLG'ON" viktorina Shorts'lari
 yig'iladi. Montaj kodi `montaj-src/` da.
 
+### Format — MUHIM
+
+**Besh savol.** Uchta emas.
+
+**Javoblar videoda aytilmaydi.** Diktor faqat savollarni o'qiydi, har
+biridan keyin pauza. Javoblar izohga (kommentariyaga) qo'yiladi — bu
+odamlarni izohga kirishga va yozishga majbur qiladi.
+
+Demak montajda **javob ochilishi yo'q**: tugma yonmaydi, ✓ chiqmaydi,
+konfetti otilmaydi, izoh kartasi ko'rinmaydi. ROST va YOLG'ON tugmalari
+butun video davomida bir xil turadi — ular savol, javob emas.
+
+Har videoga ikkita fayl tayyorlanadi:
+1. HeyGen uchun diktor matni
+2. Izohga qo'yiladigan javoblar matni (qisqa izohlar bilan)
+
+### Orqa fon — TEGILMAYDI
+
+HeyGen videosidagi fon qanday bo'lsa, shunday qoladi. Fonni kesish,
+almashtirish yoki rangini o'zgartirish **kerak emas** — sinab ko'rildi,
+auditoriyaga tabiiy ko'rinmadi. Faqat ustiga grafika qo'yiladi.
+
 ### Pauza qoidasi — MUHIM
 
 Diktor **4 soniyalik pauza** bilan yozib oladi, montajda esa pauzalar
@@ -36,21 +58,15 @@ stavkasi, soliq foizlari, modda raqamlari) har videoda qayta tekshiriladi.
 Ishonch hosil qilib bo'lmagan faktni videoga qo'yish o'rniga, o'sha savolni
 boshqasiga almashtirish kerak.
 
-### Ochiq masala — orqa fonni kesish
+### Sinab ko'rilgan va rad etilgan
 
-Hozirgi rang almashishi "sahna yorug'ligi" tarzida ishlaydi: chetlarda
-kuchli, markazda kuchsiz. Kamchiligi — rang diktorning kiyimiga ham
-tushadi. Namuna videolarda esa faqat fon rang o'zgaradi, chunki u yerda
-boshlovchi kesib olingan.
+Bular qaytadan taklif qilinmasin:
 
-Keyingi qadam: HeyGen'dan **transparent** yoki **yashil fonli** video
-olishga harakat qilinadi. Olinsa — fonni to'liq almashtirib, rang faqat
-fonda o'zgaradigan qilinadi.
-
-Agar HeyGen bermasa, zaxira yo'l — MediaPipe segmentatsiyasi (internetsiz
-ishlaydi). Lekin bu videoda mikrofon, harakatlanuvchi qo'llar va qora shim
-chegaralarida artefakt beradi. Avval sinov kadri ko'rsatilsin, keyin
-qaror qilinsin.
+- **Fonni kesib, rangli fon qo'yish** (shaffof WebM + sariq/ko'k
+  almashuvchi fon). Texnik jihatdan ishladi, lekin xodimlar va
+  o'quvchilarga tabiiy ko'rinmadi.
+- **Fonga rangli "sahna yorug'ligi"** qo'yish. Rang diktorning kiyimiga
+  ham tushadi, yoqmadi.
 
 ### Renderlangan videolar
 
