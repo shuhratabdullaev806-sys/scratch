@@ -31,32 +31,14 @@ const PhoneIcon: React.FC<{ size: number; color: string }> = ({ size, color }) =
   </svg>
 );
 
-/** Logotip kelmaguncha turadigan vaqtinchalik belgi. */
-const LogoPlaceholder: React.FC = () => (
-  <div
-    style={{
-      width: 300,
-      height: 300,
-      borderRadius: 48,
-      border: `6px dashed ${ENDCARD.accent}66`,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 10,
-      color: `${ENDCARD.accent}99`,
-      fontFamily: FONT,
-      fontWeight: 800,
-      fontSize: 30,
-      textAlign: "center",
-      lineHeight: 1.25,
-    }}
-  >
-    LOGOTIP
-    <span style={{ fontSize: 22, fontWeight: 700, opacity: 0.8 }}>
-      shu yerga
-    </span>
-  </div>
+/** Logotip hali yo'q — o'rniga nozik urg'u belgisi turadi. */
+const LogoMark: React.FC = () => (
+  <svg width={150} height={150} viewBox="0 0 100 100" fill="none">
+    <circle cx="50" cy="50" r="44" stroke={`${ENDCARD.accent}55`} strokeWidth="3" />
+    <circle cx="50" cy="50" r="33" stroke={`${ENDCARD.accent}AA`} strokeWidth="5" />
+    <path d="M34 52l11 11 21-24" stroke={ENDCARD.accent} strokeWidth="8"
+      strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
 );
 
 export const EndCard: React.FC = () => {
@@ -113,7 +95,7 @@ export const EndCard: React.FC = () => {
           {ENDCARD.logo ? (
             <Img src={staticFile(ENDCARD.logo)} style={{ width: 330, objectFit: "contain" }} />
           ) : (
-            <LogoPlaceholder />
+            <LogoMark />
           )}
         </div>
 
@@ -123,8 +105,8 @@ export const EndCard: React.FC = () => {
             style={{
               fontFamily: FONT,
               fontWeight: 900,
-              fontSize: 76,
-              letterSpacing: -0.5,
+              fontSize: ENDCARD.logo ? 76 : 86,
+              letterSpacing: -1,
               color: ENDCARD.ink,
               textAlign: "center",
               textShadow: "0 6px 24px rgba(0,0,0,.5)",

@@ -1,25 +1,34 @@
 import React from "react";
 import {
   AbsoluteFill,
+  OffthreadVideo,
+  Sequence,
   interpolate,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
 import {
   AnswerButton,
   BigNumber,
-  CalcCard,
-  Confetti,
   Countdown,
-  ExplainCard,
-  MoodBackground,
   Progress,
-  Speaker,
   QuestionText,
   between,
   popIn,
 } from "./parts";
-import { C, FPS, INTRO, OUTRO, QUESTIONS, TITLES } from "./timeline";
+import { EndCard } from "./EndCard";
+import {
+  C,
+  ENDCARD_S,
+  FPS,
+  INTRO,
+  OUTRO,
+  QUESTIONS,
+  SOURCE_S,
+  TITLES,
+  sec,
+} from "./timeline";
 
 const FONT = "Montserrat, Arial Black, sans-serif";
 
@@ -37,12 +46,7 @@ const Intro: React.FC = () => {
 
   return (
     <AbsoluteFill
-      style={{
-        alignItems: "center",
-        justifyContent: "flex-start",
-        paddingTop: 150,
-        opacity: out,
-      }}
+      style={{ alignItems: "center", justifyContent: "flex-start", paddingTop: 150, opacity: out }}
     >
       <div
         style={{
@@ -53,9 +57,9 @@ const Intro: React.FC = () => {
           padding: "22px 40px",
           fontFamily: FONT,
           fontWeight: 900,
-          fontSize: 78,
+          fontSize: 76,
           textAlign: "center",
-          lineHeight: 1.1,
+          lineHeight: 1.08,
           boxShadow: "0 16px 40px rgba(0,0,0,.5)",
         }}
       >
@@ -73,7 +77,7 @@ const Intro: React.FC = () => {
           padding: "14px 30px",
           fontFamily: FONT,
           fontWeight: 800,
-          fontSize: 44,
+          fontSize: 42,
         }}
       >
         {TITLES.introSmall}
@@ -86,14 +90,17 @@ const Outro: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / FPS;
-  if (t < OUTRO.from) return null;
+  if (t < OUTRO.from || t >= SOURCE_S) return null;
 
   const s = popIn(frame, OUTRO.from + 0.1, fps);
   const pulse = 1 + 0.05 * Math.sin((t - OUTRO.from) * Math.PI * 3);
+  const out = interpolate(t, [SOURCE_S - 0.35, SOURCE_S], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
-    <AbsoluteFill>
-      {/* sarlavha — bosh ustidagi bo'sh joyda */}
+    <AbsoluteFill style={{ opacity: out }}>
       <div
         style={{
           position: "absolute",
@@ -125,7 +132,6 @@ const Outro: React.FC = () => {
         </div>
       </div>
 
-      {/* CTA — pastdagi bo'sh joyda */}
       <div
         style={{
           position: "absolute",
@@ -177,57 +183,35 @@ export const Main: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
 
-  // Qaysi savol faol?
-  const active = QUESTIONS.find((q) => t >= q.labelAt - 0.6 && t < (QUESTIONS[q.n] ? QUESTIONS[q.n].labelAt - 0.6 : OUTRO.from));
-  const revealed = QUESTIONS.filter((q) => t >= q.pauseTo);
-  const last = revealed[revealed.length - 1];
-
-  // Tugmalar holati
-  let rostState: "idle" | "thinking" | "correct" | "wrong" = "idle";
-  let yolgonState: "idle" | "thinking" | "correct" | "wrong" = "idle";
-  let progress = 0;
-
-  const thinking = QUESTIONS.find((q) => between(t, q.pauseFrom, q.pauseTo));
-  if (thinking) {
-    rostState = "thinking";
-    yolgonState = "thinking";
-  } else if (last && active && last.n === active.n) {
-    progress = Math.min(1, (t - last.pauseTo) / 0.35);
-    if (last.answer === "ROST") {
-      rostState = "correct";
-      yolgonState = "wrong";
-    } else {
-      yolgonState = "correct";
-      rostState = "wrong";
-    }
-  }
-
+  const active = QUESTIONS.find(
+    (q, i) => t >= q.labelAt - 0.6 && (i + 1 >= QUESTIONS.length || t < QUESTIONS[i + 1].labelAt - 0.6)
+  );
+  const thinking = QUESTIONS.some((q) => between(t, q.pauseFrom, q.pauseTo));
   const quizOn = t >= INTRO.to && t < OUTRO.from;
 
   return (
-    <AbsoluteFill style={{ background: "#06394B" }}>
-      {/* rang kayfiyati: savolda sariq, javobda ko'k — boshlovchi ORQASIDA */}
-      <MoodBackground />
-      {/* shaffof fonli boshlovchi */}
-      <Speaker />
+    <AbsoluteFill style={{ background: "#000" }}>
+      {/* manba video — fonga tegilmaydi, hech qanday filtr qo'yilmaydi */}
+      <Sequence durationInFrames={sec(SOURCE_S)}>
+        <OffthreadVideo
+          src={staticFile("source.mp4")}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      </Sequence>
 
       <Intro />
 
-      {quizOn ? <Progress current={active ? active.n : 3} /> : null}
+      {quizOn ? <Progress current={active ? active.n : QUESTIONS.length} total={QUESTIONS.length} /> : null}
 
       {QUESTIONS.map((q) => (
         <React.Fragment key={q.n}>
           <BigNumber n={q.n} at={q.labelAt} />
-          <QuestionText lines={q.screenText} from={q.textFrom} to={q.pauseTo + 0.9} />
+          <QuestionText lines={q.screenText} from={q.textFrom} to={q.pauseTo} />
           <Countdown from={q.pauseFrom} to={q.pauseTo} />
-          <ExplainCard text={q.explain} from={q.explainFrom} to={q.explainTo + 0.4} />
-          {q.calc ? (
-            <CalcCard lines={q.calc.lines} from={q.calc.from} to={q.calc.to} />
-          ) : null}
         </React.Fragment>
       ))}
 
-      {/* doimiy tugmalar */}
+      {/* tugmalar — butun viktorina davomida bir xil, javob bermaydi */}
       {quizOn ? (
         <div
           style={{
@@ -239,22 +223,17 @@ export const Main: React.FC = () => {
             gap: 34,
           }}
         >
-          <AnswerButton kind="ROST" label="ROST" state={rostState} progress={progress} />
-          <AnswerButton
-            kind="YOLGON"
-            label="YOLG'ON"
-            state={yolgonState}
-            progress={progress}
-          />
+          <AnswerButton kind="ROST" label="ROST" thinking={thinking} />
+          <AnswerButton kind="YOLGON" label="YOLG'ON" thinking={thinking} />
         </div>
       ) : null}
 
-      {/* konfetti tugmalar ustida */}
-      {QUESTIONS.map((q) => (
-        <Confetti key={q.n} at={q.pauseTo} y={q.answer === "ROST" ? 968 : 1130} />
-      ))}
-
       <Outro />
+
+      {/* aloqa kartochkasi */}
+      <Sequence from={sec(SOURCE_S)} durationInFrames={sec(ENDCARD_S)}>
+        <EndCard />
+      </Sequence>
     </AbsoluteFill>
   );
 };

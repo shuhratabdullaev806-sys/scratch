@@ -1,113 +1,79 @@
-// Manba: HeyGen WebM, shaffof fon (VP9 + alpha), 1080x1920, 25fps, 52.17s.
+// Manba: HeyGen MP4, fon tegilmaydi, 608x1080, 25fps, 54.61s.
+// Pauzalar HeyGen'da 2.8-3.1 soniya chiqqan — qisqartirish kerak emas.
 //
-// HeyGen pauzalarni 1.4-1.8 soniya qilib qo'ygan, 3 emas. Shuning uchun
-// har pauzaning o'rtasiga muzlatilgan kadr qo'yib, 3 soniyaga cho'zamiz.
-// Quyidagi vaqtlar CHIQISH vaqtlari (cho'zilgandan keyingi).
+// Format: 5 savol, javoblar videoda AYTILMAYDI va ko'rsatilmaydi.
+// Javoblar izohga qo'yiladi. Shuning uchun montajda tugma yonmaydi.
 
 export const FPS = 30;
 export const WIDTH = 1080;
 export const HEIGHT = 1920;
 
-export type Answer = "ROST" | "YOLGON";
-
-/** Manbadagi pauza o'rtasi va qancha muzlatish qo'shilishi. */
-export type Freeze = { at: number; hold: number; img: string };
-
-export const FREEZES: Freeze[] = [
-  { at: 12.41, hold: 1.24, img: "muzlash1.png" },
-  { at: 26.46, hold: 1.56, img: "muzlash2.png" },
-  { at: 40.95, hold: 1.56, img: "muzlash3.png" },
-];
-
-export const SOURCE_S = 52.17;
-export const DURATION_S =
-  SOURCE_S + FREEZES.reduce((s, f) => s + f.hold, 0); // 56.53
+export const SOURCE_S = 54.61;
+export const ENDCARD_S = 3.0;
+export const DURATION_S = SOURCE_S + ENDCARD_S;
 
 export type Question = {
   n: number;
-  answer: Answer;
-  labelAt: number;
-  textFrom: number;
-  pauseFrom: number;
-  pauseTo: number;
+  labelAt: number; // "Birinchi." aytilgan payt
+  textFrom: number; // savol matni chiqadi
+  pauseFrom: number; // jimlik boshlanishi -> taymer
+  pauseTo: number; // jimlik tugashi -> matn ketadi
   screenText: string[];
-  explainFrom: number;
-  explainTo: number;
-  explain: string;
-  calc?: { lines: string[]; from: number; to: number };
 };
 
-export const INTRO = { from: 0, to: 4.28 };
-
-/** Intro va outro yozuvlari — har videoda shu yerdan o'zgartiriladi. */
-export const TITLES = {
-  introBig: ["AVTOMOBIL QQSi —", "ZACHETMI?"],
-  introSmall: "SK 266 va 267 — 3 savol",
-  outroBig: ["Nechta to'g'ri", "topdingiz?"],
-  outroCta: "Izohda yozing",
-  outroSub: "🔔 Obuna bo'ling",
-};
+export const INTRO = { from: 0, to: 3.65 };
 
 export const QUESTIONS: Question[] = [
   {
     n: 1,
-    answer: "YOLGON",
-    labelAt: 4.9,
-    textFrom: 5.99,
-    pauseFrom: 11.53,
-    pauseTo: 14.53,
-    screenText: ["Avtomobil QQSini", "zachetga olib", "bo'lmaydi."],
-    explainFrom: 16.18,
-    explainTo: 20.68,
-    explain: "266-modda ruxsat beradi — biznesda ishlatilsa",
+    labelAt: 4.63,
+    textFrom: 5.66,
+    pauseFrom: 10.71,
+    pauseTo: 13.55,
+    screenText: ["Debet majburiyatni", "oshiradi"],
   },
   {
     n: 2,
-    answer: "ROST",
-    labelAt: 21.22,
-    textFrom: 22.33,
-    pauseFrom: 26.98,
-    pauseTo: 29.98,
-    screenText: ["Zachet uchun to'rtta", "hujjat kerak. Bittasi", "yetishmasa — tushadi."],
-    explainFrom: 31.51,
-    explainTo: 37.71,
-    explain: "Yo'l varaqasi, ETTN, YOMM akti va buyruq",
+    labelAt: 13.55,
+    textFrom: 14.86,
+    pauseFrom: 19.89,
+    pauseTo: 22.94,
+    screenText: ["Aylanma qaydnomada", "debet = kredit"],
   },
   {
     n: 3,
-    answer: "YOLGON",
-    labelAt: 38.19,
-    textFrom: 39.26,
-    pauseFrom: 43.03,
-    pauseTo: 46.03,
-    screenText: ["200 mln avtomobilda", "ikkala yo'l ham", "bir xil naf beradi."],
-    explainFrom: 47.61,
-    explainTo: 52.36,
-    explain: "Zachet 24 mln qaytaradi, tannarx yo'li 3,6 mln",
-    calc: {
-      lines: ["Zachet: 24 mln qaytadi", "Tannarx: 3,6 mln tejam"],
-      from: 47.61,
-      to: 52.6,
-    },
+    labelAt: 22.94,
+    textFrom: 24.12,
+    pauseFrom: 28.24,
+    pauseTo: 31.33,
+    screenText: ["Xususiy kapital", "o'zgarmaydi"],
+  },
+  {
+    n: 4,
+    labelAt: 31.37,
+    textFrom: 32.82,
+    pauseFrom: 37.68,
+    pauseTo: 40.72,
+    screenText: ["Daromad ishlab", "topilganda tan olinadi"],
+  },
+  {
+    n: 5,
+    labelAt: 40.72,
+    textFrom: 41.93,
+    pauseFrom: 47.78,
+    pauseTo: 50.6,
+    screenText: ["Dasturlarda jurnal", "yozuvlari yo'q"],
   },
 ];
 
-export const OUTRO = { from: 52.9, to: DURATION_S };
+export const OUTRO = { from: 50.6, to: SOURCE_S };
 
-// Fon kayfiyati: savolda sariq, javob ochilgach ko'k.
-export const BLUE_WINDOWS: [number, number][] = QUESTIONS.map((q, i) => [
-  q.pauseTo,
-  i + 1 < QUESTIONS.length ? QUESTIONS[i + 1].labelAt - 0.5 : DURATION_S,
-]);
-
-// Sariq pasaytirilgan — yorqin to'q sariq yuzni sarg'aytirar va Instagram
-// siqilishida dog'lanardi. Ko'k esa yorqinligicha qoldirildi: u siqilishda
-// toza chiqadi va lentada e'tiborni tortadi.
-export const MOOD = {
-  warmA: "#D9942E",
-  warmB: "#A8600F",
-  coolA: "#12A0C4",
-  coolB: "#06394B",
+export const TITLES = {
+  introBig: ["BUXGALTERIYA", "ASOSLARI"],
+  introSmall: "5 savol — javoblar izohda",
+  outroBig: ["Nechtasini", "topdingiz?"],
+  outroCta: "Javoblar izohda",
+  outroSub: "Obuna bo'ling",
 };
 
 export const C = {

@@ -1,17 +1,6 @@
 import React from "react";
-import {
-  AbsoluteFill,
-  Img,
-  OffthreadVideo,
-  Sequence,
-  interpolate,
-  spring,
-  staticFile,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
-import { BLUE_WINDOWS, C, FPS, FREEZES, MOOD, SOURCE_S, sec } from "./timeline";
-import type { Answer } from "./timeline";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { C, FPS, sec } from "./timeline";
 
 const FONT = "Montserrat, Arial Black, sans-serif";
 
@@ -25,60 +14,41 @@ export const popIn = (frame: number, startS: number, fps: number) =>
 
 export const between = (t: number, a: number, b: number) => t >= a && t < b;
 
-/* ---------------------------------------------------------------- tugmalar */
+/* ---------------------------------------------------------------- tugmalar
+ * Javoblar videoda ochilmaydi, shuning uchun tugmalar hech qachon yonmaydi.
+ * Ular savolning bir qismi: "ROSTmi yoki YOLG'ONmi?" degan taklif.
+ * Pauza paytida ikkalasi navbatma-navbat sekin yonib-o'chadi — tanlash
+ * kerakligini eslatadi, lekin javobni bermaydi.
+ */
 
 export const AnswerButton: React.FC<{
-  kind: Answer;
+  kind: "ROST" | "YOLGON";
   label: string;
-  state: "idle" | "thinking" | "correct" | "wrong";
-  progress: number; // 0..1, holatga kirish
-}> = ({ kind, label, state, progress }) => {
+  thinking: boolean;
+}> = ({ kind, label, thinking }) => {
   const frame = useCurrentFrame();
   const base = kind === "ROST" ? C.rost : C.yolgon;
   const dark = kind === "ROST" ? C.rostDark : C.yolgonDark;
 
   const breathe = 1 + Math.sin((frame / FPS) * Math.PI) * 0.015;
-  const blink =
-    state === "thinking"
-      ? 0.9 + 0.1 * Math.sin((frame / FPS) * Math.PI * 2 + (kind === "ROST" ? 0 : Math.PI))
-      : 1;
-
-  let scale = breathe;
-  let opacity = 1;
-  let glow = 0;
-
-  if (state === "correct") {
-    scale = breathe * interpolate(progress, [0, 1], [1, 1.18], { extrapolateRight: "clamp" });
-    glow = progress;
-  } else if (state === "wrong") {
-    scale = breathe * interpolate(progress, [0, 1], [1, 0.92], { extrapolateRight: "clamp" });
-    opacity = interpolate(progress, [0, 1], [1, 0.4], { extrapolateRight: "clamp" });
-  }
+  const blink = thinking
+    ? 0.9 + 0.1 * Math.sin((frame / FPS) * Math.PI * 2 + (kind === "ROST" ? 0 : Math.PI))
+    : 1;
 
   return (
-    <div
-      style={{
-        position: "relative",
-        transform: `scale(${scale})`,
-        opacity: opacity * blink,
-        transition: "none",
-      }}
-    >
+    <div style={{ transform: `scale(${breathe})`, opacity: blink }}>
       <div
         style={{
           width: 396,
           padding: "24px 0",
           borderRadius: 32,
           background: `linear-gradient(180deg, ${base} 0%, ${dark} 100%)`,
-          boxShadow: `0 10px 0 ${dark}, 0 16px 34px rgba(0,0,0,.45)${
-            glow > 0 ? `, 0 0 ${40 * glow}px ${14 * glow}px ${base}` : ""
-          }`,
+          boxShadow: `0 10px 0 ${dark}, 0 16px 34px rgba(0,0,0,.45)`,
           border: "5px solid rgba(255,255,255,.28)",
           textAlign: "center",
           fontFamily: FONT,
           fontWeight: 900,
           fontSize: 54,
-          letterSpacing: 0,
           whiteSpace: "nowrap",
           color: "#fff",
           textShadow: "0 4px 0 rgba(0,0,0,.35)",
@@ -86,33 +56,6 @@ export const AnswerButton: React.FC<{
       >
         {label}
       </div>
-
-      {state === "correct" && progress > 0.15 ? (
-        <div
-          style={{
-            position: "absolute",
-            top: 8,
-            right: -64,
-            width: 100,
-            height: 100,
-            borderRadius: 50,
-            background: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 62,
-            color: base,
-            fontWeight: 900,
-            boxShadow: "0 8px 22px rgba(0,0,0,.4)",
-            transform: `scale(${interpolate(progress, [0.15, 0.6], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            })})`,
-          }}
-        >
-          ✓
-        </div>
-      ) : null}
     </div>
   );
 };
@@ -126,7 +69,7 @@ export const Countdown: React.FC<{ from: number; to: number }> = ({ from, to }) 
 
   const total = to - from;
   const elapsed = t - from;
-  const left = Math.max(0, Math.ceil(total - elapsed));
+  const left = Math.max(1, Math.ceil(total - elapsed));
   const ratio = Math.min(1, elapsed / total);
 
   const R = 86;
@@ -150,14 +93,7 @@ export const Countdown: React.FC<{ from: number; to: number }> = ({ from, to }) 
     >
       <svg width={200} height={200} style={{ position: "absolute", inset: 0 }}>
         <circle cx={100} cy={100} r={R} fill="rgba(8,10,16,.88)" />
-        <circle
-          cx={100}
-          cy={100}
-          r={R}
-          fill="none"
-          stroke="rgba(255,255,255,.18)"
-          strokeWidth={12}
-        />
+        <circle cx={100} cy={100} r={R} fill="none" stroke="rgba(255,255,255,.18)" strokeWidth={12} />
         <circle
           cx={100}
           cy={100}
@@ -192,11 +128,11 @@ export const Countdown: React.FC<{ from: number; to: number }> = ({ from, to }) 
 
 /* ------------------------------------------------------------- savol matni */
 
-export const QuestionText: React.FC<{
-  lines: string[];
-  from: number;
-  to: number;
-}> = ({ lines, from, to }) => {
+export const QuestionText: React.FC<{ lines: string[]; from: number; to: number }> = ({
+  lines,
+  from,
+  to,
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / FPS;
@@ -211,7 +147,7 @@ export const QuestionText: React.FC<{
     <div
       style={{
         position: "absolute",
-        top: 148,
+        top: 104,
         left: 0,
         right: 0,
         padding: "0 50px",
@@ -235,7 +171,7 @@ export const QuestionText: React.FC<{
               padding: "12px 26px",
               fontFamily: FONT,
               fontWeight: 900,
-              fontSize: 54,
+              fontSize: 50,
               lineHeight: 1.12,
               color: "#fff",
               textAlign: "center",
@@ -295,330 +231,29 @@ export const BigNumber: React.FC<{ n: number; at: number }> = ({ n, at }) => {
 
 /* -------------------------------------------------------------- indikator */
 
-export const Progress: React.FC<{ current: number }> = ({ current }) => (
+export const Progress: React.FC<{ current: number; total: number }> = ({ current, total }) => (
   <div
     style={{
       position: "absolute",
-      top: 70,
+      top: 40,
       left: 0,
       right: 0,
       display: "flex",
       justifyContent: "center",
-      gap: 14,
+      gap: 12,
     }}
   >
-    {[1, 2, 3].map((i) => (
+    {Array.from({ length: total }, (_, i) => i + 1).map((i) => (
       <div
         key={i}
         style={{
-          width: i === current ? 84 : 26,
-          height: 26,
-          borderRadius: 13,
-          background: i === current ? C.accent : "rgba(255,255,255,.4)",
-          boxShadow: "0 4px 12px rgba(0,0,0,.4)",
+          width: i === current ? 72 : 22,
+          height: 22,
+          borderRadius: 11,
+          background: i === current ? C.accent : "rgba(255,255,255,.45)",
+          boxShadow: "0 4px 12px rgba(0,0,0,.45)",
         }}
       />
     ))}
   </div>
 );
-
-/* ------------------------------------------------------------ izoh karta */
-
-export const ExplainCard: React.FC<{ text: string; from: number; to: number }> = ({
-  text,
-  from,
-  to,
-}) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const t = frame / FPS;
-  if (!between(t, from, to)) return null;
-
-  const s = popIn(frame, from, fps);
-  const out = interpolate(t, [to - 0.3, to], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: 60,
-        right: 60,
-        top: 1230,
-        transform: `translateY(${(1 - s) * 60}px)`,
-        opacity: Math.min(1, s * 1.5) * out,
-        background: C.paper,
-        borderRadius: 26,
-        padding: "26px 34px",
-        fontFamily: FONT,
-        fontWeight: 800,
-        fontSize: 44,
-        lineHeight: 1.22,
-        color: C.ink,
-        textAlign: "center",
-        boxShadow: "0 16px 40px rgba(0,0,0,.45)",
-        borderBottom: `10px solid ${C.accent}`,
-      }}
-    >
-      {text}
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------ hisob karta */
-
-export const CalcCard: React.FC<{
-  lines: string[];
-  from: number;
-  to: number;
-}> = ({ lines, from, to }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const t = frame / FPS;
-  if (!between(t, from, to)) return null;
-
-  const out = interpolate(t, [to - 0.3, to], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        top: 190,
-        display: "flex",
-        flexDirection: "column",
-        gap: 14,
-        alignItems: "center",
-        opacity: out,
-      }}
-    >
-      {lines.map((line, i) => {
-        const s = popIn(frame, from + 0.35 + i * 0.85, fps);
-        const last = i === lines.length - 1;
-        return (
-          <div
-            key={i}
-            style={{
-              transform: `translateY(${(1 - s) * 40}px) scale(${0.9 + s * 0.1})`,
-              opacity: Math.min(1, s * 1.6),
-              background: last ? C.accent : "rgba(8,10,16,.93)",
-              color: last ? C.ink : "#fff",
-              borderRadius: 16,
-              padding: "16px 26px",
-              fontFamily: FONT,
-              fontWeight: 900,
-              fontSize: 42,
-              boxShadow: "0 10px 26px rgba(0,0,0,.4)",
-            }}
-          >
-            {line}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------- fon rangi */
-
-/** Ko'klik darajasi 0..1. Savolda 0 (sariq), javobda 1 (ko'k). */
-export const blueAmount = (t: number) => {
-  const FADE = 0.45;
-  let v = 0;
-  for (const [a, b] of BLUE_WINDOWS) {
-    const rise = interpolate(t, [a - FADE, a], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-    const fall = interpolate(t, [b, b + FADE], [1, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-    v = Math.max(v, Math.min(rise, fall));
-  }
-  return v;
-};
-
-/** Sekin suzuvchi yumshoq dog'lar — kadr jonlanib tursin. */
-const BLOBS = [
-  { x: 8, y: 14, r: 420, sx: 46, sy: 30, sp: 0.055, ph: 0 },
-  { x: 88, y: 26, r: 360, sx: -38, sy: 44, sp: 0.041, ph: 1.7 },
-  { x: 16, y: 74, r: 480, sx: 52, sy: -36, sp: 0.033, ph: 3.1 },
-  { x: 92, y: 82, r: 400, sx: -44, sy: -28, sp: 0.047, ph: 4.4 },
-];
-
-const MoodLayer: React.FC<{ a: string; b: string; opacity: number; t: number }> = ({
-  a,
-  b,
-  opacity,
-  t,
-}) => (
-  <div style={{ position: "absolute", inset: 0, opacity }}>
-    {/* to'liq rangli fon — boshlovchi kesib olingani uchun butun kadr rangda */}
-    <div style={{ position: "absolute", inset: 0, background: b }} />
-    {/* bosh orqasidagi yorug'lik */}
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: `radial-gradient(58% 34% at 50% 34%, ${a} 0%, ${a}00 72%)`,
-      }}
-    />
-    {/* suzuvchi dog'lar */}
-    {BLOBS.map((o, i) => (
-      <div
-        key={i}
-        style={{
-          position: "absolute",
-          left: `${o.x}%`,
-          top: `${o.y}%`,
-          width: o.r,
-          height: o.r,
-          marginLeft: -o.r / 2,
-          marginTop: -o.r / 2,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${a}99 0%, ${a}00 70%)`,
-          transform: `translate(${Math.sin(t * o.sp * Math.PI * 2 + o.ph) * o.sx}px, ${
-            Math.cos(t * o.sp * Math.PI * 2 + o.ph) * o.sy
-          }px)`,
-        }}
-      />
-    ))}
-    {/* chekkalarni quyuqlashtirish — chuqurlik va matn kontrasti */}
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: `radial-gradient(96% 62% at 50% 46%, rgba(0,0,0,0) 40%, rgba(0,0,0,.26) 100%)`,
-      }}
-    />
-  </div>
-);
-
-export const MoodBackground: React.FC = () => {
-  const frame = useCurrentFrame();
-  const t = frame / FPS;
-  const blue = blueAmount(t);
-
-  return (
-    <AbsoluteFill style={{ pointerEvents: "none" }}>
-      <MoodLayer a={MOOD.warmA} b={MOOD.warmB} opacity={1 - blue} t={t} />
-      <MoodLayer a={MOOD.coolA} b={MOOD.coolB} opacity={blue} t={t} />
-    </AbsoluteFill>
-  );
-};
-
-/* ------------------------------------------------------------- boshlovchi */
-
-/**
- * Shaffof WebM'ni bo'laklab ko'rsatadi va pauzalarga muzlatilgan kadr
- * qo'shadi. HeyGen pauzalari qisqa chiqqani uchun shu yo'l bilan
- * 3 soniyaga cho'ziladi; ustidagi taymer harakati muzlashni yashiradi.
- */
-export const Speaker: React.FC = () => {
-  // Manbadagi kesim 85.4% da tugaydi — sonlar tepasida. Kattalashtirib
-  // pastga suramiz, shunda kesim kadr tashqarisiga chiqadi va oyoqlar
-  // ramkaga yetib boradi. Chapga surish o'ng qo'l chetga urilmasligi uchun.
-  //   tepa  413px -> 448px  (savol matni ostida qoladi)
-  //   past 1640px -> 1986px (kadrdan tashqarida)
-  const look = {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover" as const,
-    transform: "translate(-8%, 9.2%) scale(1.25)",
-    transformOrigin: "50% 50%",
-    filter: "drop-shadow(0 18px 38px rgba(0,0,0,.42))",
-  };
-
-  const blocks: React.ReactNode[] = [];
-  let srcFrom = 0;
-  let out = 0;
-
-  FREEZES.forEach((f, i) => {
-    const segDur = f.at - srcFrom;
-    blocks.push(
-      <Sequence key={`v${i}`} from={sec(out)} durationInFrames={sec(segDur)}>
-        <OffthreadVideo
-          src={staticFile("source.webm")}
-          transparent
-          startFrom={sec(srcFrom)}
-          style={look}
-        />
-      </Sequence>
-    );
-    out += segDur;
-
-    blocks.push(
-      <Sequence key={`f${i}`} from={sec(out)} durationInFrames={sec(f.hold)}>
-        <Img src={staticFile(f.img)} style={look} />
-      </Sequence>
-    );
-    out += f.hold;
-    srcFrom = f.at;
-  });
-
-  const tail = SOURCE_S - srcFrom;
-  blocks.push(
-    <Sequence key="vlast" from={sec(out)} durationInFrames={sec(tail) + 2}>
-      <OffthreadVideo
-        src={staticFile("source.webm")}
-        transparent
-        startFrom={sec(srcFrom)}
-        style={look}
-      />
-    </Sequence>
-  );
-
-  return <AbsoluteFill>{blocks}</AbsoluteFill>;
-};
-
-/* -------------------------------------------------------------- konfetti */
-
-const CONFETTI = Array.from({ length: 46 }, (_, i) => {
-  const r = (n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
-  return {
-    dx: (r(1) - 0.5) * 900,
-    dy: -260 - r(2) * 560,
-    rot: (r(3) - 0.5) * 900,
-    size: 16 + r(4) * 22,
-    color: ["#FFD23F", "#2ECC71", "#4DA3FF", "#FF7AB6", "#FFFFFF"][Math.floor(r(5) * 5)],
-    delay: r(6) * 0.12,
-  };
-});
-
-export const Confetti: React.FC<{ at: number; y: number }> = ({ at, y }) => {
-  const frame = useCurrentFrame();
-  const t = frame / FPS;
-  const life = 1.5;
-  if (!between(t, at, at + life)) return null;
-
-  return (
-    <div style={{ position: "absolute", left: 254, top: y, width: 0, height: 0 }}>
-      {CONFETTI.map((c, i) => {
-        const p = Math.max(0, Math.min(1, (t - at - c.delay) / life));
-        const x = c.dx * p;
-        const y = c.dy * p + 900 * p * p;
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              width: c.size,
-              height: c.size * 0.55,
-              background: c.color,
-              borderRadius: 3,
-              opacity: 1 - p * p,
-              transform: `translate(${x}px, ${y}px) rotate(${c.rot * p}deg)`,
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-};
