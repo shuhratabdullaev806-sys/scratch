@@ -10,7 +10,7 @@ import {
 } from "remotion";
 import {
   AnswerButton,
-  BigNumber,
+  Confetti,
   Countdown,
   Progress,
   QuestionText,
@@ -25,6 +25,7 @@ import {
   INTRO,
   OUTRO,
   QUESTIONS,
+  REVEAL_S,
   SOURCE_S,
   TITLES,
   sec,
@@ -187,7 +188,23 @@ export const Main: React.FC = () => {
     (q, i) => t >= q.labelAt - 0.6 && (i + 1 >= QUESTIONS.length || t < QUESTIONS[i + 1].labelAt - 0.6)
   );
   const thinking = QUESTIONS.some((q) => between(t, q.pauseFrom, q.pauseTo));
-  const quizOn = t >= INTRO.to && t < OUTRO.from;
+
+  // Pauza tugagach to'g'ri tugma qisqa vaqt yonadi.
+  const revealing = QUESTIONS.find((q) => between(t, q.pauseTo, q.pauseTo + REVEAL_S));
+  const progress = revealing ? Math.min(1, (t - revealing.pauseTo) / 0.3) : 0;
+
+  let rostState: "idle" | "thinking" | "correct" | "wrong" = "idle";
+  let yolgonState: "idle" | "thinking" | "correct" | "wrong" = "idle";
+  if (revealing) {
+    rostState = revealing.answer === "ROST" ? "correct" : "wrong";
+    yolgonState = revealing.answer === "ROST" ? "wrong" : "correct";
+  } else if (thinking) {
+    rostState = "thinking";
+    yolgonState = "thinking";
+  }
+
+  const lastQ = QUESTIONS[QUESTIONS.length - 1];
+  const quizOn = t >= INTRO.to && t < lastQ.pauseTo + REVEAL_S;
 
   return (
     <AbsoluteFill style={{ background: "#000" }}>
@@ -205,8 +222,7 @@ export const Main: React.FC = () => {
 
       {QUESTIONS.map((q) => (
         <React.Fragment key={q.n}>
-          <BigNumber n={q.n} at={q.labelAt} />
-          <QuestionText lines={q.screenText} from={q.textFrom} to={q.pauseTo} />
+          <QuestionText lines={q.screenText} from={q.textFrom} to={q.pauseTo + REVEAL_S} />
           <Countdown from={q.pauseFrom} to={q.pauseTo} />
         </React.Fragment>
       ))}
@@ -223,10 +239,15 @@ export const Main: React.FC = () => {
             gap: 34,
           }}
         >
-          <AnswerButton kind="ROST" label="ROST" thinking={thinking} />
-          <AnswerButton kind="YOLGON" label="YOLG'ON" thinking={thinking} />
+          <AnswerButton kind="ROST" label="ROST" state={rostState} progress={progress} />
+          <AnswerButton kind="YOLGON" label="YOLG'ON" state={yolgonState} progress={progress} />
         </div>
       ) : null}
+
+      {/* konfetti tugmalar ustida */}
+      {QUESTIONS.map((q) => (
+        <Confetti key={q.n} at={q.pauseTo} y={q.answer === "ROST" ? 968 : 1130} />
+      ))}
 
       <Outro />
 
