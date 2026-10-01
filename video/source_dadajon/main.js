@@ -143,26 +143,26 @@ tl.fromTo('#rcShine', { x: -300 }, { x: 1100, duration: .9, ease: 'power2.inOut'
 tl.fromTo('#rcShine', { x: -300 }, { x: 1100, duration: .9, ease: 'power2.inOut', immediateRender: false }, 46.0);
 
 /* ---------------- speaker out at 48.9 (before he looks away) ---------------- */
-tl.set(cam, { ccx: IRIS.ccx, ccy: IRIS.ccy }, 48.9);
-tl.to(cam, { cr: 0, duration: .3, ease: 'power3.in' }, 48.9);
-tl.to(cam, { ringA: 1, duration: .08, ease: 'none' }, 48.9);
-tl.to(cam, { ringA: 0, duration: .08, ease: 'none' }, 49.15);
-out('#rc', 48.85, { y: -40, filter: 'blur(10px)' }, .3);
-out('#nc', 48.85, { x: -60, filter: 'blur(10px)' }, .3);
+tl.set(cam, { ccx: IRIS.ccx, ccy: IRIS.ccy }, 48.68);
+tl.to(cam, { cr: 0, duration: .22, ease: 'power2.inOut' }, 48.68);
+tl.to(cam, { ringA: 1, duration: .06, ease: 'none' }, 48.68);
+tl.to(cam, { ringA: 0, duration: .06, ease: 'none' }, 48.86);
+out('#rc', 48.6, { y: -40, filter: 'blur(10px)' }, .25);
+out('#nc', 48.6, { x: -60, filter: 'blur(10px)' }, .25);
 
 /* ---------------- END CARD 49.2 → 54.2 ---------------- */
-tl.fromTo('#ecLogo', { opacity: 0, scale: .5, rotation: -20 }, { opacity: 1, scale: 1, rotation: 0, duration: .8, ease: 'back.out(1.8)' }, 49.25);
-tl.fromTo('#ecTitle', { opacity: 0, y: 40, filter: 'blur(14px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7 }, 49.45);
-tl.fromTo('#ec', { opacity: 0, y: 90, filter: 'blur(14px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .8 }, 49.65);
-tl.fromTo('#ec1', { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .5 }, 49.95);
-tl.fromTo('#ec2', { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .5 }, 50.2);
-tl.fromTo('#ecShine', { x: -300 }, { x: 1200, duration: 1.0, ease: 'power2.inOut' }, 51.0);
+tl.fromTo('#ecLogo', { opacity: 0, scale: .5, rotation: -20 }, { opacity: 1, scale: 1, rotation: 0, duration: .8, ease: 'back.out(1.8)' }, 48.95);
+tl.fromTo('#ecTitle', { opacity: 0, y: 40, filter: 'blur(14px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7 }, 49.15);
+tl.fromTo('#ec', { opacity: 0, y: 90, filter: 'blur(14px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .8 }, 49.35);
+tl.fromTo('#ec1', { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .5 }, 49.65);
+tl.fromTo('#ec2', { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .5 }, 49.90);
+tl.fromTo('#ecShine', { x: -300 }, { x: 1200, duration: 1.0, ease: 'power2.inOut' }, 50.70);
 
-tl.to({}, { duration: .01 }, 54.3);
+tl.to({}, { duration: .01 }, 54.00);
 
 /* ---------------- windows ---------------- */
-const WIN = { sHk: [2.45, 10.5], sA1: [10.45, 17.5], sB1: [17.1, 29.0], sC1: [28.2, 39.95], sRec: [40.7, 49.2], sEnd: [49.2, 99] };
-const SUB_HIDE = [[10.65, 17.25], [28.5, 39.7], [49.0, 99]];
+const WIN = { sHk: [2.45, 10.5], sA1: [10.45, 17.5], sB1: [17.1, 29.0], sC1: [28.2, 39.95], sRec: [40.7, 48.9], sEnd: [48.9, 99] };
+const SUB_HIDE = [[10.65, 17.25], [28.5, 39.7], [48.92, 99]];
 const inWin = (t, ws) => ws.some(([a, b]) => t >= a && t < b);
 const SPLIT_WIN = [[17.4, 28.35]];
 const SIZES = [2, 3, 1, 1, 2, 3, 2, 2, 1, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2];
@@ -176,7 +176,7 @@ function sceneTick(t, blink) {
     d.style.opacity = t > 19.2 && t < 23.4 ? Math.sin(Math.PI * ph) : 0;
   });
   for (const [id, [a, b]] of Object.entries(WIN)) $('#' + id).style.visibility = (t >= a && t < b) ? 'visible' : 'hidden';
-  $('#nc').style.visibility = (t >= .25 && t < 49.2) ? 'visible' : 'hidden';
+  $('#nc').style.visibility = (t >= .25 && t < 48.9) ? 'visible' : 'hidden';
 }
 
 /* ---------------- subtitles ---------------- */
