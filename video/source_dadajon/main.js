@@ -102,13 +102,13 @@ toA(10.45);
 riseIn('#a1Kick', 10.85, .5, 20);
 riseIn('#a1Map', 10.9, .7, 60);
 draw('#a1Roads', 11.05, .9, 0, 'power2.out');
-tl.fromTo('#a1Pin', { opacity: 0, y: -160 }, { opacity: 1, y: 0, duration: .5, ease: 'bounce.out' }, 11.35);
+tl.fromTo('#a1Pin', { opacity: 0, y: -160 }, { opacity: 1, y: 0, duration: .5, ease: 'bounce.out' }, 11.25);
 tl.fromTo('#a1Ping', { opacity: 0, width: 10, height: 10, x: 0, y: 0 }, { keyframes: [{ opacity: 1, duration: .01 }, { width: 260, height: 260, x: -125, y: -125, opacity: 0, duration: .8, ease: 'power2.out' }] }, 11.8);
 popIn('#a1Dist', 11.8, { x: -20 }, .5, 'back.out(2.2)');
-riseIn('#a1Co', 12.6, .7, 70);
-draw('#a1Co .ln', 12.7, .9, .05);
-tl.fromTo('#a1Mchj', { opacity: 0 }, { opacity: 1, duration: .4, ease: 'none' }, 13.45);
-popIn('#a1Work', 16.1, { y: 20 }, .5, 'back.out(2.2)');
+riseIn('#a1Co', 12.85, .7, 70);
+draw('#a1Co .ln', 12.95, .9, .05);
+tl.fromTo('#a1Mchj', { opacity: 0 }, { opacity: 1, duration: .4, ease: 'none' }, 13.55);
+popIn('#a1Work', 16.4, { y: 20 }, .5, 'back.out(2.2)');
 tl.fromTo('#sA1', { opacity: 1, scale: 1 }, { opacity: 0, scale: 1.04, duration: .35, ease: 'power2.in', immediateRender: false }, 17.1);
 fromA(17.2);
 toB(17.2, '#b1Panel');
@@ -118,16 +118,16 @@ popIn('#b1k', 17.5, { x: -40 }, .6, 'back.out(1.6)');
 draw('#b1k .ln', 17.6, .6, .05);
 draw('#b1Arr', 18.0, .4, 0, 'power2.out');
 tl.fromTo('#b1Head', { opacity: 0 }, { opacity: 1, duration: .2, ease: 'none' }, 18.35);
-popIn('#b1w', 18.15, { x: 40 }, .6, 'back.out(1.6)');
-draw('#b1w .ln', 18.25, .6, .05);
-riseIn('#b1Sk', 22.8, .6, 30);
-tl.fromTo('#b1Bar', { scaleX: 0 }, { scaleX: 1, duration: 2.6, ease: 'power2.inOut' }, 23.2);
+popIn('#b1w', 18.0, { x: 40 }, .6, 'back.out(1.6)');
+draw('#b1w .ln', 18.1, .6, .05);
+riseIn('#b1Sk', 23.8, .6, 30);
+tl.fromTo('#b1Bar', { scaleX: 0 }, { scaleX: 1, duration: 2.4, ease: 'power2.inOut' }, 24.1);
 tl.to('#b1w', { boxShadow: '0 0 0 3px rgba(76,201,240,.8), 0 0 60px rgba(76,201,240,.45)', duration: .3, ease: 'none' }, 26.6);
 popIn('#b1Help', 26.6, { y: 20 }, .5, 'back.out(2.2)');
 toCfromB(28.3, '#b1Panel');
 
 /* ---------------- C1 28.5 → 39.7 ---------------- */
-[['#tk0', 29.05, '#tc0', 32.3], ['#tk1', 30.2, '#tc1', 32.5], ['#tk2', 33.85, '#tc2', 34.7]].forEach(([c, t, k, tk]) => {
+[['#tk0', 29.3, '#tc0', 31.85], ['#tk1', 30.7, '#tc1', 32.05], ['#tk2', 33.6, '#tc2', 35.0]].forEach(([c, t, k, tk]) => {
   tl.fromTo(c, { opacity: 0, x: 120, filter: 'blur(12px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: .7 }, t);
   draw(c + ' .ln', t + .1, .8, .06);
   tl.fromTo(k, { opacity: 0, scale: 0, rotation: -40 }, { opacity: 1, scale: 1, rotation: 0, duration: .45, ease: 'back.out(2.6)' }, tk);
@@ -168,12 +168,12 @@ const SPLIT_WIN = [[17.4, 28.35]];
 const SIZES = [2, 3, 1, 1, 2, 3, 2, 2, 1, 1, 2, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2];
 
 function sceneTick(t, blink) {
-  const k = clamp((t - 23.2) / 2.6), pk = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+  const k = clamp((t - 24.1) / 2.4), pk = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
   $('#b1Pct').textContent = Math.round(pk * 100) + '%';
   fdots.forEach((d, i) => {
     const ph = ((t - 19.2) * .9 + i / 5) % 1;
     d.style.transform = `translateX(${ph * 110}px)`;
-    d.style.opacity = t > 19.2 && t < 22.6 ? Math.sin(Math.PI * ph) : 0;
+    d.style.opacity = t > 19.2 && t < 23.4 ? Math.sin(Math.PI * ph) : 0;
   });
   for (const [id, [a, b]] of Object.entries(WIN)) $('#' + id).style.visibility = (t >= a && t < b) ? 'visible' : 'hidden';
   $('#nc').style.visibility = (t >= .25 && t < 49.2) ? 'visible' : 'hidden';
