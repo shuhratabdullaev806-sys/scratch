@@ -9,17 +9,19 @@ yig'iladi. Montaj kodi `montaj-src/` da.
 
 **Besh savol.** Uchta emas.
 
-**Javoblar videoda aytilmaydi.** Diktor faqat savollarni o'qiydi, har
-biridan keyin pauza. Javoblar izohga (kommentariyaga) qo'yiladi — bu
-odamlarni izohga kirishga va yozishga majbur qiladi.
+**Javobni DIKTOR aytmaydi, lekin EKRANDA ko'rinadi.**
 
-Demak montajda **javob ochilishi yo'q**: tugma yonmaydi, ✓ chiqmaydi,
-konfetti otilmaydi, izoh kartasi ko'rinmaydi. ROST va YOLG'ON tugmalari
-butun video davomida bir xil turadi — ular savol, javob emas.
+Diktor faqat savollarni o'qiydi. Pauza tugagach montajda to'g'ri tugma
+yonadi: kattalashadi, nur chiqaradi, ustiga ✓ va konfetti. Noto'g'ri
+tugma xiralashadi. Bu atigi ~1.1 soniya turadi — ilg'amagan odam
+videoni qayta ko'radi, aynan shu kerak.
+
+Izoh kartasi va tushuntirish videoda **ko'rsatilmaydi** — ular izohga
+(kommentariyaga) qo'yiladi.
 
 Har videoga ikkita fayl tayyorlanadi:
-1. HeyGen uchun diktor matni
-2. Izohga qo'yiladigan javoblar matni (qisqa izohlar bilan)
+1. HeyGen uchun diktor matni (javobsiz)
+2. Izohga qo'yiladigan javoblar matni (qisqa tushuntirishlar bilan)
 
 ### Orqa fon — TEGILMAYDI
 
