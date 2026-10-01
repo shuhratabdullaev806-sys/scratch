@@ -1,14 +1,17 @@
 // Ishlatish: node render.js [overlay|preview|frame] [t] ["sarlavha"]
+//          node render.js frames <papka> <yakuniy_ekran_soniyasi> "sarlavha"  (montaj uchun PNG kadrlar)
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const { execSync } = require('child_process');
 const fs = require('fs'), path = require('path');
-const FF = process.env.FFMPEG || 'ffmpeg', FPS = 30, TOTAL = 45;
+const FF = process.env.FFMPEG || 'ffmpeg', FPS = 30;
 const [mode='preview', arg, titleArg] = process.argv.slice(2);
 (async () => {
   const b = await chromium.launch();
   const pg = await b.newPage({ viewport:{width:1080,height:1920} });
-  const q = new URLSearchParams({ mode: mode==='overlay'?'overlay':'preview' });
-  if (titleArg) q.set('title', titleArg);
+  const q = new URLSearchParams({ mode: mode==='preview'||mode==='frame'?'preview':'overlay' });
+  const END = mode==='frames' ? +titleArg : 40, TOTAL = END + 5;
+  if (mode==='frames') { q.set('end', END); q.set('masks', 1); if (process.argv[5]) q.set('title', process.argv[5]); }
+  else if (titleArg) q.set('title', titleArg);
   await pg.goto('file://'+path.resolve('shablon.html')+'?'+q);
   await pg.evaluate(()=>document.fonts.ready);
   if (mode==='frame') {
@@ -16,12 +19,14 @@ const [mode='preview', arg, titleArg] = process.argv.slice(2);
     await pg.screenshot({ path:`kadr_${arg}.png`, omitBackground: q.get('mode')==='overlay' });
     return b.close();
   }
-  const dir = fs.mkdtempSync('frames_');
+  const dir = mode==='frames' ? arg : fs.mkdtempSync('frames_');
+  fs.mkdirSync(dir, {recursive:true});
   for (let i=0;i<TOTAL*FPS;i++){
     await pg.evaluate(t=>renderAt(t), i/FPS);
-    await pg.screenshot({ path:`${dir}/f${String(i).padStart(5,'0')}.png`, omitBackground: mode==='overlay' });
+    await pg.screenshot({ path:`${dir}/f${String(i).padStart(5,'0')}.png`, omitBackground: mode!=='preview' });
   }
   await b.close();
+  if (mode==='frames') return;
   const out = mode==='overlay'
     ? `-c:v prores_ks -profile:v 4444 -pix_fmt yuva444p10le titul_overlay.mov`
     : `-c:v libx264 -pix_fmt yuv420p -crf 18 preview.mp4`;

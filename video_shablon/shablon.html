@@ -30,6 +30,10 @@
     background:repeating-linear-gradient(45deg,rgba(229,35,59,.14) 0 14px,transparent 14px 28px);
     border-top:3px solid var(--red);color:#ff8a99;font-size:36px;align-items:center;justify-content:center}
   body.preview #safe{display:flex}
+  /* montajda: oynalar burchagini yumaloq qilib, atrofini fon rangi bilan yopadi */
+  .mask{position:absolute;left:60px;width:960px;border-radius:28px;display:none;
+    box-shadow:0 0 0 12px #0b0f1f}
+  body.masks .mask{display:block}
   /* --- yakuniy ekran --- */
   #end{position:absolute;inset:0;opacity:0;
     background:radial-gradient(120% 80% at 50% 0%,var(--navy2) 0%,var(--navy) 60%,#080f33 100%);
@@ -49,6 +53,8 @@
   <div id="s1" class="slot">Hisob-kitob (Instadoodle) — 960×936</div>
   <div id="s2" class="slot">Diktor (HeyGen) — bosh va yelka, 960×390</div>
 
+  <div class="mask" style="top:262px;height:936px"></div>
+  <div class="mask" style="top:1210px;height:390px"></div>
   <div id="safe">Instagram caption / tugmalar zonasi (17%)</div>
 
   <div id="head">
@@ -80,7 +86,8 @@
 
 <script>
 const P = new URLSearchParams(location.search);
-const TOTAL = 45, HEAD_IN = 1, END_AT = 40;           // soniyalar
+const HEAD_IN = 1, END_AT = +(P.get('end') || 40);     // soniyalar; yakuniy ekran 5 s
+if (P.get('masks')) document.body.classList.add('masks');
 if (P.get('mode') !== 'overlay') document.body.classList.add('preview');
 if (P.get('title')) document.getElementById('title').textContent = P.get('title');
 const $ = id => document.getElementById(id);

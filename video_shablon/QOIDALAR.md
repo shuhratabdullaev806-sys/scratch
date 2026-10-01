@@ -27,3 +27,9 @@ Har mavzu uchun ikkita alohida matn beriladi (nusxalab joylash uchun):
 | Yakuniy ekran (to'liq ekran) | 40–45 s |
 
 Stavka va schyotlar chiqarishdan oldin amaldagi Soliq kodeksi va BHMS bo'yicha tekshiriladi.
+
+## Montaj (avtomatik)
+1. HeyGen diktor videosi (9:16) va Instadoodle doska videosi (16:9, oq fon) yuklanadi.
+2. `doska_moslash.py` dagi XARITA diktor gaplari vaqtiga moslanadi: har blok diktor uni aytayotganda yoziladi.
+3. `./montaj.sh diktor.mp4 doska.mp4 <diktor_tugash_soniyasi> "Sarlavha" chiqish.mp4`
+   Yakuniy ekran diktor tugagach 5 s turadi. Natija: 1080×1920, 30 fps, H.264 + AAC.
