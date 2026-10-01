@@ -82,7 +82,7 @@ export const QUESTIONS: Question[] = [
 export const OUTRO = { from: 51.9, to: SOURCE_S };
 
 export const TITLES = {
-  introBig: ["BUXGALTERIYA", "ASOSLARI"],
+  introBig: ["BUXGALTERIYA ASOSLARI"],
   introSmall: "5 savol — javoblar izohda",
   outroBig: ["Nechtasini", "topdingiz?"],
   outroCta: "Javoblar izohda",

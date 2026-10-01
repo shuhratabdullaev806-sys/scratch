@@ -233,7 +233,7 @@ export const QuestionText: React.FC<{ lines: string[]; from: number; to: number 
     <div
       style={{
         position: "absolute",
-        top: 104,
+        top: 60,
         left: 0,
         right: 0,
         padding: "0 50px",
@@ -321,12 +321,10 @@ export const Progress: React.FC<{ current: number; total: number }> = ({ current
   <div
     style={{
       position: "absolute",
-      top: 40,
-      left: 0,
-      right: 0,
+      top: 838,
+      left: 62,
       display: "flex",
-      justifyContent: "center",
-      gap: 12,
+      gap: 11,
     }}
   >
     {Array.from({ length: total }, (_, i) => i + 1).map((i) => (

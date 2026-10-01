@@ -47,38 +47,37 @@ const Intro: React.FC = () => {
 
   return (
     <AbsoluteFill
-      style={{ alignItems: "center", justifyContent: "flex-start", paddingTop: 150, opacity: out }}
+      style={{ alignItems: "center", justifyContent: "flex-start", paddingTop: 42, opacity: out }}
     >
       <div
         style={{
           transform: `translateY(${(1 - s) * 70}px) scale(${0.8 + s * 0.2})`,
           background: C.accent,
           color: C.ink,
-          borderRadius: 26,
-          padding: "22px 40px",
+          borderRadius: 24,
+          padding: "18px 34px",
           fontFamily: FONT,
           fontWeight: 900,
-          fontSize: 76,
+          fontSize: 58,
           textAlign: "center",
           lineHeight: 1.08,
+          whiteSpace: "nowrap",
           boxShadow: "0 16px 40px rgba(0,0,0,.5)",
         }}
       >
         {TITLES.introBig[0]}
-        <br />
-        {TITLES.introBig[1]}
       </div>
       <div
         style={{
-          marginTop: 22,
+          marginTop: 14,
           transform: `scale(${0.8 + popIn(frame, 0.5, fps) * 0.2})`,
           background: "rgba(8,10,16,.93)",
           color: "#fff",
-          borderRadius: 18,
-          padding: "14px 30px",
+          borderRadius: 16,
+          padding: "11px 26px",
           fontFamily: FONT,
           fontWeight: 800,
-          fontSize: 42,
+          fontSize: 36,
         }}
       >
         {TITLES.introSmall}
