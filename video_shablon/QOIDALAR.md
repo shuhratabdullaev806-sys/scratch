@@ -30,6 +30,6 @@ Stavka va schyotlar chiqarishdan oldin amaldagi Soliq kodeksi va BHMS bo'yicha t
 
 ## Montaj (avtomatik)
 1. HeyGen diktor videosi (9:16) va Instadoodle doska videosi (16:9, oq fon) yuklanadi.
-2. `doska_moslash.py` dagi XARITA diktor gaplari vaqtiga moslanadi: har blok diktor uni aytayotganda yoziladi.
-3. `./montaj.sh diktor.mp4 doska.mp4 <diktor_tugash_soniyasi> "Sarlavha" chiqish.mp4`
+2. `xaritalar/NN.json` yoziladi: diktor gaplari vaqti -> doska vaqti, 2-kadr boshlanishi (k2) va kesish joylari (crop1, crop2).
+3. `./montaj.sh diktor.mp4 doska.mp4 <diktor_tugash_soniyasi> "Sarlavha" chiqish.mp4 xaritalar/NN.json`
    Yakuniy ekran diktor tugagach 5 s turadi. Natija: 1080×1920, 30 fps, H.264 + AAC.

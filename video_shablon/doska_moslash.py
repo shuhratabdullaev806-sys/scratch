@@ -1,19 +1,10 @@
 """Instadoodle videosini diktor gaplariga moslab qayta vaqtlaydi.
-Ishlatish: python3 doska_moslash.py kirish.mp4 chiqish.mp4 umumiy_soniya
-XARITA: (chiqish_vaqti, manba_vaqti) nuqtalari; orasi chiziqli, teng manba = to'xtab turadi."""
-import subprocess, sys, os
+Ishlatish: python3 doska_moslash.py kirish.mp4 chiqish.mp4 umumiy_soniya xaritalar/NN.json
+xarita: [chiqish_vaqti, manba_vaqti] nuqtalari; orasi chiziqli, teng manba = to'xtab turadi."""
+import subprocess, sys, os, json
 FF = os.environ.get('FFMPEG', 'ffmpeg')
 W, H, FPS = 1920, 1080, 30
-XARITA = [  # 1-holat: oddiy foiz
-    (0.0, 0.0), (5.7, 10.5),      # sarlavha yoziladi
-    (11.8, 12.3),                  # formula
-    (12.4, 12.3), (18.5, 15.2),    # kofe shartlari
-    (19.0, 15.2), (22.3, 16.55),   # xato
-    (25.0, 16.55), (31.1, 18.05),  # to'g'ri
-    (31.5, 18.05), (34.2, 19.5),   # jami
-    (34.7, 33.8), (42.1, 47.9),    # 2-kadr: maslahat
-    (99, 47.9),
-]
+XARITA = json.load(open(sys.argv[4]))['xarita']
 def manba(t):
     for (a, sa), (b, sb) in zip(XARITA, XARITA[1:]):
         if t <= b: return sa if b == a else sa + (sb - sa) * (t - a) / (b - a)
