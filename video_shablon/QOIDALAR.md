@@ -33,3 +33,7 @@ Stavka va schyotlar chiqarishdan oldin amaldagi Soliq kodeksi va BHMS bo'yicha t
 2. `xaritalar/NN.json` yoziladi: diktor gaplari vaqti -> doska vaqti, 2-kadr boshlanishi (k2) va kesish joylari (crop1, crop2).
 3. `./montaj.sh diktor.mp4 doska.mp4 <diktor_tugash_soniyasi> "Sarlavha" chiqish.mp4 xaritalar/NN.json`
    Yakuniy ekran diktor tugagach 5 s turadi. Natija: 1080×1920, 30 fps, H.264 + AAC.
+
+## Diktor video formati
+HeyGen ba'zan 9:16 o'rniga 16:9 kadr ichida vertikal rasm beradi (yon tomonlari oq). Bunda `xaritalar/NN.json` ga
+`dk_scale`, `dk_bg`, `dk_fg` (diktorni kesish joylari) yoziladi; oq chetlar kesib tashlanadi. Namuna: `xaritalar/04_mulk_soligi.json`.
