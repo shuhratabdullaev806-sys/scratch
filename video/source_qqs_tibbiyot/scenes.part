@@ -1,0 +1,274 @@
+  <!-- =============== S0: QQS imtiyozi — BEKOR (talking head side card) 1.9 → 4.0 =============== -->
+  <div class="scene" id="sS0">
+    <div class="abs glass dark" id="s0Card" style="left:46px;top:430px;width:380px;border-radius:34px;padding:30px 28px 34px;text-align:center">
+      <div style="width:120px;height:120px;margin:0 auto;border-radius:30px;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(67,97,238,.6)">
+        <svg width="84" height="84" viewBox="0 0 120 120" class="glow" style="stroke:#fff;stroke-width:7"><path class="ln" pathLength="1" d="M60 10l40 15v30c0 28-17 47-40 55C37 102 20 83 20 55V25z"/><path class="ln" pathLength="1" d="M44 78l32-36M46 48a5 5 0 1 0 .1 0M74 72a5 5 0 1 0 .1 0"/></svg></div>
+      <div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:3px;margin-top:20px">TIBBIY XIZMATLAR</div>
+      <div style="font-size:52px;font-weight:800;line-height:1.05;margin-top:6px">QQS <span class="grad-text">imtiyozi</span></div>
+      <div class="stamp" id="s0Stamp" style="position:relative;display:inline-block;margin-top:26px;font-size:44px;padding:10px 22px;border-width:5px">BEKOR QILINDI</div>
+    </div>
+  </div>
+
+  <!-- =============== A1: murojaat — klinika → FMK, «Endi nima qilamiz?» 4.3 → 8.45 =============== -->
+  <div class="scene" id="sA1">
+    <div class="abs kicker" id="a1Kick" style="left:0;right:0;top:300px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Yangi murojaat</div>
+    <div class="abs" id="a1Clin" style="left:60px;top:400px;width:440px;height:460px">
+      <div class="abs" style="left:40px;top:60px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(76,201,240,.35),transparent 70%)"></div>
+      <svg class="abs glow" width="440" height="440" viewBox="0 0 220 220" style="left:0;top:0;stroke:#bfe9ff;stroke-width:3.2">
+        <path class="ln" pathLength="1" d="M10 206H210"/>
+        <path class="ln" pathLength="1" d="M34 206V86h152v120"/>
+        <path class="ln" pathLength="1" d="M24 90L110 40l86 50"/>
+        <path class="ln" pathLength="1" d="M90 206v-40h40v40M110 166v40"/>
+        <path class="ln" pathLength="1" d="M50 104h26v22H50zM144 104h26v22h-26zM50 140h26v22H50zM144 140h26v22h-26z"/>
+      </svg>
+      <div class="abs" id="a1Cross" style="left:178px;top:118px;width:84px;height:84px;border-radius:22px;background:linear-gradient(135deg,#ff7ab6,#f72585);box-shadow:0 0 40px rgba(247,37,133,.8);display:flex;align-items:center;justify-content:center">
+        <svg width="54" height="54" viewBox="0 0 10 10"><path d="M3.6 0h2.8v3.6H10v2.8H6.4V10H3.6V6.4H0V3.6h3.6z" fill="#fff"/></svg></div>
+      <div class="abs win" style="left:104px;top:212px"></div><div class="abs win" style="left:292px;top:212px"></div>
+      <div class="abs win" style="left:104px;top:284px"></div><div class="abs win" style="left:292px;top:284px"></div>
+    </div>
+    <div class="abs chip" id="a1Tag" style="left:70px;top:880px;width:420px;justify-content:center;background:rgba(247,37,133,.16);border:2px solid rgba(247,37,133,.75);font-size:30px;font-weight:700">Xususiy tibbiyot markazi</div>
+    <div class="abs glass dark" id="a1Fmk" style="left:620px;top:470px;width:400px;height:360px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+      <div style="width:150px;height:150px;border-radius:38px;overflow:hidden;box-shadow:0 14px 40px rgba(67,97,238,.7)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      <div style="font-size:36px;font-weight:800;text-align:center;line-height:1.1">Faxr Madad<br><span class="grad-text">Konsalt</span></div>
+      <div class="abs" id="a1Ping" style="right:26px;top:26px;width:30px;height:30px;border-radius:50%;background:#f72585;box-shadow:0 0 20px #f72585"></div>
+    </div>
+    <svg class="abs" width="1080" height="400" viewBox="0 0 1080 400" style="left:0;top:500px">
+      <path id="a1Path" d="M430 160C520 40 560 40 640 120" fill="none" stroke="rgba(143,227,255,.6)" stroke-width="5" stroke-dasharray="4 14" stroke-linecap="round"/>
+    </svg>
+    <div class="abs" id="a1Env" style="left:0;top:0;width:96px;height:72px;border-radius:14px;background:linear-gradient(135deg,#fff,#dfe6ff);box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 30px rgba(143,227,255,.6)">
+      <svg width="96" height="72" viewBox="0 0 96 72"><path d="M8 10l40 30 40-30" fill="none" stroke="#4361ee" stroke-width="6" stroke-linejoin="round"/></svg></div>
+    <div class="abs glass dark" id="a1Bub" style="left:110px;top:1010px;width:860px;height:300px;border-radius:60px;display:flex;align-items:center;justify-content:center;gap:30px">
+      <div class="abs" style="left:120px;top:-34px;width:70px;height:70px;transform:rotate(45deg);border-radius:12px;background:rgba(40,46,110,.9)"></div>
+      <div id="a1Dots" style="position:absolute;display:flex;gap:18px"><i class="tdot"></i><i class="tdot"></i><i class="tdot"></i></div>
+      <div id="a1Q" style="font-size:76px;font-weight:800;letter-spacing:-1px">«Endi nima <span class="grad-text">qilamiz?</span>»</div>
+    </div>
+    <div class="abs qm" id="a1q1" style="left:120px;top:1330px;font-size:120px">?</div>
+    <div class="abs qm" id="a1q2" style="left:880px;top:930px;font-size:90px">?</div>
+    <div class="abs qm" id="a1q3" style="left:900px;top:1330px;font-size:70px">?</div>
+  </div>
+
+  <!-- =============== B1: 1-qadam — inventarizatsiya (split) 8.45 → 16.35 =============== -->
+  <div class="scene" id="sB1">
+    <div class="panel" id="b1Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs step" id="b1Step" style="left:70px;top:96px"><b>1</b><span>Inventarizatsiya</span></div>
+      <div class="abs glass dark icard" id="b1c1" style="left:70px;top:200px">
+        <div class="ihead"><svg width="70" height="70" viewBox="0 0 120 120" class="glow" style="stroke:#a6f0ff;stroke-width:6"><path class="ln" pathLength="1" d="M60 14l40 20v50L60 104 20 84V34z"/><path class="ln" pathLength="1" d="M20 34l40 20 40-20M60 54v50"/></svg>
+          <div><div class="it">Tovar-moddiy</div><div class="is">zaxiralar</div></div></div>
+        <div class="irow"><span class="skel" style="width:62%"></span><i class="ick">✓</i></div>
+        <div class="irow"><span class="skel" style="width:48%"></span><i class="ick">✓</i></div>
+        <div class="irow"><span class="skel" style="width:70%"></span><i class="ick">✓</i></div>
+        <div class="iscan"></div>
+      </div>
+      <div class="abs glass dark icard" id="b1c2" style="left:555px;top:200px">
+        <div class="ihead"><svg width="70" height="70" viewBox="0 0 120 120" class="glow" style="stroke:#d0a6ff;stroke-width:6"><path class="ln" pathLength="1" d="M14 24h92v60H14zM44 100h32M60 84v16"/><path class="ln" pathLength="1" d="M22 58h18l8-18 12 34 10-22 6 6h22"/></svg>
+          <div><div class="it">Uzoq muddatli</div><div class="is">aktivlar</div></div></div>
+        <div class="irow"><span class="skel" style="width:56%"></span><i class="ick">✓</i></div>
+        <div class="irow"><span class="skel" style="width:72%"></span><i class="ick">✓</i></div>
+        <div class="irow"><span class="skel" style="width:44%"></span><i class="ick">✓</i></div>
+        <div class="iscan"></div>
+      </div>
+      <div class="abs glass dark" id="b1Date" style="left:70px;top:670px;width:940px;height:150px;border-radius:34px;display:flex;align-items:center;gap:30px;padding:0 34px">
+        <div id="b1Cal" style="width:104px;height:110px;border-radius:20px;overflow:hidden;flex:none;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.4)">
+          <div style="height:32px;background:linear-gradient(90deg,#f72585,#b5179e)"></div>
+          <div style="height:78px;display:flex;align-items:center;justify-content:center;color:#141a4a;font-size:50px;font-weight:800">01</div></div>
+        <div><div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:3px">HOLAT SANASI</div>
+          <div style="font-size:38px;font-weight:800;line-height:1.15">Imtiyoz <span style="color:#ff8bbd">bekor qilingan</span> sana</div></div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C1: 2-qadam — 1 yil ichida QQS bilan xaridlar (circle) 16.5 → 23.55 =============== -->
+  <div class="scene" id="sC1">
+    <div class="abs step" id="c1Step" style="left:0;right:0;margin:0 auto;width:max-content;top:700px"><b>2</b><span>Tanlash</span></div>
+    <div class="abs glass dark" id="c1Box" style="left:50px;top:820px;width:980px;height:760px;border-radius:44px;overflow:hidden">
+      <div class="abs" id="c1Win" style="left:420px;top:60px;width:470px;height:640px;border-radius:30px;background:linear-gradient(180deg,rgba(76,201,240,.22),rgba(76,201,240,.06));border:3px solid rgba(76,201,240,.85);box-shadow:0 0 50px rgba(76,201,240,.35),inset 0 0 40px rgba(76,201,240,.15)">
+        <div class="abs chip" style="left:0;right:0;margin:0 auto;width:max-content;top:-2px;transform:translateY(-50%);background:linear-gradient(120deg,#4cc9f0,#4361ee);font-size:30px;font-weight:800;padding:8px 24px">≤ 1 yil</div></div>
+      <div class="abs" id="c1Axis" style="left:60px;right:60px;top:560px;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(160,180,255,.25),rgba(160,180,255,.8));transform-origin:0 50%"></div>
+      <div id="c1Ticks"></div>
+      <div class="abs" id="c1Mark" style="left:870px;top:420px;width:40px;height:220px">
+        <div class="abs" style="left:17px;top:40px;width:6px;height:150px;border-radius:3px;background:#f72585;box-shadow:0 0 18px #f72585"></div>
+        <svg class="abs" width="40" height="52" viewBox="0 0 100 130" style="left:0;top:0"><path d="M50 124C50 124 8 76 8 46a42 42 0 1 1 84 0c0 30-42 78-42 78z" fill="url(#gp)"/><circle cx="50" cy="46" r="15" fill="#fff"/></svg></div>
+      <div class="abs" id="c1MarkL" style="left:700px;top:660px;width:250px;text-align:center;font-size:24px;font-weight:700;color:#ff8bbd;line-height:1.15">Imtiyoz bekor<br>qilingan sana</div>
+      <div id="c1Inv"></div>
+      <div class="abs chip" id="c1Res" style="left:60px;top:640px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.5);font-size:30px;font-weight:800;padding:10px 26px">✓ Tanlandi</div>
+    </div>
+  </div>
+
+  <!-- =============== S3: 3-qadam chip (talking head) 23.6 → 24.75 =============== -->
+  <div class="scene" id="sS3">
+    <div class="abs step big" id="s3Step" style="left:50px;top:470px"><b>3</b><span>qadam</span></div>
+  </div>
+
+  <!-- =============== A2: 3-qadam — har bir aktiv, QQS ajratish 24.7 → 30.05 =============== -->
+  <div class="scene" id="sA2">
+    <div class="abs step" id="a2Step" style="left:0;right:0;margin:0 auto;width:max-content;top:250px"><b>3</b><span>QQSni ajratish</span></div>
+    <div class="abs glass dark acard" id="a2bk2" style="left:150px;top:380px;transform:rotate(-7deg)"></div>
+    <div class="abs glass dark acard" id="a2bk1" style="left:150px;top:380px;transform:rotate(5deg)"></div>
+    <div class="abs glass dark acard" id="a2Card" style="left:150px;top:380px">
+      <div class="row" style="justify-content:flex-start;gap:26px">
+        <div style="width:120px;height:120px;border-radius:30px;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;flex:none">
+          <svg width="80" height="80" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:6.5;fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M14 24h92v60H14zM44 100h32M60 84v16"/><path d="M22 58h18l8-18 12 34 10-22 6 6h22"/></svg></div>
+        <div><div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:3px">AKTIV</div>
+          <div style="font-size:46px;font-weight:800;line-height:1.05">Tibbiy uskuna</div></div>
+      </div>
+      <div class="fld" id="a2Date" style="margin-top:30px"><span>Xarid sanasi</span><b class="mono">14.03.2024</b></div>
+      <div class="fld"><span>Xarid summasi</span><b class="mono">11 200 000</b></div>
+      <div id="a2Bar" style="position:relative;margin-top:34px;height:96px;border-radius:24px;overflow:hidden;background:rgba(255,255,255,.06)">
+        <div id="a2Net" class="abs" style="left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,#4361ee,#5b6cf5);display:flex;align-items:center;padding-left:26px;font-size:30px;font-weight:700"><span id="a2NetT">11 200 000</span></div>
+        <div id="a2Vat" class="abs" style="right:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#f72585,#b5179e);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;overflow:hidden;white-space:nowrap">QQS</div>
+      </div>
+      <div class="row" style="margin-top:12px;font-size:24px;color:#aebcff;font-weight:600"><span id="a2l1">Qiymat</span><span id="a2l2" style="color:#ff8bbd">QQS 12%</span></div>
+    </div>
+    <div class="abs glass dark" id="a2F" style="left:110px;top:1210px;width:860px;height:150px;border-radius:36px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:44px;font-weight:700">
+      <span class="mono">11 200 000</span><span style="color:#aebcff">×</span><span class="mono" style="color:#8fe3ff">12/112</span><span style="color:#aebcff">=</span><span class="mono" id="a2Res" style="color:#ff8bbd">1 200 000</span></div>
+    <div class="abs" id="a2Coin" style="left:420px;top:1420px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff9cc4,#f72585 60%,#8a0f4d);box-shadow:0 0 60px rgba(247,37,133,.6),inset 0 -10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="font-size:34px;font-weight:800">QQS</div><div class="mono" style="font-size:30px;font-weight:700">1 200 000</div></div>
+    <div class="abs chip" id="a2Ok" style="left:0;right:0;margin:0 auto;width:max-content;top:1690px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:36px;font-weight:800;padding:12px 32px">✓ Ajratildi</div>
+  </div>
+
+  <!-- =============== B2: 2023 yildan keyin — 12% (split) 30.1 → 34.0 =============== -->
+  <div class="scene" id="sB2">
+    <div class="panel" id="b2Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#f72585;opacity:.25"></div>
+      <div class="abs" style="left:70px;top:110px;font-size:28px;color:#aebcff;font-weight:600;letter-spacing:5px">QQS STAVKASI · XARID YILI</div>
+      <div id="b2Years" class="abs" style="left:70px;top:170px;width:940px;height:460px;display:flex;align-items:flex-end;gap:16px"></div>
+      <div class="abs" id="b2Brk" style="left:620px;top:150px;width:390px;height:6px;border-radius:3px;background:linear-gradient(90deg,#4cc9f0,#f72585);box-shadow:0 0 20px rgba(76,201,240,.8);transform-origin:0 50%"></div>
+      <div class="abs chip" id="b2Tag" style="left:620px;top:660px;width:390px;justify-content:center;background:rgba(76,201,240,.16);border:2px solid rgba(76,201,240,.8);font-size:30px;font-weight:800">2023 yildan keyin</div>
+      <div class="abs" id="b2Big" style="left:70px;top:620px;font-size:200px;font-weight:800;line-height:1;letter-spacing:-6px" ><span class="grad-text" id="b2BigN">12%</span></div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C2: 4-qadam — QQS hisob-kitobi 5-ilova → 3-ilova 0123 (circle) 34.1 → 44.1 =============== -->
+  <div class="scene" id="sC2">
+    <div class="abs step" id="c2Step" style="left:0;right:0;margin:0 auto;width:max-content;top:690px"><b>4</b><span>QQS hisob-kitobi</span></div>
+    <div class="abs chip" id="c2Sum" style="left:0;right:0;margin:0 auto;width:max-content;top:800px;background:rgba(247,37,133,.18);border:2px solid rgba(247,37,133,.85);font-size:32px;font-weight:700;padding:12px 28px">Tuzatish summasi: <b class="mono" style="color:#ff9cc4;margin-left:10px">1 200 000</b></div>
+    <div class="abs glass dark dcard" id="c2D5" style="left:40px;top:920px">
+      <div class="dtab">5-ilova</div>
+      <div class="dsub">1-jadval</div>
+      <div class="drow"><span class="skel" style="width:60%"></span></div>
+      <div class="drow"><span class="skel" style="width:45%"></span></div>
+      <div class="drow hot" id="c2R5"><span style="font-size:24px;color:#c8d1ff;font-weight:600">Tuzatish</span><b class="mono" id="c2V5"></b></div>
+      <div class="drow"><span class="skel" style="width:52%"></span></div>
+    </div>
+    <div class="abs glass dark dcard" id="c2D3" style="left:560px;top:920px">
+      <div class="dtab">3-ilova</div>
+      <div class="dsub">satrlar</div>
+      <div class="drow"><span class="code">0110</span><span class="skel" style="width:40%"></span></div>
+      <div class="drow"><span class="code">0120</span><span class="skel" style="width:30%"></span></div>
+      <div class="drow hot" id="c2R3"><span class="code">0123</span><b class="mono" id="c2V3"></b></div>
+      <div class="drow"><span class="code">0130</span><span class="skel" style="width:36%"></span></div>
+    </div>
+    <svg class="abs" width="200" height="120" viewBox="0 0 200 120" style="left:440px;top:1290px"><path id="c2Arr" class="ln" pathLength="1" d="M20 60H170M140 30l32 30-32 30" stroke="#8fe3ff" stroke-width="10" style="filter:drop-shadow(0 0 12px #4cc9f0)"/></svg>
+    <div class="abs chip mono" id="c2Fly" style="left:0;top:0;background:linear-gradient(120deg,#f72585,#7209b7);box-shadow:0 10px 30px rgba(247,37,133,.6);font-size:28px;font-weight:700;padding:8px 18px">1 200 000</div>
+    <div class="abs chip" id="c2Ok" style="left:0;right:0;margin:0 auto;width:max-content;top:1560px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:34px;font-weight:800;padding:12px 30px">✓ 0123-satrga tushdi</div>
+  </div>
+
+  <!-- =============== A3: NATIJA 44.3 → 49.75 =============== -->
+  <div class="scene" id="sA3">
+    <div class="abs kicker" id="a3Kick" style="left:0;right:0;top:250px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Natija</div>
+    <div class="abs" id="a3Sh" style="left:340px;top:330px;width:400px;height:440px">
+      <div class="abs" id="a3Halo" style="left:-60px;top:-40px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(76,201,240,.45),transparent 65%)"></div>
+      <svg class="abs glow" width="400" height="440" viewBox="0 0 120 132" style="left:0;top:0;stroke:#bff0ff;stroke-width:4.5"><path class="ln" pathLength="1" d="M60 6l48 18v36c0 34-20 56-48 66C32 116 12 94 12 60V24z" fill="rgba(67,97,238,.18)"/><path class="ln" pathLength="1" d="M38 66l16 16 30-34" stroke="#fff" stroke-width="8"/></svg>
+    </div>
+    <div class="abs glass dark rrow" id="a3r0" style="top:840px">
+      <div class="rico" style="background:linear-gradient(135deg,#ff7ab6,#f72585)"><svg width="48" height="48" viewBox="0 0 10 10"><path d="M3.6 0h2.8v3.6H10v2.8H6.4V10H3.6V6.4H0V3.6h3.6z" fill="#fff"/></svg></div>
+      <div style="flex:1"><div class="rk">Markaz</div><div class="rv">O‘ziga tegishli QQS</div></div>
+      <div class="rbadge" id="a3b0" style="background:linear-gradient(120deg,#4cc9f0,#4361ee)">✓ Hisobga olindi</div>
+    </div>
+    <div class="abs glass dark rrow" id="a3r1" style="top:1060px">
+      <div class="rico" style="background:linear-gradient(135deg,#4361ee,#7209b7)"><svg width="50" height="50" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:8;fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M16 38h80a8 8 0 0 1 8 8v54a8 8 0 0 1-8 8H24a8 8 0 0 1-8-8zM20 38l56-22 10 22"/><path d="M104 60H82a10 10 0 0 0 0 20h22z"/></svg></div>
+      <div style="flex:1"><div class="rk">Ortiqcha to‘lov</div><div class="rv"><span class="mono" id="a3Over" style="position:relative">1 200 000<i id="a3Strike" class="abs" style="left:-6px;right:-6px;top:50%;height:6px;border-radius:3px;background:#f72585;transform-origin:0 50%"></i></span></div></div>
+      <div class="rbadge mono" id="a3b1" style="background:linear-gradient(120deg,#4cc9f0,#4361ee);font-size:44px">0</div>
+    </div>
+    <div id="a3Conf"></div>
+  </div>
+
+  <!-- =============== B3: NKT — 12% (split) 49.8 → 53.75 =============== -->
+  <div class="scene" id="sB3">
+    <div class="panel" id="b3Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs" id="b3Pos" style="left:70px;top:150px;width:440px;height:700px">
+        <div class="abs" id="b3RcW" style="left:90px;top:0;width:260px;height:300px;overflow:hidden">
+          <div class="abs rcpt" id="b3Rc" style="left:10px;top:0;width:240px;padding:20px 20px 34px">
+            <div class="rh" style="font-size:28px">CHEK</div>
+            <div class="rl"></div><div class="rl" style="width:70%"></div>
+            <div class="rt" style="font-size:24px"><span>QQS</span><b class="mono">12%</b></div>
+          </div></div>
+        <div class="abs" style="left:0;top:290px;width:440px;height:410px;border-radius:44px;background:linear-gradient(160deg,#283078,#0f1440);box-shadow:inset 0 0 0 4px rgba(160,180,255,.4),0 30px 70px rgba(0,0,0,.5)">
+          <div class="abs" style="left:70px;top:-14px;width:300px;height:28px;border-radius:14px;background:#05071a"></div>
+          <div class="abs" style="left:34px;top:40px;width:372px;height:150px;border-radius:20px;background:linear-gradient(135deg,#0b2a4a,#071a33);box-shadow:inset 0 0 0 3px rgba(76,201,240,.5);display:flex;align-items:center;justify-content:center;flex-direction:column">
+            <div style="font-size:22px;color:#8fe3ff;letter-spacing:4px;font-weight:600">QQS</div>
+            <div class="mono" id="b3Scr" style="font-size:64px;font-weight:700;color:#bff0ff;text-shadow:0 0 16px #4cc9f0">0%</div></div>
+          <div class="abs" id="b3Keys" style="left:34px;top:216px;width:372px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px"></div>
+        </div>
+      </div>
+      <div class="abs glass dark" id="b3Set" style="left:560px;top:180px;width:450px;height:620px;border-radius:36px;padding:34px 30px">
+        <div class="row" style="justify-content:flex-start;gap:14px"><svg width="44" height="44" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 4l-2.1-.7a7 7 0 0 0-.6-1.5l1-2-1.4-1.4-2 1a7 7 0 0 0-1.5-.6L13.7 3h-2l-.7 2.1c-.5.1-1 .3-1.5.6l-2-1L6.2 6.1l1 2c-.3.5-.5 1-.6 1.5L4.5 10.3v2l2.1.7c.1.5.3 1 .6 1.5l-1 2 1.4 1.4 2-1c.5.3 1 .5 1.5.6l.7 2.1h2l.7-2.1c.5-.1 1-.3 1.5-.6l2 1 1.4-1.4-1-2c.3-.5.5-1 .6-1.5l2.1-.7z" fill="#aebcff" id="b3Gear"/></svg><span style="font-size:34px;font-weight:800">Sozlamalar</span></div>
+        <div style="font-size:24px;color:#aebcff;font-weight:600;letter-spacing:3px;margin-top:34px">NKT · QQS STAVKASI</div>
+        <div class="opt" id="b3o0"><span>Imtiyoz</span><b class="mono">0%</b></div>
+        <div class="opt" id="b3o1"><span>Standart</span><b class="mono">12%</b></div>
+        <div class="abs chip" id="b3Ok" style="left:30px;right:30px;bottom:34px;justify-content:center;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.5);font-size:32px;font-weight:800">✓ 12% ga o‘zgartirildi</div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== CTA 53.9 → 58.6 =============== -->
+  <div class="scene" id="sCTA">
+    <div class="abs glass dark" id="ctaQ" style="left:46px;top:430px;width:360px;border-radius:34px;padding:28px 26px;text-align:center">
+      <div style="width:110px;height:110px;margin:0 auto;border-radius:50%;background:linear-gradient(135deg,#f72585,#7209b7);display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:800;box-shadow:0 0 40px rgba(247,37,133,.6)">?</div>
+      <div style="font-size:34px;font-weight:800;line-height:1.15;margin-top:18px">Imtiyoz <span style="color:#ff8bbd">bekor</span> bo‘lganmi?</div>
+    </div>
+    <div class="abs glass dark" id="cta" style="left:70px;top:1400px;width:940px;height:190px;border-radius:44px;display:flex;align-items:center;gap:28px;padding:0 30px">
+      <div style="width:110px;height:110px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.2)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      <div style="flex:1">
+        <div style="font-size:26px;color:#aebcff;font-weight:500">Izoh qoldiring</div>
+        <div style="display:flex;align-items:center;gap:6px;height:66px"><span id="ctaPh" style="font-size:40px;color:#7f8bc0">Izoh...</span><span id="ctaTyped" class="grad-text" style="font-size:60px;font-weight:800;letter-spacing:2px"></span><span id="ctaCaret" style="width:4px;height:54px;background:#8fe3ff"></span></div>
+        <div id="ctaSub" style="font-size:26px;color:#bff0ff;font-weight:600">✓ tekshirib beramiz</div>
+      </div>
+      <div id="ctaSend" style="width:100px;height:100px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(67,97,238,.6)">
+        <svg width="50" height="50" viewBox="0 0 50 50"><path d="M6 24L44 6 32 44l-8-15z" fill="#fff"/></svg></div>
+    </div>
+  </div>
+
+  <!-- =============== END CARD 58.75 → 61.8 =============== -->
+  <div class="scene" id="sEnd">
+    <div class="abs" id="ecLogo" style="left:0;right:0;top:330px;display:flex;justify-content:center">
+      <div style="position:relative;width:300px;height:300px">
+        <div class="abs" id="ecRing" style="inset:-22px;border-radius:84px;background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);filter:blur(2px);opacity:.9"></div>
+        <div class="abs" style="inset:-14px;border-radius:78px;background:#0b1030"></div>
+        <div class="abs" style="inset:0;border-radius:70px;overflow:hidden;box-shadow:0 20px 70px rgba(67,97,238,.8)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      </div></div>
+    <div class="abs" id="ecTitle" style="left:0;right:0;top:720px;text-align:center;font-size:96px;font-weight:800;letter-spacing:-1px;line-height:1.05">Faxr Madad <span class="grad-text">Konsalt.</span></div>
+    <div class="abs" id="ecLine" style="left:340px;width:400px;top:850px;height:5px;border-radius:3px;background:linear-gradient(90deg,transparent,#4cc9f0,#f72585,transparent);transform-origin:50% 50%"></div>
+    <div class="glass dark abs" id="ec" style="left:50px;top:920px;width:980px;border-radius:46px;padding:40px 40px;overflow:hidden">
+      <div class="ecr" id="ec1">
+        <div class="abs" id="ecPing" style="left:62px;top:60px;width:20px;height:20px;border-radius:50%;border:4px solid #f72585"></div>
+        <svg width="92" height="112" viewBox="0 0 100 122" style="flex:none;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(247,37,133,.7))" id="ecPin">
+          <path class="ln" pathLength="1" d="M50 116C50 116 10 72 10 44a40 40 0 1 1 80 0c0 28-40 72-40 72z" fill="rgba(247,37,133,.22)" stroke="#ff7ab6" stroke-width="7"/>
+          <path class="ln" pathLength="1" d="M36 44a14 14 0 1 0 28 0a14 14 0 1 0-28 0" stroke="#fff" stroke-width="7"/></svg>
+        <div style="font-size:38px;font-weight:600;line-height:1.35"><b style="color:#8fe3ff">Manzil:</b> Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi, 1-uy.</div></div>
+      <div class="ecr" id="ec2" style="margin-top:24px">
+        <div id="ecPh" style="width:92px;height:92px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(76,201,240,.7)">
+          <svg width="46" height="46" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="#fff"/></svg></div>
+        <div style="font-size:58px;font-weight:700"><span style="font-size:38px;color:#8fe3ff;font-weight:700">Tel:</span> <span class="mono">+998976448800</span></div></div>
+      <div class="abs" id="ecShine" style="top:-60px;bottom:-60px;width:220px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
+
+  <!-- =============== TOP BANNER 0.35 → 15 =============== -->
+  <div class="abs glass dark" id="banner" style="left:0;right:0;margin:0 auto;width:max-content;top:44px;border-radius:999px;padding:18px 44px 18px 18px;display:flex;align-items:center;gap:24px">
+    <div id="bnIco" style="width:92px;height:92px;border-radius:50%;flex:none;background:linear-gradient(135deg,#ff7ab6,#f72585);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(247,37,133,.7)">
+      <svg width="46" height="46" viewBox="0 0 10 10"><path d="M3.6 0h2.8v3.6H10v2.8H6.4V10H3.6V6.4H0V3.6h3.6z" fill="#fff"/></svg></div>
+    <div id="bnText" style="font-size:54px;font-weight:800;letter-spacing:-.5px;white-space:nowrap">Tibbiyot markazi <span class="grad-text">murojaat</span></div>
+    <i id="bnDot" style="width:18px;height:18px;border-radius:50%;background:#4cc9f0;box-shadow:0 0 16px #4cc9f0;flex:none"></i>
+  </div>

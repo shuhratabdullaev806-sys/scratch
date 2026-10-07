@@ -1,0 +1,43 @@
+.win{width:44px;height:36px;border-radius:6px;background:rgba(143,227,255,.08)}
+.tdot{display:block;width:26px;height:26px;border-radius:50%;background:#aebcff}
+.qm{font-weight:800;color:#c77dff;text-shadow:0 0 30px rgba(199,125,255,.8);opacity:.85}
+.step{display:flex;align-items:center;gap:18px;padding:10px 30px 10px 10px;border-radius:999px;
+  background:linear-gradient(140deg,rgba(34,44,110,.8),rgba(12,16,44,.7));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.4),0 14px 40px rgba(0,0,0,.4);border:2px solid rgba(160,180,255,.35)}
+.step b{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#4361ee,#7209b7 60%,#f72585);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;box-shadow:0 0 24px rgba(114,9,183,.7)}
+.step span{font-size:36px;font-weight:800;letter-spacing:.5px}
+.step.big{flex-direction:column;padding:28px 40px;border-radius:40px;gap:10px}
+.step.big b{width:130px;height:130px;font-size:80px}
+.step.big span{font-size:40px;color:#c8d1ff;text-transform:uppercase;letter-spacing:6px;font-weight:700}
+.icard{width:455px;height:420px;border-radius:36px;padding:28px 28px;overflow:hidden}
+.ihead{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+.it{font-size:36px;font-weight:800;line-height:1.05}.is{font-size:30px;color:#aebcff;font-weight:600}
+.irow{height:70px;margin-top:14px;border-radius:18px;background:rgba(0,0,0,.25);border:2px solid rgba(160,180,255,.22);display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.irow .skel{height:18px}
+.ick{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;font-size:26px;box-shadow:0 0 18px rgba(76,201,240,.7)}
+.iscan{position:absolute;left:0;right:0;top:0;height:8px;background:#8fe3ff;box-shadow:0 0 24px #4cc9f0,0 0 60px #4cc9f0;border-radius:4px;opacity:0}
+.tick{position:absolute;top:574px;width:4px;height:22px;border-radius:2px;background:rgba(160,180,255,.6)}
+.tlab{position:absolute;top:604px;font-size:22px;color:#8f9bd0;font-weight:600;transform:translateX(-50%)}
+.inv{position:absolute;width:104px;height:150px;border-radius:14px;background:linear-gradient(180deg,#fff,#e6ebff);color:#141a4a;padding:14px 12px;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.inv i{display:block;height:9px;border-radius:5px;background:#cfd6f5;margin:8px 0}
+.inv b{position:absolute;left:10px;right:10px;bottom:12px;height:34px;border-radius:10px;background:linear-gradient(90deg,#f72585,#b5179e);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.inv .st{position:absolute;right:-16px;top:-16px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;color:#fff;opacity:0}
+.acard{width:780px;height:760px;border-radius:44px;padding:40px 44px}
+.yr{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px}
+.yr .bar{width:100%;border-radius:18px 18px 8px 8px;display:flex;align-items:flex-start;justify-content:center;padding-top:16px;font-size:30px;font-weight:800;transform-origin:50% 100%}
+.yr .y{font-size:26px;font-weight:700;color:#aab6ec}
+.dcard{width:480px;height:600px;border-radius:36px;padding:28px 26px;overflow:hidden}
+.dtab{display:inline-block;padding:8px 22px;border-radius:14px;background:linear-gradient(120deg,#4361ee,#7209b7);font-size:34px;font-weight:800}
+.dsub{font-size:28px;color:#aebcff;font-weight:600;margin:14px 0 6px;letter-spacing:2px}
+.drow{height:80px;margin-top:16px;border-radius:18px;background-color:rgba(0,0,0,.25);border:2px solid rgba(160,180,255,.2);display:flex;align-items:center;gap:16px;padding:0 18px;justify-content:space-between}
+.drow .skel{height:18px;flex:none}
+.drow b{font-size:30px;color:#ff9cc4}
+.code{font-family:Mono,monospace;font-size:28px;font-weight:700;color:#c8d1ff}
+.rrow{left:90px;width:900px;height:180px;border-radius:40px;display:flex;align-items:center;gap:26px;padding:0 30px}
+.rico{width:100px;height:100px;border-radius:28px;display:flex;align-items:center;justify-content:center;flex:none}
+.rk{font-size:26px;color:#aebcff;font-weight:600;letter-spacing:2px}.rv{font-size:40px;font-weight:800;line-height:1.1}
+.rbadge{padding:14px 26px;border-radius:999px;font-size:30px;font-weight:800;box-shadow:0 10px 30px rgba(76,201,240,.5);white-space:nowrap}
+.opt{margin-top:22px;height:100px;border-radius:24px;background-color:rgba(0,0,0,.25);border:3px solid rgba(160,180,255,.25);display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:34px;font-weight:700}
+.opt b{font-size:40px}
+.key{height:34px;border-radius:10px;background:rgba(255,255,255,.1);box-shadow:inset 0 -3px 0 rgba(0,0,0,.3)}
+.ecr{position:relative;display:flex;align-items:center;gap:26px;padding:20px 26px;border-radius:28px;background:rgba(255,255,255,.07);border:2px solid rgba(160,180,255,.3)}
+.cf{position:absolute;width:16px;height:16px;border-radius:4px}
