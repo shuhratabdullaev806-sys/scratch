@@ -34,6 +34,12 @@ Stavka va schyotlar chiqarishdan oldin amaldagi Soliq kodeksi va BHMS bo'yicha t
 3. `./montaj.sh diktor.mp4 doska.mp4 <diktor_tugash_soniyasi> "Sarlavha" chiqish.mp4 xaritalar/NN.json`
    Yakuniy ekran diktor tugagach 5 s turadi. Natija: 1080×1920, 30 fps, H.264 + AAC.
 
+## Vaqtni moslash
+- Diktor gaplari vaqti taxmin qilinmaydi: `silencedetect` (noise=-35dB, d=0.25) bilan pauzalar topiladi, gaplar shu pauzalarga bog'lanadi.
+- Doska qatorlari boshlanishi siyoh profilidan (har 0.1 s dagi eng pastki qora qator) aniqlanadi.
+- `<diktor_tugash_soniyasi>` — oxirgi so'z tugagan vaqt (oxirgi silence_start), video uzunligi emas.
+- Doskaning eng oxirgi kadri bo'sh bo'lishi mumkin: ushlab turish uchun oxirgidan ~0.1 s oldingi kadr olinadi.
+
 ## Diktor video formati
 HeyGen ba'zan 9:16 o'rniga 16:9 kadr ichida vertikal rasm beradi (yon tomonlari oq). Bunda `xaritalar/NN.json` ga
 `dk_scale`, `dk_bg`, `dk_fg` (diktorni kesish joylari) yoziladi; oq chetlar kesib tashlanadi. Namuna: `xaritalar/04_mulk_soligi.json`.
