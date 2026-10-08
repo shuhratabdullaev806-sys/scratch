@@ -28,6 +28,14 @@ Har mavzu uchun ikkita alohida matn beriladi (nusxalab joylash uchun):
 
 Stavka va schyotlar chiqarishdan oldin amaldagi Soliq kodeksi va BHMS bo'yicha tekshiriladi.
 
+## Doska matnini berishdan oldin majburiy tekshiruv
+1. Har bir raqam diktor matnidagi raqam bilan bir xilmi (ziddiyat bo'lsa, matn berilmaydi — hisob tuzatiladi).
+2. Summa QQS bilanmi yoki QQSsiz: QQS ichida bo'lsa × 12/112, ustiga bo'lsa × 12%.
+3. Har bir schyot 21-sonli BHMS schyotlar rejasida bormi va mazmuni to'g'rimi
+   (masalan: 10 10 xom ashyo, 44 10 bo'nak/kiruvchi QQS, 60 10 yetkazib beruvchi, 51 10 hisob-kitob schyoti, 64 10 byudjetga qarz).
+4. Xarid yetkazib beruvchi orqali (Kt 60 10), to'lov alohida provodka.
+5. Tuzatish provodkasi asl xatoni aniq teskari qiladimi.
+
 ## Montaj (avtomatik)
 1. HeyGen diktor videosi (9:16) va Instadoodle doska videosi (16:9, oq fon) yuklanadi.
 2. `xaritalar/NN.json` yoziladi: diktor gaplari vaqti -> doska vaqti, 2-kadr boshlanishi (k2) va kesish joylari (crop1, crop2).
