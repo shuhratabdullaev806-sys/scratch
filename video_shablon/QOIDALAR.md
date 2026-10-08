@@ -39,4 +39,4 @@ HeyGen ba'zan 9:16 o'rniga 16:9 kadr ichida vertikal rasm beradi (yon tomonlari 
 `dk_scale`, `dk_bg`, `dk_fg` (diktorni kesish joylari) yoziladi; oq chetlar kesib tashlanadi. Namuna: `xaritalar/04_mulk_soligi.json`.
 
 Keng ofis sahnasi (16:9, logotip va yozuvlar bilan) — sahna doska kengligida to'liq ko'rsatiladi, yon chetlar bo'sh qolmaydi:
-`"dk_bg": "1920:780:0:100", "dk_fg": "1920:780:0:100"` (960:390 nisbati; y=100 bosh va qo'llarni sig'diradi). Namuna: `xaritalar/05_qqs_imtiyoz.json`.
+`"dk_bg": "1920:780:0:30", "dk_fg": "1920:780:0:30"` (960:390 nisbati; y=30 bosh va qo'llarni sig'diradi). Namuna: `xaritalar/05_qqs_imtiyoz.json`.
