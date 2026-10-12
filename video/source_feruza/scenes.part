@@ -1,0 +1,195 @@
+  <!-- =============== S0: qiziqish — buxgalteriya (side card) 3.9 → 6.0 =============== -->
+  <div class="scene" id="sS0">
+    <div class="abs glass dark" id="s0Card" style="left:744px;top:470px;width:300px;border-radius:34px;padding:28px 22px 30px;text-align:center">
+      <div style="position:relative;width:130px;height:130px;margin:0 auto;border-radius:34px;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(67,97,238,.6)">
+        <svg width="84" height="84" viewBox="0 0 120 120" class="glow" style="stroke:#fff;stroke-width:6.5"><path class="ln" pathLength="1" d="M28 10h64a8 8 0 0 1 8 8v84a8 8 0 0 1-8 8H28a8 8 0 0 1-8-8V18a8 8 0 0 1 8-8z"/><path class="ln" pathLength="1" d="M34 24h52v22H34z"/><path class="ln" pathLength="1" d="M36 62h8M56 62h8M76 62h8M36 78h8M56 78h8M76 78h8M36 94h8M56 94h8M76 94h8"/></svg>
+        <div class="abs spark" style="left:-18px;top:-16px">✦</div><div class="abs spark" style="right:-20px;top:20px;font-size:30px">✦</div><div class="abs spark" style="left:6px;bottom:-22px;font-size:26px">✦</div>
+      </div>
+      <div style="font-size:24px;color:#aebcff;font-weight:600;letter-spacing:4px;margin-top:22px">QIZIQISH</div>
+      <div style="font-size:44px;font-weight:800;line-height:1.05;margin-top:6px" class="grad-text">Buxgalteriya</div>
+      <div id="s0Heart" style="margin:18px auto 0;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#ff7ab6,#f72585);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(247,37,133,.7)">
+        <svg width="36" height="36" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.8-8 11-8 11z" fill="#fff"/></svg></div>
+    </div>
+  </div>
+
+  <!-- =============== A1: o'quv markaziga keldim — yo'l, FMK binosi 6.3 → 9.35 =============== -->
+  <div class="scene" id="sA1">
+    <div class="abs kicker" id="a1Kick" style="left:0;right:0;top:250px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>O‘quv markazi</div>
+    <svg class="abs" width="1080" height="1300" viewBox="0 0 1080 1300" style="left:0;top:220px">
+      <path id="a1Road" d="M150 1150C150 960 420 980 520 860S700 660 760 560" fill="none" stroke="rgba(143,227,255,.18)" stroke-width="64" stroke-linecap="round"/>
+      <path id="a1Path" class="ln" pathLength="1" d="M150 1150C150 960 420 980 520 860S700 660 760 560" stroke="#8fe3ff" stroke-width="8" style="filter:drop-shadow(0 0 12px #4cc9f0)"/>
+    </svg>
+    <div class="abs" id="a1Me" style="left:0;top:0;width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#ff7ab6,#f72585);box-shadow:0 0 0 6px rgba(255,255,255,.18),0 0 40px rgba(247,37,133,.8);display:flex;align-items:center;justify-content:center">
+      <svg width="54" height="54" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:10;fill:none;stroke-linecap:round"><path d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0-40 0M22 106c4-20 20-30 38-30s34 10 38 30"/></svg></div>
+    <div class="abs" id="a1Bld" style="left:560px;top:330px;width:420px;height:470px">
+      <div class="abs" id="a1Halo" style="left:-40px;top:20px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(76,201,240,.45),transparent 65%)"></div>
+      <svg class="abs glow" width="420" height="420" viewBox="0 0 210 210" style="left:0;top:40px;stroke:#bfe9ff;stroke-width:3.2">
+        <path class="ln" pathLength="1" d="M8 200H202"/>
+        <path class="ln" pathLength="1" d="M30 200V70h150v130"/>
+        <path class="ln" pathLength="1" d="M20 74L105 28l85 46"/>
+        <path class="ln" pathLength="1" d="M88 200v-46h34v46"/>
+        <path class="ln" pathLength="1" d="M46 92h24v20H46zM140 92h24v20h-24zM46 128h24v20H46zM140 128h24v20h-24z"/>
+      </svg>
+      <div class="abs" id="a1Logo" style="left:160px;top:120px;width:100px;height:100px;border-radius:26px;overflow:hidden;box-shadow:0 0 40px rgba(67,97,238,.9)"><img src="logo.svg" style="width:100%;height:100%"></div>
+    </div>
+    <div class="abs glass dark" id="a1Name" style="left:0;right:0;margin:0 auto;width:max-content;top:1080px;border-radius:40px;padding:26px 46px;text-align:center">
+      <div style="font-size:62px;font-weight:800;line-height:1.05;letter-spacing:-.5px">Faxr Madad <span class="grad-text">Konsalt</span></div>
+      <div style="font-size:30px;color:#aebcff;font-weight:600;letter-spacing:6px;margin-top:8px">O‘QUV MARKAZI</div>
+    </div>
+    <div class="abs chip" id="a1Ok" style="left:0;right:0;margin:0 auto;width:max-content;top:1290px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:36px;font-weight:800;padding:12px 32px">✓ Keldim</div>
+  </div>
+
+  <!-- =============== B1: bilim + 1C malaka (split) 9.3 → 15.0 =============== -->
+  <div class="scene" id="sB1">
+    <div class="panel" id="b1Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs glass dark kcard" id="b1c1" style="left:60px;top:150px">
+        <div class="kk">BILIM</div>
+        <div class="kt">Buxgalteriya</div>
+        <div class="abs" style="left:40px;right:40px;bottom:40px;height:360px">
+          <div class="book" style="bottom:0;width:86%;background:linear-gradient(90deg,#4361ee,#5b6cf5)">Asoslar</div>
+          <div class="book" style="bottom:76px;width:78%;left:6%;background:linear-gradient(90deg,#7209b7,#9d4edd)">Hisob</div>
+          <div class="book" style="bottom:152px;width:82%;left:2%;background:linear-gradient(90deg,#3a0ca3,#4361ee)">Soliqlar</div>
+          <div class="book" style="bottom:228px;width:74%;left:9%;background:linear-gradient(90deg,#b5179e,#f72585)">Hisobotlar</div>
+        </div>
+      </div>
+      <div class="abs glass dark kcard" id="b1c2" style="left:560px;top:150px">
+        <div class="kk">DASTUR</div>
+        <div class="row" style="justify-content:flex-start;gap:18px;margin-top:6px">
+          <div id="b1One" style="width:96px;height:96px;border-radius:24px;background:linear-gradient(135deg,#ffd84d,#ffb800);color:#c4001a;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:800;box-shadow:0 10px 30px rgba(255,184,0,.45)">1C</div>
+          <div class="kt" style="margin:0">dasturi</div></div>
+        <div class="kk" style="margin-top:34px">MALAKA</div>
+        <div class="abs" id="b1Chart" style="left:40px;right:40px;bottom:110px;height:250px;display:flex;align-items:flex-end;gap:16px"></div>
+        <svg class="abs" width="380" height="250" viewBox="0 0 380 250" style="left:40px;bottom:110px"><path id="b1Trend" class="ln" pathLength="1" d="M20 220L120 170 210 120 300 60 360 20M330 20h30v30" stroke="#8fe3ff" stroke-width="8" style="filter:drop-shadow(0 0 10px #4cc9f0)"/></svg>
+        <div class="abs chip" id="b1Up" style="left:40px;right:40px;bottom:30px;justify-content:center;background:linear-gradient(120deg,#4cc9f0,#4361ee);font-size:30px;font-weight:800;padding:10px">↑ Malaka oshdi</div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C1: amaliy ish ko'nikmalari (circle) 15.6 → 20.45 =============== -->
+  <div class="scene" id="sC1">
+    <div class="abs kicker" id="c1Kick" style="left:0;right:0;top:700px;justify-content:center"><b></b>Hozirgi vaqtda</div>
+    <div class="abs glass dark" id="c1Box" style="left:60px;top:770px;width:960px;height:640px;border-radius:44px;padding:40px 44px">
+      <div style="font-size:50px;font-weight:800;line-height:1.05">Amaliy ish <span class="grad-text">ko‘nikmalari</span></div>
+      <div class="abs" id="c1Ring" style="left:44px;top:150px;width:330px;height:330px">
+        <svg width="330" height="330" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="10"/><circle id="c1Arc" cx="60" cy="60" r="50" fill="none" stroke="url(#g1)" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 60 60)" style="filter:drop-shadow(0 0 6px #4cc9f0)"/></svg>
+        <div class="abs" style="inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column"><div class="mono" id="c1Pct" style="font-size:70px;font-weight:700">0%</div><div style="font-size:24px;color:#aebcff;font-weight:600;letter-spacing:3px">AMALIYOT</div></div>
+      </div>
+      <div class="abs" style="left:420px;top:160px;width:500px">
+        <div class="pk" id="c1k0"><svg width="54" height="54" viewBox="0 0 100 120" style="stroke:#a6f0ff;stroke-width:8;fill:none"><path d="M14 8h50l22 22v82H14zM64 8v22h22M28 54h44M28 70h44M28 86h30"/></svg><span>Hujjatlar</span><i class="ick">✓</i></div>
+        <div class="pk" id="c1k1"><div class="mono" style="width:54px;font-size:22px;font-weight:700;color:#d0a6ff;line-height:1.1">Dt<br>Kt</div><span>Provodkalar</span><i class="ick">✓</i></div>
+        <div class="pk" id="c1k2"><svg width="54" height="54" viewBox="0 0 120 120" style="stroke:#ff9cc4;stroke-width:9;fill:none;stroke-linecap:round"><path d="M12 96l30-30 20 18 44-50M82 34h24v24"/></svg><span>Hisobotlar</span><i class="ick">✓</i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== A2: OLDIN — «real firmalar bilan ishlay olamanmi?» 23.5 → 27.0 =============== -->
+  <div class="scene" id="sA2">
+    <div class="abs kicker" id="a2Kick" style="left:0;right:0;top:250px;justify-content:center"><b></b>Kelishimdan oldin</div>
+    <div id="a2Firms"></div>
+    <div class="abs" id="a2Cloud" style="left:90px;top:760px;width:900px;height:420px">
+      <div class="abs glass dark" style="inset:0;border-radius:200px"></div>
+      <div class="abs glass dark" style="left:120px;top:-60px;width:220px;height:220px;border-radius:50%"></div>
+      <div class="abs glass dark" style="left:380px;top:-100px;width:280px;height:280px;border-radius:50%"></div>
+      <div class="abs glass dark" style="left:620px;top:-40px;width:200px;height:200px;border-radius:50%"></div>
+      <div class="abs" style="inset:0;border-radius:200px;background:linear-gradient(140deg,rgba(34,44,110,.9),rgba(12,16,44,.85) 50%,rgba(54,22,112,.9))"></div>
+      <div class="abs" style="inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 60px">
+        <div id="a2Q" style="font-size:64px;font-weight:800;line-height:1.15;letter-spacing:-.5px">«<span class="grad-text">Real firmalar</span> bilan<br>ishlay olamanmi?»</div></div>
+    </div>
+    <div class="abs" id="a2t1" style="left:330px;top:1220px;width:60px;height:60px;border-radius:50%;background:rgba(60,70,150,.85)"></div>
+    <div class="abs" id="a2t2" style="left:290px;top:1310px;width:36px;height:36px;border-radius:50%;background:rgba(60,70,150,.85)"></div>
+    <div class="abs qm" id="a2q1" style="left:70px;top:620px;font-size:110px">?</div>
+    <div class="abs qm" id="a2q2" style="left:930px;top:640px;font-size:90px">?</div>
+  </div>
+
+  <!-- =============== B2: 1-2 darslardanoq javob (split) 27.0 → 31.45 =============== -->
+  <div class="scene" id="sB2">
+    <div class="panel" id="b2Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs glass dark lcard" id="b2l1" style="left:60px;top:140px"><div class="ln1">DARS</div><div class="ln2">1</div><i class="ick big">✓</i></div>
+      <div class="abs glass dark lcard" id="b2l2" style="left:330px;top:140px"><div class="ln1">DARS</div><div class="ln2">2</div><i class="ick big">✓</i></div>
+      <div class="abs" id="b2Q" style="left:690px;top:150px;width:300px;height:300px">
+        <div class="abs" id="b2Qm" style="inset:0;display:flex;align-items:center;justify-content:center;font-size:230px;font-weight:800;color:#c77dff;text-shadow:0 0 40px rgba(199,125,255,.8)">?</div>
+        <div class="abs" id="b2Bulb" style="inset:0;display:flex;align-items:center;justify-content:center">
+          <div class="abs" style="inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,217,138,.55),transparent 65%)"></div>
+          <svg width="230" height="270" viewBox="0 0 100 120" style="position:relative;filter:drop-shadow(0 0 20px rgba(255,217,138,.9))"><path d="M50 6a36 36 0 0 0-22 64c5 4 8 9 8 15v5h28v-5c0-6 3-11 8-15A36 36 0 0 0 50 6z" fill="#ffd98a" stroke="#fff3cf" stroke-width="4"/><path d="M36 98h28M39 108h22" stroke="#fff3cf" stroke-width="6" stroke-linecap="round"/><path d="M40 52l8 8 14-16" stroke="#7a4a00" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="abs glass dark" id="b2Ans" style="left:60px;top:560px;width:930px;height:160px;border-radius:40px;display:flex;align-items:center;gap:26px;padding:0 34px">
+        <div style="width:100px;height:100px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;font-size:58px;font-weight:800;box-shadow:0 0 30px rgba(76,201,240,.7)">✓</div>
+        <div><div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:3px">SAVOLLARIMGA</div><div style="font-size:52px;font-weight:800">Javob <span class="grad-text">topdim</span></div></div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== REC: tavsiya qilaman (talking head chip) 31.6 → 34.6 =============== -->
+  <div class="scene" id="sRec">
+    <div class="abs glass dark" id="rc" style="left:0;right:0;margin:0 auto;width:max-content;top:300px;border-radius:40px;padding:24px 40px;overflow:hidden;text-align:center">
+      <div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:5px">TAVSIYA QILAMAN</div>
+      <div style="font-size:52px;font-weight:800;line-height:1.1;margin-top:4px">Faxr Madad <span class="grad-text">Konsalt</span></div>
+      <div id="rcStars" style="display:flex;gap:12px;justify-content:center;margin-top:12px"></div>
+      <div class="abs" id="rcShine" style="top:-60px;bottom:-60px;width:180px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
+
+  <!-- =============== C2: professional ustozlar (circle) 34.6 → 37.15 =============== -->
+  <div class="scene" id="sC2">
+    <div class="abs kicker" id="c2Kick" style="left:0;right:0;top:700px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Bu yerda</div>
+    <div class="abs" id="c2Board" style="left:90px;top:780px;width:900px;height:300px;border-radius:30px;background:linear-gradient(160deg,#123a3a,#0b2626);box-shadow:inset 0 0 0 10px #6b4a2a,inset 0 0 0 14px #3d2a17,0 30px 70px rgba(0,0,0,.5);overflow:hidden">
+      <svg class="abs" width="900" height="300" viewBox="0 0 900 300" style="left:0;top:0;stroke:#e9f7ef;stroke-width:5;fill:none;stroke-linecap:round;opacity:.9">
+        <path class="ln" pathLength="1" d="M60 90h60M90 60v60M170 90h70M330 70h40v40h-40zM330 70l40 40M420 90h40M460 70l20 20-20 20"/>
+        <path class="ln" pathLength="1" d="M520 70c20-14 50-14 60 6s-20 30-40 34 30 8 40 22-30 26-60 10"/>
+        <path class="ln" pathLength="1" d="M640 90h30M690 60v60h50M60 190h420M60 230h300M540 200l40 30 60-80"/>
+      </svg>
+    </div>
+    <div class="abs" id="c2Teach" style="left:90px;top:1120px;width:900px;display:flex;gap:30px;justify-content:center"></div>
+    <div class="abs chip" id="c2Pro" style="left:0;right:0;margin:0 auto;width:max-content;top:1360px;background:linear-gradient(120deg,#4361ee,#7209b7);box-shadow:0 10px 30px rgba(114,9,183,.55);font-size:36px;font-weight:800;padding:12px 34px">★ Professional ustozlar</div>
+  </div>
+
+  <!-- =============== B3: yanada chuqurroq (split) 37.1 → 40.85 =============== -->
+  <div class="scene" id="sB3">
+    <div class="panel" id="b3Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:120px;background:#7209b7;opacity:.4"></div>
+      <div class="abs" style="left:70px;top:110px;font-size:28px;color:#aebcff;font-weight:600;letter-spacing:5px">BUXGALTERIYA BILIMLARI</div>
+      <div id="b3Lv"></div>
+      <div class="abs" id="b3Dive" style="left:880px;top:180px;width:110px;height:560px">
+        <div class="abs" style="left:49px;top:0;bottom:60px;width:12px;border-radius:6px;background:rgba(255,255,255,.08)"></div>
+        <div class="abs" id="b3Fill" style="left:49px;top:0;height:500px;width:12px;border-radius:6px;background:linear-gradient(180deg,#4cc9f0,#7209b7,#f72585);box-shadow:0 0 20px rgba(114,9,183,.8);transform-origin:50% 0"></div>
+        <div class="abs" id="b3Arrow" style="left:20px;top:0;width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#f72585,#7209b7);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;box-shadow:0 0 30px rgba(247,37,133,.7)">↓</div>
+      </div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== END CARD 41.0 → 46.0 =============== -->
+  <div class="scene" id="sEnd">
+    <div class="abs" id="ecLogo" style="left:0;right:0;top:480px;display:flex;justify-content:center">
+      <div style="position:relative;width:300px;height:300px">
+        <div class="abs" id="ecRing" style="inset:-22px;border-radius:84px;background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);filter:blur(2px);opacity:.9"></div>
+        <div class="abs" style="inset:-14px;border-radius:78px;background:#0b1030"></div>
+        <div class="abs" style="inset:0;border-radius:70px;overflow:hidden;box-shadow:0 20px 70px rgba(67,97,238,.8)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      </div></div>
+    <div class="abs" id="ecTitle" style="left:0;right:0;top:870px;text-align:center;font-size:96px;font-weight:800;letter-spacing:-1px;line-height:1.05">Faxr Madad <span class="grad-text">Konsalt.</span></div>
+    <div class="abs" id="ecLine" style="left:340px;width:400px;top:1000px;height:5px;border-radius:3px;background:linear-gradient(90deg,transparent,#4cc9f0,#f72585,transparent)"></div>
+    <div class="glass dark abs" id="ec" style="left:50px;top:1070px;width:980px;border-radius:46px;padding:40px 40px;overflow:hidden">
+      <div class="ecr" id="ec1">
+        <div class="abs" id="ecPing" style="left:72px;top:64px;width:20px;height:20px;border-radius:50%;border:4px solid #f72585"></div>
+        <svg width="92" height="112" viewBox="0 0 100 122" style="flex:none;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(247,37,133,.7))" id="ecPin">
+          <path class="ln" pathLength="1" d="M50 116C50 116 10 72 10 44a40 40 0 1 1 80 0c0 28-40 72-40 72z" fill="rgba(247,37,133,.22)" stroke="#ff7ab6" stroke-width="7"/>
+          <path class="ln" pathLength="1" d="M36 44a14 14 0 1 0 28 0a14 14 0 1 0-28 0" stroke="#fff" stroke-width="7"/></svg>
+        <div style="font-size:38px;font-weight:600;line-height:1.35"><b style="color:#8fe3ff">Manzil:</b> Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi, 1-uy.</div></div>
+      <div class="ecr" id="ec2" style="margin-top:24px">
+        <div id="ecPh" style="width:92px;height:92px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(76,201,240,.7)">
+          <svg width="46" height="46" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="#fff"/></svg></div>
+        <div style="font-size:58px;font-weight:700"><span style="font-size:38px;color:#8fe3ff;font-weight:700">Tel:</span> <span class="mono">+998976448800</span></div></div>
+      <div class="abs" id="ecShine" style="top:-60px;bottom:-60px;width:220px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
