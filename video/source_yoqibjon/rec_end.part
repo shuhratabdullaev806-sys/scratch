@@ -1,0 +1,34 @@
+  <!-- =============== REC: tavsiya qilaman (talking head chip) 31.6 → 34.6 =============== -->
+  <div class="scene" id="sRec">
+    <div class="abs glass dark" id="rc" style="left:0;right:0;margin:0 auto;width:max-content;top:300px;border-radius:40px;padding:24px 40px;overflow:hidden;text-align:center">
+      <div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:5px">TAVSIYA QILAMAN</div>
+      <div style="font-size:52px;font-weight:800;line-height:1.1;margin-top:4px">Faxr Madad <span class="grad-text">Konsalt</span></div>
+      <div id="rcStars" style="display:flex;gap:12px;justify-content:center;margin-top:12px"></div>
+      <div class="abs" id="rcShine" style="top:-60px;bottom:-60px;width:180px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
+
+  <!-- =============== END CARD 41.0 → 46.0 =============== -->
+  <div class="scene" id="sEnd">
+    <div class="abs" id="ecLogo" style="left:0;right:0;top:480px;display:flex;justify-content:center">
+      <div style="position:relative;width:300px;height:300px">
+        <div class="abs" id="ecRing" style="inset:-22px;border-radius:84px;background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);filter:blur(2px);opacity:.9"></div>
+        <div class="abs" style="inset:-14px;border-radius:78px;background:#0b1030"></div>
+        <div class="abs" style="inset:0;border-radius:70px;overflow:hidden;box-shadow:0 20px 70px rgba(67,97,238,.8)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      </div></div>
+    <div class="abs" id="ecTitle" style="left:0;right:0;top:870px;text-align:center;font-size:96px;font-weight:800;letter-spacing:-1px;line-height:1.05">Faxr Madad <span class="grad-text">Konsalt.</span></div>
+    <div class="abs" id="ecLine" style="left:340px;width:400px;top:1000px;height:5px;border-radius:3px;background:linear-gradient(90deg,transparent,#4cc9f0,#f72585,transparent)"></div>
+    <div class="glass dark abs" id="ec" style="left:50px;top:1070px;width:980px;border-radius:46px;padding:40px 40px;overflow:hidden">
+      <div class="ecr" id="ec1">
+        <div class="abs" id="ecPing" style="left:72px;top:64px;width:20px;height:20px;border-radius:50%;border:4px solid #f72585"></div>
+        <svg width="92" height="112" viewBox="0 0 100 122" style="flex:none;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(247,37,133,.7))" id="ecPin">
+          <path class="ln" pathLength="1" d="M50 116C50 116 10 72 10 44a40 40 0 1 1 80 0c0 28-40 72-40 72z" fill="rgba(247,37,133,.22)" stroke="#ff7ab6" stroke-width="7"/>
+          <path class="ln" pathLength="1" d="M36 44a14 14 0 1 0 28 0a14 14 0 1 0-28 0" stroke="#fff" stroke-width="7"/></svg>
+        <div style="font-size:38px;font-weight:600;line-height:1.35"><b style="color:#8fe3ff">Manzil:</b> Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi, 1-uy.</div></div>
+      <div class="ecr" id="ec2" style="margin-top:24px">
+        <div id="ecPh" style="width:92px;height:92px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(76,201,240,.7)">
+          <svg width="46" height="46" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="#fff"/></svg></div>
+        <div style="font-size:58px;font-weight:700"><span style="font-size:38px;color:#8fe3ff;font-weight:700">Tel:</span> <span class="mono">+998976448800</span></div></div>
+      <div class="abs" id="ecShine" style="top:-60px;bottom:-60px;width:220px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
