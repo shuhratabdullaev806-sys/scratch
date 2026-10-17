@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>Javohir teaser</title>
+<style>
+@font-face{font-family:Outfit;font-weight:500;src:url(node_modules/@fontsource/outfit/files/outfit-latin-500-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:600;src:url(node_modules/@fontsource/outfit/files/outfit-latin-600-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:700;src:url(node_modules/@fontsource/outfit/files/outfit-latin-700-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:800;src:url(node_modules/@fontsource/outfit/files/outfit-latin-800-normal.woff2)}
+@font-face{font-family:Mono;font-weight:700;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+body{font-family:Outfit,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#070b18}
+.abs{position:absolute}
+#bg{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:50% 45%}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.85),rgba(143,227,255,.35) 40%,transparent 75%);opacity:0;mix-blend-mode:screen}
+.glass{border-radius:40px;background:linear-gradient(140deg,rgba(34,44,110,.82),rgba(12,16,44,.78) 50%,rgba(54,22,112,.8));
+  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),0 24px 70px rgba(0,0,0,.45);border:1.6px solid rgba(190,205,255,.35)}
+.grad{background:linear-gradient(100deg,#8fdcff,#6d86ff 45%,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kick{font-size:26px;font-weight:600;letter-spacing:7px;color:#aebcff;display:flex;align-items:center;gap:14px}
+.kick b{width:14px;height:14px;border-radius:50%;background:#f72585;box-shadow:0 0 16px #f72585}
+#cta{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 30%,#1b2160 0%,#0d1233 45%,#060913 100%);opacity:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);mix-blend-mode:screen}
+.pt{position:absolute;width:6px;height:6px;border-radius:50%;background:#9fb4ff;box-shadow:0 0 12px #6f8cff}
+.row{display:flex;align-items:center;gap:22px}
+.mono{font-family:Mono,monospace}
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="bg" src="../../v12/out/00000.jpg">
+  <div id="flash"></div>
+
+  <!-- HOOK -->
+  <div class="abs glass" id="hook" style="left:60px;right:60px;top:250px;padding:30px 40px 34px;text-align:center">
+    <div class="kick" style="justify-content:center"><b></b>O‘QUVCHIMIZ FIKRI</div>
+    <div style="font-size:66px;font-weight:800;line-height:1.08;margin-top:12px;letter-spacing:-.5px">Nega aynan<br><span class="grad">Faxr Madad Konsalt?</span></div>
+  </div>
+
+  <!-- CTA -->
+  <div id="cta">
+    <div class="blob" id="cb1" style="width:760px;height:760px;background:#4361ee;opacity:.55"></div>
+    <div class="blob" id="cb2" style="width:640px;height:640px;background:#7209b7;opacity:.5"></div>
+    <div class="blob" id="cb3" style="width:500px;height:500px;background:#f72585;opacity:.3"></div>
+    <div id="dots"></div>
+    <div class="abs" id="cLogo" style="left:0;right:0;top:400px;display:flex;justify-content:center">
+      <div style="position:relative;width:230px;height:230px">
+        <div class="abs" id="cRing" style="inset:-18px;border-radius:68px;background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);filter:blur(2px)"></div>
+        <div class="abs" style="inset:-11px;border-radius:62px;background:#0b1030"></div>
+        <div class="abs" style="inset:0;border-radius:56px;overflow:hidden;box-shadow:0 20px 70px rgba(67,97,238,.8)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      </div></div>
+    <div class="abs" id="cT1" style="left:0;right:0;top:700px;text-align:center;font-size:44px;font-weight:600;color:#c8d1ff">Siz ham Javohir kabi</div>
+    <div class="abs" id="cT2" style="left:40px;right:40px;top:765px;text-align:center;font-size:84px;font-weight:800;line-height:1.02;letter-spacing:-1px">buxgalteriyani<br><span class="grad">o‘rganing</span></div>
+    <div class="abs glass" id="cCard" style="left:70px;right:70px;top:1030px;padding:30px 34px">
+      <div class="row" id="cR1">
+        <svg width="70" height="86" viewBox="0 0 100 122" style="flex:none;filter:drop-shadow(0 0 14px rgba(247,37,133,.7))"><path d="M50 116C50 116 10 72 10 44a40 40 0 1 1 80 0c0 28-40 72-40 72z" fill="rgba(247,37,133,.25)" stroke="#ff7ab6" stroke-width="7"/><path d="M36 44a14 14 0 1 0 28 0a14 14 0 1 0-28 0" stroke="#fff" stroke-width="7" fill="none"/></svg>
+        <div style="font-size:40px;font-weight:700">Faxr Madad Konsalt <span style="color:#8fe3ff">· Jizzax</span></div></div>
+      <div class="row" id="cR2" style="margin-top:24px">
+        <div id="cPh" style="width:76px;height:76px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(76,201,240,.7)">
+          <svg width="40" height="40" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="#fff"/></svg></div>
+        <div class="mono" style="font-size:58px;font-weight:700">+998976448800</div></div>
+    </div>
+    <div class="abs" id="cBtn" style="left:0;right:0;margin:0 auto;width:max-content;top:1360px;padding:26px 54px;border-radius:999px;background:linear-gradient(120deg,#4361ee,#7209b7 60%,#f72585);box-shadow:0 16px 50px rgba(114,9,183,.6),inset 0 1.5px 0 rgba(255,255,255,.45);font-size:44px;font-weight:800;overflow:hidden">
+      To‘liq video profilimizda ↗
+      <div class="abs" id="cShine" style="top:-40px;bottom:-40px;width:160px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg)"></div></div>
+  </div>
+</div>
+<script>
+const FPS = 25, $ = s => document.querySelector(s);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const eOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const back = x => { x = clamp(x); const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+// [teaserStart, sourceStart, duration] in the Javohir main video
+const SEG = [[0, 0.2, 2.0], [2.0, 7.6, 2.4], [4.4, 10.2, 3.75], [8.15, 20.8, 4.85]];
+const CTA = 13.0, END = 16.0;
+const cuts = SEG.slice(1).map(s => s[0]).concat([CTA]);
+const DOTS = [];
+for (let i = 0; i < 34; i++) {
+  const d = document.createElement('div'); d.className = 'pt';
+  const r = (i * 9301 + 49297) % 233280 / 233280, r2 = (i * 7919 + 1237) % 1000 / 1000, r3 = (i * 3571 + 17) % 997 / 997;
+  DOTS.push({ d, x: r * 1080, y: r2 * 2000, sp: 20 + r3 * 60, sz: .4 + r3 * 1.1, ph: r * 6.28 }); $('#dots').appendChild(d);
+}
+function inA(t, a, d = .5) { return eOut((t - a) / d); }
+function pop(el, t, a, d = .55, dy = 50) { const k = clamp((t - a) / d); el.style.opacity = Math.min(1, k * 1.6); el.style.transform = `translateY(${(1 - eOut(k)) * dy}px) scale(${.9 + .1 * back(k)})`; el.style.filter = `blur(${(1 - eOut(k)) * 10}px)`; }
+const img = $('#bg');
+window.renderFrame = async (frame) => {
+  const t = frame / FPS;
+  // background source frame
+  let src = null, segT = 0;
+  for (const [a, s, d] of SEG) if (t >= a && t < a + d) { src = Math.min(874, Math.round((s + t - a) * FPS)); segT = t - a; }
+  if (src !== null) {
+    const p = `../../v12/out/${String(src).padStart(5, '0')}.jpg`;
+    if (!img.src.endsWith(p.slice(5))) { img.src = p; await img.decode().catch(() => { }); }
+  }
+  // cut punch + flash
+  let fl = 0, punch = 0;
+  for (const c of cuts) { const dt = t - c; if (dt >= 0 && dt < .35) { fl = Math.max(fl, (1 - dt / .35) * .55); punch = Math.max(punch, 1 - eOut(dt / .35)); } }
+  { const dt = t - 0; if (dt < .3) fl = Math.max(fl, (1 - dt / .3) * .5); }
+  $('#flash').style.opacity = fl;
+  img.style.transform = `scale(${1 + .07 * punch + .015 * Math.min(segT, 4) / 4})`;
+  // hook
+  { const h = $('#hook'); if (t < 2.0) { pop(h, t, .12, .55, -40); if (t > 1.75) h.style.opacity = clamp((2.0 - t) / .25); } else h.style.opacity = 0; }
+  // CTA
+  const c = t - CTA;
+  $('#cta').style.opacity = clamp(c / .25);
+  if (c >= 0) {
+    $('#cb1').style.transform = `translate(${-120 + 160 * Math.sin(t * .6)}px, ${120 + 120 * Math.cos(t * .5)}px)`;
+    $('#cb2').style.transform = `translate(${520 + 140 * Math.cos(t * .5)}px, ${760 + 160 * Math.sin(t * .4)}px)`;
+    $('#cb3').style.transform = `translate(${200 + 200 * Math.sin(t * .4 + 1)}px, ${1300 + 140 * Math.cos(t * .6)}px)`;
+    DOTS.forEach(p => { const y = ((p.y - t * p.sp) % 2000 + 2000) % 2000 - 40; p.d.style.transform = `translate(${p.x + 30 * Math.sin(t * .6 + p.ph)}px, ${y}px) scale(${p.sz})`; p.d.style.opacity = .25 + .35 * Math.sin(t * 1.3 + p.ph) ** 2; });
+    { const k = clamp((c - .05) / .7); const L = $('#cLogo'); L.style.opacity = Math.min(1, k * 2); L.style.transform = `scale(${.4 + .6 * back(k)}) rotate(${(1 - eOut(k)) * -25}deg)`; }
+    $('#cRing').style.transform = `rotate(${t * 60}deg)`;
+    pop($('#cT1'), t, CTA + .3, .5, 30); pop($('#cT2'), t, CTA + .45, .6, 50);
+    pop($('#cCard'), t, CTA + .8, .6, 70); pop($('#cR1'), t, CTA + 1.0, .5, 20); pop($('#cR2'), t, CTA + 1.2, .5, 20);
+    pop($('#cBtn'), t, CTA + 1.5, .55, 60);
+    { const ph = ((c - 2.0) % 1.2 + 1.2) % 1.2; $('#cBtn').style.transform += ` scale(${c > 2.0 ? 1 + .035 * Math.sin(Math.PI * clamp(ph / .5)) : 1})`; }
+    $('#cShine').style.transform = `translateX(${-200 + 1100 * clamp((c - 2.1) / .9)}px) skewX(-18deg)`;
+    { const k = c - 2.4; $('#cPh').style.transform = k > 0 && k < .4 ? `rotate(${14 * Math.sin(k * 50) * (1 - k / .4)}deg)` : ''; }
+  }
+  return t;
+};
+window.ready = (async () => { await document.fonts.ready; return true; })();
+</script>
+</body>
+</html>
