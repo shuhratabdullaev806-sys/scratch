@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>Javohir fikri</title>
+<style>
+@font-face{font-family:Outfit;font-weight:400;src:url(node_modules/@fontsource/outfit/files/outfit-latin-400-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:500;src:url(node_modules/@fontsource/outfit/files/outfit-latin-500-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:600;src:url(node_modules/@fontsource/outfit/files/outfit-latin-600-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:700;src:url(node_modules/@fontsource/outfit/files/outfit-latin-700-normal.woff2)}
+@font-face{font-family:Outfit;font-weight:800;src:url(node_modules/@fontsource/outfit/files/outfit-latin-800-normal.woff2)}
+@font-face{font-family:Mono;font-weight:500;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2)}
+@font-face{font-family:Mono;font-weight:700;src:url(node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2)}
+:root{
+  --p:#4361ee; --pd:#3a0ca3; --s:#7209b7; --a:#f72585; --c:#4cc9f0; --ink:#070b18; --navy:#0f172a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+body{font-family:Outfit,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--ink)}
+.abs{position:absolute}
+.full{position:absolute;inset:0}
+.mono{font-family:Mono,monospace}
+
+/* ---------- background world ---------- */
+#bg{background:radial-gradient(120% 70% at 50% 25%,#1b2160 0%,#0d1233 45%,#060913 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);mix-blend-mode:screen}
+#floor{position:absolute;left:-540px;right:-540px;bottom:-200px;height:1100px;
+  background-image:linear-gradient(rgba(124,160,255,.16) 2px,transparent 2px),linear-gradient(90deg,rgba(124,160,255,.16) 2px,transparent 2px);
+  background-size:90px 90px;transform:perspective(900px) rotateX(72deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.9),transparent 85%)}
+#dots{position:absolute;inset:0}
+.pt{position:absolute;width:6px;height:6px;border-radius:50%;background:#9fb4ff;box-shadow:0 0 12px #6f8cff}
+#vig{background:radial-gradient(130% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+/* ---------- speaker ---------- */
+#spkSplit{position:absolute;inset:0;will-change:clip-path}
+#spkCirc{position:absolute;inset:0}
+#v{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+#ring{position:absolute;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+  filter:drop-shadow(0 0 22px rgba(76,122,255,.9))}
+#ringGlow{position:absolute;border-radius:50%;box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.08)}
+#tint{position:absolute;inset:0;pointer-events:none}
+
+/* ---------- glass ---------- */
+.glass:not(.abs):not(.full):not(.sg){position:relative}
+.glass{border-radius:36px;
+  background:linear-gradient(140deg,rgba(255,255,255,.17),rgba(255,255,255,.05) 45%,rgba(255,255,255,.08));
+  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),inset 0 0 40px rgba(255,255,255,.05),0 24px 70px rgba(0,0,0,.38)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;
+  background:linear-gradient(150deg,rgba(255,255,255,.75),rgba(255,255,255,.08) 35%,rgba(255,255,255,.02) 60%,rgba(160,190,255,.55));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.glass::after{content:"";position:absolute;left:6%;top:3px;width:55%;height:45%;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.28),transparent 70%)}
+.dark{background:linear-gradient(140deg,rgba(34,44,110,.72),rgba(10,14,42,.66) 50%,rgba(46,22,104,.66))}
+
+/* ---------- subtitles ---------- */
+#subs{position:absolute;left:0;right:0;top:0;height:0}
+.sg{position:absolute;left:50%;top:0;display:flex;gap:18px;padding:22px 38px 26px;border-radius:999px;white-space:nowrap;
+  font-weight:700;font-size:62px;letter-spacing:-.5px;line-height:1;transform-origin:50% 50%}
+.sg.glass{background:linear-gradient(140deg,rgba(34,44,110,.62),rgba(12,16,44,.56) 50%,rgba(54,22,112,.58))}
+.sw{position:relative;z-index:2;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.hl{position:absolute;z-index:1;top:14px;bottom:16px;border-radius:22px;
+  background:linear-gradient(120deg,#4361ee,#7209b7 70%,#f72585);box-shadow:0 8px 26px rgba(90,70,255,.55),inset 0 1px 0 rgba(255,255,255,.45)}
+
+/* ---------- name card ---------- */
+#nc{left:48px;top:1452px;display:flex;align-items:center;gap:26px;padding:24px 44px 24px 24px;border-radius:34px}
+#ncLogo{width:104px;height:104px;border-radius:26px;overflow:hidden;box-shadow:0 10px 30px rgba(67,97,238,.6)}
+#ncLogo img{width:100%;height:100%}
+#ncName{font-size:50px;font-weight:700;letter-spacing:-.5px;line-height:1.05}
+#ncRole{font-size:34px;font-weight:500;color:#c9d4ff;margin-top:6px;display:flex;align-items:center;gap:14px}
+#ncRole i{display:inline-block;width:34px;height:4px;border-radius:2px;background:linear-gradient(90deg,#4cc9f0,#f72585)}
+.mask{overflow:hidden;display:block}
+
+/* ---------- generic scene bits ---------- */
+.scene{position:absolute;inset:0;visibility:hidden}
+.kicker{font-size:30px;font-weight:600;letter-spacing:8px;color:#aebcff;text-transform:uppercase;display:flex;align-items:center;gap:16px}
+.kicker b{width:14px;height:14px;border-radius:50%;background:#f72585;box-shadow:0 0 16px #f72585}
+svg .ln{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.glow{filter:drop-shadow(0 0 10px rgba(96,130,255,.9)) drop-shadow(0 0 30px rgba(114,9,183,.6))}
+.pinkglow{filter:drop-shadow(0 0 12px rgba(247,37,133,.9))}
+.grad-text{background:linear-gradient(100deg,#8fdcff,#6d86ff 45%,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{display:inline-flex;align-items:center;gap:14px;padding:14px 26px;border-radius:999px;font-weight:600;font-size:32px}
+.stamp{position:absolute;padding:14px 34px;border:6px solid #ff3d8b;border-radius:18px;color:#ff3d8b;font-weight:800;font-size:76px;letter-spacing:4px;
+  text-shadow:0 0 24px rgba(247,37,133,.8);box-shadow:0 0 40px rgba(247,37,133,.5),inset 0 0 30px rgba(247,37,133,.3);background:rgba(40,0,20,.35)}
+.stamp.ok{border-color:#4cc9f0;color:#4cc9f0;text-shadow:0 0 24px rgba(76,201,240,.8);box-shadow:0 0 40px rgba(76,201,240,.5),inset 0 0 30px rgba(76,201,240,.3);background:rgba(0,30,50,.35)}
+.skel{height:22px;border-radius:11px;background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,.2),rgba(255,255,255,.10));}
+.row{display:flex;align-items:center;justify-content:space-between}
+
+/* panel for split */
+.panel{position:absolute;left:0;top:960px;width:1080px;height:960px;overflow:hidden;
+  background:radial-gradient(110% 80% at 50% 0%,#1c2366 0%,#0c1030 55%,#060913 100%)}
+.panel .seam{position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,transparent,#4cc9f0,#4361ee,#f72585,transparent);box-shadow:0 0 30px #4361ee}
+.pgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,160,255,.07) 2px,transparent 2px),linear-gradient(90deg,rgba(124,160,255,.07) 2px,transparent 2px);background-size:60px 60px;-webkit-mask-image:radial-gradient(80% 70% at 50% 45%,#000,transparent)}
+
+.hks{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:32px;border:3px solid rgba(160,180,255,.4);color:#aab6ec}
+.shav{width:64px;height:64px;border-radius:50%;border:3px solid #1a1f55}
+.mon{height:74px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;background:rgba(255,255,255,.07);border:2px solid rgba(160,180,255,.25);color:#aab6ec}
+.rcpt{background:linear-gradient(180deg,#ffffff,#e9edff);color:#141a4a;border-radius:16px 16px 0 0;padding:26px 22px 40px;box-shadow:0 20px 50px rgba(0,0,0,.45);-webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 16px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/24px 16px repeat-x}
+.rh{font-size:34px;font-weight:800;letter-spacing:2px}.rs{font-size:24px;color:#5b648f;margin-bottom:14px}
+.rl{height:14px;border-radius:7px;background:#cfd6f5;margin:12px 0;width:90%}
+.rt{display:flex;justify-content:space-between;font-size:26px;font-weight:700;margin-top:18px;border-top:2px dashed #aab3dd;padding-top:14px}
+.rbar{height:70px;margin-top:18px;background:repeating-linear-gradient(90deg,#141a4a 0 3px,transparent 3px 7px,#141a4a 7px 9px,transparent 9px 14px);opacity:.8}
+.mcard{height:330px;border-radius:34px;padding:30px 34px;display:flex;flex-direction:column;gap:6px}
+.mnum{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#4361ee,#7209b7);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;margin-bottom:10px}
+.mt{font-size:50px;font-weight:800;line-height:1.05}.mst2{font-size:28px;color:#aebcff;font-weight:500}
+.mtag{margin-top:auto;align-self:flex-start;background:rgba(76,201,240,.18);border:2px solid rgba(76,201,240,.7);font-size:28px;padding:6px 18px;font-weight:800}
+.fld{margin-top:18px;height:84px;border-radius:18px;background:rgba(0,0,0,.28);border:2px solid rgba(160,180,255,.35);display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:28px;font-weight:600}
+.cday{height:62px;border-radius:14px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#aab6ec}
+.crow{height:88px;border-radius:18px;background-color:rgba(255,255,255,.06);border:2px solid rgba(160,180,255,.2);display:flex;align-items:center;padding:0 22px;gap:18px;font-size:28px}
+.crow .st{padding:8px 16px;border-radius:999px;font-size:22px;font-weight:800;background-color:rgba(255,255,255,.12);color:#c8d1ff;white-space:nowrap}
+.bnE{color:#ff8bbd}.bnC{color:#8fe3ff}
+#grain{position:absolute;inset:-100px;opacity:.07;mix-blend-mode:overlay;pointer-events:none}
+.qm{font-weight:800;color:#c77dff;text-shadow:0 0 30px rgba(199,125,255,.8);opacity:.85}
+.spark{font-size:40px;color:#ffd98a;text-shadow:0 0 16px #ffd98a}
+.ick{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;font-size:26px;box-shadow:0 0 18px rgba(76,201,240,.7);flex:none}
+.ick.big{position:absolute;right:20px;top:20px;width:64px;height:64px;font-size:36px}
+.kcard{width:460px;height:700px;border-radius:40px;padding:36px 40px;overflow:hidden}
+.kk{font-size:24px;color:#aebcff;font-weight:600;letter-spacing:5px}
+.kt{font-size:50px;font-weight:800;line-height:1.05;margin-top:6px}
+.book{position:absolute;left:0;height:64px;border-radius:14px;display:flex;align-items:center;padding-left:22px;font-size:28px;font-weight:700;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 10px 24px rgba(0,0,0,.35)}
+.cbar{flex:1;border-radius:12px 12px 4px 4px;background:linear-gradient(180deg,rgba(143,227,255,.9),rgba(67,97,238,.6));transform-origin:50% 100%}
+.pk{height:110px;margin-bottom:22px;border-radius:26px;background:rgba(0,0,0,.25);border:2px solid rgba(160,180,255,.25);display:flex;align-items:center;gap:22px;padding:0 24px;font-size:38px;font-weight:700}
+.pk span{flex:1}
+.lcard{width:240px;height:330px;border-radius:36px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ln1{font-size:28px;color:#aebcff;font-weight:600;letter-spacing:6px}
+.ln2{font-size:170px;font-weight:800;line-height:1;background:linear-gradient(160deg,#8fdcff,#6d86ff 50%,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.teach{width:270px;height:200px;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.av{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px rgba(255,255,255,.15)}
+.tst{font-size:22px;color:#ffd98a;letter-spacing:3px}
+.lv{position:absolute;left:70px;width:780px;height:120px;border-radius:30px;display:flex;align-items:center;gap:24px;padding:0 30px;font-size:40px;font-weight:800}
+.lv .n{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;background:rgba(255,255,255,.15)}
+.lv .d{margin-left:auto;font-size:24px;color:#c8d1ff;font-weight:600;letter-spacing:3px}
+.ecr{position:relative;display:flex;align-items:center;gap:26px;padding:20px 26px;border-radius:28px;background:rgba(255,255,255,.07);border:2px solid rgba(160,180,255,.3)}
+.sstar{display:inline-block}
+.ccard{width:460px;height:560px;border-radius:40px;padding:36px 40px}
+.cic{width:130px;height:130px;border-radius:34px;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 34px rgba(0,0,0,.4)}
+.pbar{margin-top:40px;height:26px;border-radius:13px;background:rgba(255,255,255,.1);overflow:hidden}
+.pbar i{display:block;height:100%;width:100%;border-radius:13px;background:linear-gradient(90deg,#4cc9f0,#4361ee,#c77dff);transform-origin:0 50%;box-shadow:0 0 20px rgba(76,201,240,.6)}
+.pl{margin-top:14px;font-size:26px;color:#aebcff;font-weight:600}.pl b{font-size:34px;color:#fff}
+.node{width:420px;height:420px;border-radius:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.av.big{width:170px;height:170px}
+.nt{font-size:44px;font-weight:800;line-height:1.1;margin-top:4px}
+.lh{margin-top:26px;padding:0 10px;font-size:22px;color:#aebcff;font-weight:600;letter-spacing:2px}
+.lh span:first-child{flex:1}.lh span{width:110px;text-align:right}
+.mrow{height:84px;margin-top:14px;border-radius:18px;background-color:rgba(0,0,0,.25);border:2px solid rgba(160,180,255,.2);display:flex;align-items:center;padding:0 14px;gap:12px;font-size:26px;font-weight:700}
+.mrow .nm{flex:1;display:flex;align-items:center;gap:12px}
+.mrow .q{width:110px;text-align:right;font-family:Mono,monospace;font-size:24px}
+.mrow .q.in{color:#8fe3ff}.mrow .q.out{color:#ff9cc4}
+.sk{margin-top:22px}.sk .row{font-size:30px;font-weight:700}.sk .row b{font-family:Mono,monospace;font-size:30px;color:#8fe3ff}
+.sbar{margin-top:10px;height:30px;border-radius:15px;background:rgba(255,255,255,.1);overflow:hidden}
+.sbar i{display:block;height:100%;border-radius:15px;transform-origin:0 50%}
+.orb{position:absolute;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#8fe3ff 40%,#4361ee);box-shadow:0 0 24px #4cc9f0,0 0 50px rgba(76,201,240,.6)}
+.astep{flex:1;height:96px;border-radius:22px;background:rgba(0,0,0,.25);border:2px solid rgba(160,180,255,.25);display:flex;align-items:center;justify-content:center;gap:10px;font-size:26px;font-weight:700;color:#aab6ec}
+.gcol{position:absolute;bottom:0;width:200px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.gcol .g{width:100%;border-radius:26px 26px 10px 10px;transform-origin:50% 100%;display:flex;align-items:flex-start;justify-content:center;padding-top:18px}
+.gcol .l{font-size:30px;font-weight:800;color:#c8d1ff;letter-spacing:2px}
+.ocard{width:460px;height:400px;border-radius:40px;padding:36px 40px}
+.tcard{width:460px;height:370px;border-radius:40px;padding:34px 40px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8fe3ff"/><stop offset=".5" stop-color="#6b86ff"/><stop offset="1" stop-color="#c76bff"/>
+    </linearGradient>
+    <linearGradient id="gp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7ab6"/><stop offset="1" stop-color="#f72585"/>
+    </linearGradient>
+    <linearGradient id="gc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a6f0ff"/><stop offset="1" stop-color="#4cc9f0"/>
+    </linearGradient>
+    <!-- reusable icons -->
+    <symbol id="i-machine" viewBox="0 0 200 150">
+      <path class="ln" pathLength="1" d="M8 138H192M30 44h100a10 10 0 0 1 10 10v74H20V54a10 10 0 0 1 10-10z"/>
+      <path class="ln" pathLength="1" d="M36 60h64v44H36z"/>
+      <path class="ln" pathLength="1" d="M68 60v20M60 80h16M68 86v8M50 104l8-8h20l8 8"/>
+      <path class="ln" pathLength="1" d="M150 58h36v70h-36z"/>
+      <path class="ln" pathLength="1" d="M157 66h22v14h-22zM156 98.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M172 98.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M156 114.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M172 114.0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+      <path class="ln" pathLength="1" d="M44 44V26h72v18M96 26V12M90 12h12"/>
+      <path class="ln" pathLength="1" d="M108 116h24M108 124h24"/>
+    </symbol>
+    <symbol id="i-building" viewBox="0 0 140 150">
+      <path class="ln" pathLength="1" d="M6 140H134M20 140V34l48-22v128"/>
+      <path class="ln" pathLength="1" d="M68 52h50v88"/>
+      <path class="ln" pathLength="1" d="M34 46h20M34 64h20M34 82h20M34 100h20M82 68h22M82 86h22M82 104h22"/>
+      <path class="ln" pathLength="1" d="M36 140v-20h16v20M86 140v-18h14v18"/>
+    </symbol>
+    <symbol id="i-car" viewBox="0 0 180 110">
+      <path class="ln" pathLength="1" d="M34 82H16V64c0-7 5-12 12-13l22-4 20-22c4-4 8-6 13-6h38c6 0 10 2 13 7l15 20 14 3c7 1 12 7 12 14v19h-14M66 82h52"/>
+      <path class="ln" pathLength="1" d="M36 82a14 14 0 1 0 28 0a14 14 0 1 0-28 0M120 82a14 14 0 1 0 28 0a14 14 0 1 0-28 0"/>
+      <path class="ln" pathLength="1" d="M74 46l14-16h18v16zM114 46V30h12l12 16z"/>
+    </symbol>
+    <symbol id="i-person" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0 -40 0"/>
+      <path class="ln" pathLength="1" d="M22 106c4-20 20-30 38-30s34 10 38 30"/>
+    </symbol>
+    <symbol id="i-box" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 14l40 20v50L60 104 20 84V34z"/>
+      <path class="ln" pathLength="1" d="M20 34l40 20 40-20M60 54v50"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 12l38 14v30c0 26-16 44-38 52C38 100 22 82 22 56V26z"/>
+      <path class="ln" pathLength="1" d="M42 60l12 12 24-26"/>
+    </symbol>
+    <symbol id="i-doc" viewBox="0 0 100 120">
+      <path class="ln" pathLength="1" d="M14 8h50l22 22v82H14zM64 8v22h22"/>
+      <path class="ln" pathLength="1" d="M28 54h44M28 70h44M28 86h30"/>
+    </symbol>
+    <symbol id="i-scales" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 12v90M36 106h48M18 30h84M60 12l-4 6h8z"/>
+      <path class="ln" pathLength="1" d="M18 30L6 66M18 30l12 36M102 30l-12 36M102 30l12 36"/>
+      <path class="ln" pathLength="1" d="M4 66c2 12 26 12 28 0zM88 66c2 12 26 12 28 0z"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M24 22h72a8 8 0 0 1 8 8v72a8 8 0 0 1-8 8H24a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8zM16 48h88M40 12v20M80 12v20"/>
+      <path class="ln" pathLength="1" d="M34 66h10M56 66h10M78 66h10M34 88h10M56 88h10M78 88h10"/>
+    </symbol>
+    <symbol id="i-bookmark" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M32 10h56v100L60 86 32 110z"/>
+    </symbol>
+    <symbol id="i-share" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M72 26a14 14 0 1 0 28 0a14 14 0 1 0-28 0M16 60a14 14 0 1 0 28 0a14 14 0 1 0-28 0M72 94a14 14 0 1 0 28 0a14 14 0 1 0-28 0"/>
+      <path class="ln" pathLength="1" d="M43 53l30-20M43 67l30 20"/>
+    </symbol>
+    <symbol id="i-wallet" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M16 38h80a8 8 0 0 1 8 8v54a8 8 0 0 1-8 8H24a8 8 0 0 1-8-8zM20 38l56-22 10 22"/>
+      <path class="ln" pathLength="1" d="M104 60H82a10 10 0 0 0 0 20h22zM84 70h2"/>
+    </symbol>
+    <symbol id="i-family" viewBox="0 0 160 120">
+      <path class="ln" pathLength="1" d="M36 30a14 14 0 1 0 28 0a14 14 0 1 0-28 0M96 30a14 14 0 1 0 28 0a14 14 0 1 0-28 0M70 62a10 10 0 1 0 20 0a10 10 0 1 0-20 0"/>
+      <path class="ln" pathLength="1" d="M24 112c0-24 11-38 26-38s26 14 26 38M84 112c0-24 11-38 26-38s26 14 26 38M66 112c0-14 6-26 14-26s14 12 14 26"/>
+    </symbol>
+    <symbol id="i-safe" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M20 14h80a6 6 0 0 1 6 6v80a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6zM24 106v8M96 106v8"/>
+      <path class="ln" pathLength="1" d="M36 60a22 22 0 1 0 44 0a22 22 0 1 0-44 0M58 38v8M58 74v8M36 60h8M72 60h8M94 48v24"/>
+    </symbol>
+    <symbol id="i-book" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M60 30c-12-10-30-12-46-8v74c16-4 34-2 46 8c12-10 30-12 46-8V22c-16-4-34-2-46 8zM60 30v74"/>
+      <path class="ln" pathLength="1" d="M26 42c8-2 18-1 24 2M26 58c8-2 18-1 24 2M70 44c6-3 16-4 24-2M70 60c6-3 16-4 24-2"/>
+    </symbol>
+    <symbol id="i-badge" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M34 48a26 26 0 1 0 52 0a26 26 0 1 0-52 0M44 70l-12 38 18-8 10 16 8-30M76 70l12 38-18-8-10 16"/>
+      <path class="ln" pathLength="1" d="M48 48l8 8 16-16"/>
+    </symbol>
+    <symbol id="i-net" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M48 60a12 12 0 1 0 24 0a12 12 0 1 0-24 0M10 24a10 10 0 1 0 20 0a10 10 0 1 0-20 0M90 24a10 10 0 1 0 20 0a10 10 0 1 0-20 0M10 96a10 10 0 1 0 20 0a10 10 0 1 0-20 0M90 96a10 10 0 1 0 20 0a10 10 0 1 0-20 0"/>
+      <path class="ln" pathLength="1" d="M27 31l23 20M93 31L70 51M27 89l23-20M93 89L70 69M30 24h60M30 96h60"/>
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M14 30h92v62H14zM14 30l46 36 46-36"/>
+    </symbol>
+    <symbol id="i-trend" viewBox="0 0 120 120">
+      <path class="ln" pathLength="1" d="M12 96l30-30 20 18 44-50M82 34h24v24"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <!-- world background -->
+  <div id="bg" class="full">
+    <div class="blob" id="b1" style="width:760px;height:760px;background:#4361ee;opacity:.55"></div>
+    <div class="blob" id="b2" style="width:680px;height:680px;background:#7209b7;opacity:.5"></div>
+    <div class="blob" id="b3" style="width:520px;height:520px;background:#f72585;opacity:.28"></div>
+    <div id="floor"></div>
+    <div id="dots"></div>
+    <div id="vig" class="full"></div>
+  </div>
+
+  <!-- speaker -->
+  <div id="spkSplit"><div id="spkCirc"><img id="v" src="../frames/0001.jpg"><div id="tint"></div></div></div>
+  <div id="ringGlow"></div>
+  <div id="ring"></div>
+
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gstar" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset="1" stop-color="#ffb800"/></linearGradient></defs></svg>
+  <!-- =============== A1: buxgalteriya yo'nalishi → bilim va ko'nikmani oshirish 2.7 → 7.55 =============== -->
+  <div class="scene" id="sA1">
+    <div class="abs kicker" id="a1Kick" style="left:0;right:0;top:250px;justify-content:center"><b style="background:#4cc9f0;box-shadow:0 0 16px #4cc9f0"></b>Yo‘nalishim</div>
+    <div class="abs" id="a1Hero" style="left:290px;top:330px;width:500px;height:460px">
+      <div class="abs" id="a1Halo" style="left:0;top:0;width:500px;height:460px;border-radius:50%;background:radial-gradient(circle,rgba(114,9,183,.5),transparent 66%)"></div>
+      <svg class="abs glow" width="380" height="300" viewBox="0 0 120 120" style="left:60px;top:120px;stroke:#d9c2ff;stroke-width:3.4">
+        <path class="ln" pathLength="1" d="M60 30c-12-10-30-12-46-8v74c16-4 34-2 46 8c12-10 30-12 46-8V22c-16-4-34-2-46 8zM60 30v74"/>
+        <path class="ln" pathLength="1" d="M26 42c8-2 18-1 24 2M26 58c8-2 18-1 24 2M26 74c8-2 18-1 24 2M70 44c6-3 16-4 24-2M70 60c6-3 16-4 24-2M70 76c6-3 16-4 24-2"/>
+      </svg>
+      <svg class="abs" id="a1Cap" width="200" height="140" viewBox="0 0 160 110" style="left:150px;top:10px">
+        <path d="M80 8L154 38 80 68 6 38z" fill="#2b1e6e" stroke="#c77dff" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M36 52v28c0 10 20 20 44 20s44-10 44-20V52" fill="#24195c" stroke="#c77dff" stroke-width="5"/>
+        <path d="M148 40v38" stroke="#ffd98a" stroke-width="5" stroke-linecap="round"/><circle cx="148" cy="82" r="7" fill="#ffd98a"/>
+      </svg>
+    </div>
+    <div class="abs glass dark" id="a1Dir" style="left:0;right:0;margin:0 auto;width:max-content;top:800px;border-radius:999px;padding:18px 44px;font-size:52px;font-weight:800">Buxgalteriya <span class="grad-text">yo‘nalishi</span></div>
+    <div class="abs glass dark" id="a1Sk" style="left:90px;top:960px;width:900px;height:430px;border-radius:44px;padding:36px 44px">
+      <div class="row"><span style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:4px">MAQSAD · OSHIRISH</span>
+        <span id="a1Up" style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;box-shadow:0 0 30px rgba(76,201,240,.7)">↑</span></div>
+      <div class="sk"><div class="row"><span>Bilim</span><b id="a1n1">40%</b></div><div class="sbar"><i id="a1b1" style="width:100%;background:linear-gradient(90deg,#4361ee,#4cc9f0)"></i></div></div>
+      <div class="sk"><div class="row"><span>Ko‘nikma</span><b id="a1n2">35%</b></div><div class="sbar"><i id="a1b2" style="width:100%;background:linear-gradient(90deg,#7209b7,#f72585)"></i></div></div>
+    </div>
+  </div>
+
+  <!-- =============== B1: o'quv markazi + konsalting — tanladim (split) 7.5 → 10.15 =============== -->
+  <div class="scene" id="sB1">
+    <div class="panel" id="b1Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs glass dark" id="b1Brand" style="left:0;right:0;margin:0 auto;width:max-content;top:110px;border-radius:999px;padding:14px 40px 14px 14px;display:flex;align-items:center;gap:22px">
+        <div style="width:90px;height:90px;border-radius:24px;overflow:hidden;box-shadow:0 10px 30px rgba(67,97,238,.6)"><img src="logo.svg" style="width:100%;height:100%"></div>
+        <div style="font-size:50px;font-weight:800">Faxr Madad <span class="grad-text">Konsalt</span></div></div>
+      <div class="abs glass dark ocard" id="b1o1" style="left:60px;top:290px">
+        <div class="cic" style="background:linear-gradient(135deg,#4361ee,#7209b7)"><svg width="80" height="80" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M60 30c-12-10-30-12-46-8v74c16-4 34-2 46 8c12-10 30-12 46-8V22c-16-4-34-2-46 8zM60 30v74"/></svg></div>
+        <div class="kt" style="margin-top:20px">O‘quv markazi</div><i class="ick big">✓</i></div>
+      <div class="abs glass dark ocard" id="b1o2" style="left:560px;top:290px">
+        <div class="cic" style="background:linear-gradient(135deg,#f72585,#7209b7)"><svg width="80" height="80" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M16 30h60a8 8 0 0 1 8 8v30a8 8 0 0 1-8 8H44L26 92V76H16a8 8 0 0 1-8-8V38a8 8 0 0 1 8-8z"/><path d="M92 50h12a8 8 0 0 1 8 8v26a8 8 0 0 1-8 8h-6v14L84 92H66"/></svg></div>
+        <div class="kt" style="margin-top:20px">Konsalting</div><i class="ick big">✓</i></div>
+      <div class="abs chip" id="b1Ok" style="left:0;right:0;margin:0 auto;width:max-content;top:740px;background:linear-gradient(120deg,#4cc9f0,#4361ee);box-shadow:0 10px 30px rgba(76,201,240,.55);font-size:38px;font-weight:800;padding:14px 40px">✓ Tanladim</div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== C1: nazariy + amaliy — chuqur egalladim (circle) 10.1 → 14.05 =============== -->
+  <div class="scene" id="sC1">
+    <div class="abs kicker" id="c1Kick" style="left:0;right:0;top:700px;justify-content:center"><b></b>Bu yerda</div>
+    <div class="abs glass dark tcard" id="c1a" style="left:60px;top:790px">
+      <div class="cic" style="background:linear-gradient(135deg,#4cc9f0,#4361ee)"><svg width="80" height="80" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M14 24h92v60H14zM44 100h32M60 84v16M28 40h30M28 54h50M28 68h20"/></svg></div>
+      <div class="kk" style="margin-top:22px">BILIM</div><div class="kt">Amaliy</div><i class="ick big">✓</i></div>
+    <div class="abs glass dark tcard" id="c1b" style="left:560px;top:790px">
+      <div class="cic" style="background:linear-gradient(135deg,#7209b7,#f72585)"><svg width="80" height="80" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round"><path d="M60 30c-12-10-30-12-46-8v74c16-4 34-2 46 8c12-10 30-12 46-8V22c-16-4-34-2-46 8zM60 30v74"/></svg></div>
+      <div class="kk" style="margin-top:22px">BILIM</div><div class="kt">Nazariy</div><i class="ick big">✓</i></div>
+    <div class="abs glass dark" id="c1Deep" style="left:60px;top:1200px;width:960px;height:180px;border-radius:40px;display:flex;align-items:center;gap:28px;padding:0 36px">
+      <div style="font-size:30px;color:#aebcff;font-weight:700;letter-spacing:4px">CHUQUR</div>
+      <div style="flex:1;height:34px;border-radius:17px;background:rgba(255,255,255,.1);overflow:hidden"><i id="c1Bar" style="display:block;height:100%;width:100%;border-radius:17px;background:linear-gradient(90deg,#4cc9f0,#4361ee,#7209b7,#f72585);transform-origin:0 50%;box-shadow:0 0 24px rgba(114,9,183,.7)"></i></div>
+      <div id="c1Ok" style="padding:12px 24px;border-radius:999px;background:linear-gradient(120deg,#4cc9f0,#4361ee);font-size:30px;font-weight:800;box-shadow:0 10px 30px rgba(76,201,240,.5)">✓ Egalladim</div>
+    </div>
+  </div>
+
+  <!-- =============== B2: ustozlardan bilim → hozir amaliyot (split) 15.6 → 20.75 =============== -->
+  <div class="scene" id="sB2">
+    <div class="panel" id="b2Panel">
+      <div class="pgrid"></div>
+      <div class="blob" style="width:520px;height:520px;left:-150px;top:280px;background:#4361ee;opacity:.33"></div>
+      <div class="blob" style="width:420px;height:420px;right:-120px;top:80px;background:#7209b7;opacity:.4"></div>
+      <div class="abs glass dark" id="b2T" style="left:60px;top:110px;width:380px;height:330px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <div style="display:flex">
+          <div class="av" style="width:100px;height:100px;background:linear-gradient(135deg,#4361ee,#7209b7)"><svg width="56" height="56" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:10;fill:none;stroke-linecap:round"><path d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0-40 0M22 106c4-20 20-30 38-30s34 10 38 30"/></svg></div>
+          <div class="av" style="width:100px;height:100px;margin-left:-26px;background:linear-gradient(135deg,#f72585,#7209b7)"><svg width="56" height="56" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:10;fill:none;stroke-linecap:round"><path d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0-40 0M22 106c4-20 20-30 38-30s34 10 38 30"/></svg></div>
+          <div class="av" style="width:100px;height:100px;margin-left:-26px;background:linear-gradient(135deg,#4cc9f0,#4361ee)"><svg width="56" height="56" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:10;fill:none;stroke-linecap:round"><path d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0-40 0M22 106c4-20 20-30 38-30s34 10 38 30"/></svg></div>
+        </div>
+        <div class="nt">Ustozlar</div></div>
+      <div class="abs glass dark" id="b2Me" style="left:640px;top:110px;width:380px;height:330px;border-radius:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <div class="av" style="width:120px;height:120px;background:linear-gradient(135deg,#ffd84d,#f72585)"><svg width="66" height="66" viewBox="0 0 120 120" style="stroke:#fff;stroke-width:10;fill:none;stroke-linecap:round"><path d="M40 40a20 20 0 1 0 40 0a20 20 0 1 0-40 0M22 106c4-20 20-30 38-30s34 10 38 30"/></svg></div>
+        <div class="nt">Men</div>
+        <div class="row" style="gap:10px"><span class="chip" style="font-size:22px;padding:4px 14px;background:rgba(76,201,240,.18);border:2px solid rgba(76,201,240,.7)">Bilim</span><span class="chip" style="font-size:22px;padding:4px 14px;background:rgba(199,125,255,.18);border:2px solid rgba(199,125,255,.7)">Ko‘nikma</span></div></div>
+      <div id="b2Orbs"></div>
+      <div class="abs" style="left:60px;top:500px;font-size:26px;color:#aebcff;font-weight:600;letter-spacing:4px">HOZIRDA · AMALIYOT</div>
+      <div class="abs" id="b2Steps" style="left:60px;top:550px;width:960px;display:flex;gap:16px">
+        <div class="astep" id="as0"><i class="ick" style="width:36px;height:36px;font-size:20px">✓</i>Hujjat</div>
+        <div class="astep" id="as1"><i class="ick" style="width:36px;height:36px;font-size:20px">✓</i>Provodka</div>
+        <div class="astep" id="as2"><i class="ick" style="width:36px;height:36px;font-size:20px">✓</i>Hisobot</div>
+      </div>
+      <div class="abs" id="b2Run" style="left:60px;top:670px;width:960px;height:20px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden"><i id="b2RunF" style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#4cc9f0,#4361ee,#c77dff);transform-origin:0 50%;border-radius:10px"></i></div>
+      <div class="abs" id="b2RunL" style="left:60px;top:705px;font-size:28px;font-weight:700;color:#bff0ff">o‘rganib kelmoqdaman…</div>
+      <div class="seam"></div>
+    </div>
+  </div>
+
+  <!-- =============== A2: kelganimdan so'ng — qiziqish yanada oshdi 20.7 → 25.75 =============== -->
+  <div class="scene" id="sA2">
+    <div class="abs kicker" id="a2Kick" style="left:0;right:0;top:250px;justify-content:center"><b></b>Buxgalteriyaga qiziqishim</div>
+    <div class="abs" id="a2Chart" style="left:140px;top:380px;width:800px;height:820px">
+      <div class="abs" style="left:0;right:0;bottom:70px;height:4px;background:rgba(160,180,255,.4)"></div>
+      <div class="gcol" id="a2c0" style="left:80px"><div class="g" id="a2g0" style="height:300px;background:linear-gradient(180deg,rgba(150,120,255,.6),rgba(80,60,160,.35))"></div><div class="l">OLDIN</div></div>
+      <div class="gcol" id="a2c1" style="left:500px"><div class="g" id="a2g1" style="height:620px;background:linear-gradient(180deg,#f72585,#7209b7);box-shadow:0 0 50px rgba(247,37,133,.45)">
+        <div style="width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center"><svg width="62" height="62" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.8-8 11-8 11z" fill="#fff"/></svg></div></div><div class="l" style="color:#fff">HOZIR</div></div>
+      <svg class="abs" width="800" height="820" viewBox="0 0 800 820" style="left:0;top:0"><path id="a2Arr" class="ln" pathLength="1" d="M200 420C300 300 420 220 560 120M520 110l50 6-14 48" stroke="#8fe3ff" stroke-width="12" style="filter:drop-shadow(0 0 14px #4cc9f0)"/></svg>
+    </div>
+    <div class="abs glass dark" id="a2Tag" style="left:0;right:0;margin:0 auto;width:max-content;top:1250px;border-radius:999px;padding:18px 44px;font-size:50px;font-weight:800">Yanada <span class="grad-text">oshdi ↑</span></div>
+  </div>
+
+  <!-- =============== REC: tavsiya qilaman (talking head chip) 31.6 → 34.6 =============== -->
+  <div class="scene" id="sRec">
+    <div class="abs glass dark" id="rc" style="left:0;right:0;margin:0 auto;width:max-content;top:200px;border-radius:40px;padding:24px 40px;overflow:hidden;text-align:center">
+      <div style="font-size:26px;color:#aebcff;font-weight:600;letter-spacing:5px">TAVSIYA QILIB QOLAMAN</div>
+      <div style="font-size:52px;font-weight:800;line-height:1.1;margin-top:4px">Faxr Madad <span class="grad-text">Konsalt</span></div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:12px"><span class="chip" id="rcT1" style="background:rgba(76,201,240,.16);border:2px solid rgba(76,201,240,.75);font-size:26px;padding:6px 18px">O‘quv markazi</span><span class="chip" id="rcT2" style="background:rgba(199,125,255,.16);border:2px solid rgba(199,125,255,.75);font-size:26px;padding:6px 18px">Konsalting</span></div>
+      <div id="rcStars" style="display:flex;gap:12px;justify-content:center;margin-top:12px"></div>
+      <div class="abs" id="rcShine" style="top:-60px;bottom:-60px;width:180px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
+
+  <!-- =============== END CARD 41.0 → 46.0 =============== -->
+  <div class="scene" id="sEnd">
+    <div class="abs" id="ecLogo" style="left:0;right:0;top:480px;display:flex;justify-content:center">
+      <div style="position:relative;width:300px;height:300px">
+        <div class="abs" id="ecRing" style="inset:-22px;border-radius:84px;background:conic-gradient(from 0deg,#4cc9f0,#4361ee,#7209b7,#f72585,#4cc9f0);filter:blur(2px);opacity:.9"></div>
+        <div class="abs" style="inset:-14px;border-radius:78px;background:#0b1030"></div>
+        <div class="abs" style="inset:0;border-radius:70px;overflow:hidden;box-shadow:0 20px 70px rgba(67,97,238,.8)"><img src="logo.svg" style="width:100%;height:100%"></div>
+      </div></div>
+    <div class="abs" id="ecTitle" style="left:0;right:0;top:870px;text-align:center;font-size:96px;font-weight:800;letter-spacing:-1px;line-height:1.05">Faxr Madad <span class="grad-text">Konsalt.</span></div>
+    <div class="abs" id="ecLine" style="left:340px;width:400px;top:1000px;height:5px;border-radius:3px;background:linear-gradient(90deg,transparent,#4cc9f0,#f72585,transparent)"></div>
+    <div class="glass dark abs" id="ec" style="left:50px;top:1070px;width:980px;border-radius:46px;padding:40px 40px;overflow:hidden">
+      <div class="ecr" id="ec1">
+        <div class="abs" id="ecPing" style="left:72px;top:64px;width:20px;height:20px;border-radius:50%;border:4px solid #f72585"></div>
+        <svg width="92" height="112" viewBox="0 0 100 122" style="flex:none;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(247,37,133,.7))" id="ecPin">
+          <path class="ln" pathLength="1" d="M50 116C50 116 10 72 10 44a40 40 0 1 1 80 0c0 28-40 72-40 72z" fill="rgba(247,37,133,.22)" stroke="#ff7ab6" stroke-width="7"/>
+          <path class="ln" pathLength="1" d="M36 44a14 14 0 1 0 28 0a14 14 0 1 0-28 0" stroke="#fff" stroke-width="7"/></svg>
+        <div style="font-size:38px;font-weight:600;line-height:1.35"><b style="color:#8fe3ff">Manzil:</b> Jizzax viloyati, Jizzax shahri, Xalqobod MFY, Mustaqillik ko‘chasi, 1-uy.</div></div>
+      <div class="ecr" id="ec2" style="margin-top:24px">
+        <div id="ecPh" style="width:92px;height:92px;border-radius:50%;flex:none;background:linear-gradient(135deg,#4cc9f0,#4361ee);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(76,201,240,.7)">
+          <svg width="46" height="46" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="#fff"/></svg></div>
+        <div style="font-size:58px;font-weight:700"><span style="font-size:38px;color:#8fe3ff;font-weight:700">Tel:</span> <span class="mono">+998976448800</span></div></div>
+      <div class="abs" id="ecShine" style="top:-60px;bottom:-60px;width:220px;left:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-18deg)"></div>
+    </div>
+  </div>
+
+  <!-- subtitles -->
+  <div id="subs"></div>
+
+  <!-- name card -->
+  <div class="abs glass" id="nc" style="background:linear-gradient(140deg,rgba(34,44,110,.62),rgba(12,16,44,.55) 50%,rgba(54,22,112,.58))">
+    <div id="ncLogo"><img src="logo.svg"></div>
+    <div>
+      <span class="mask"><div id="ncName">Javohir</div></span>
+      <span class="mask"><div id="ncRole"><i></i>Faxr Madad Konsalt o‘quvchisi</div></span>
+    </div>
+  </div>
+
+  <canvas id="grain" width="640" height="1140"></canvas>
+</div>
+
+<script src="node_modules/gsap/dist/gsap.min.js"></script>
+<script src="data.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
