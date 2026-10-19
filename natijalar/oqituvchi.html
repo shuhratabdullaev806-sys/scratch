@@ -153,11 +153,38 @@
         }
 
         // Bir o'quvchi qayta yuborsa, eski natija yangisi bilan almashtiriladi.
+        // Bir o'quvchining bir nechta fayli (masalan, sinfda va uyda) birlashtiriladi:
+        // har bir modul yozuvi yangiroq fayldan olinadi, mavzu natijalari mavzu bo'yicha.
+        function birlashtir(eski, yangi) {
+            const [a, b] = new Date(yangi.sana) >= new Date(eski.sana) ? [eski, yangi] : [yangi, eski];
+            const malumot = JSON.parse(JSON.stringify(a.malumot || {}));
+            for (const [modul, qiymatlar] of Object.entries(b.malumot || {})) {
+                malumot[modul] = malumot[modul] || {};
+                for (const [prefix, v] of Object.entries(qiymatlar)) {
+                    if (prefix === 'vazifa_natija_') {
+                        const mavzular = {};
+                        for (const r of [...(malumot[modul][prefix] || []), ...(v || [])]) {
+                            const oldin = mavzular[r.mavzu_id];
+                            if (!oldin || new Date(r.sana) >= new Date(oldin.sana)) mavzular[r.mavzu_id] = r;
+                        }
+                        malumot[modul][prefix] = Object.values(mavzular);
+                    } else if (yozuvlarSoni(v) > 0 || !(prefix in malumot[modul])) {
+                        malumot[modul][prefix] = v;
+                    }
+                }
+            }
+            return {
+                ...b, malumot, xulosa: modulXulosasi(malumot),
+                togri: a.togri && b.togri,
+                manba: [...new Set([a.manba, b.manba].join(', ').split(', '))].join(', '),
+            };
+        }
+
         function qosh(n) {
             const kalit = (n.ism + '|' + n.guruh).toLowerCase();
             const i = natijalar.findIndex(x => (x.ism + '|' + x.guruh).toLowerCase() === kalit);
             if (i === -1) natijalar.push(n);
-            else if (new Date(n.sana) >= new Date(natijalar[i].sana)) natijalar[i] = n;
+            else natijalar[i] = birlashtir(natijalar[i], n);
         }
 
         async function fayllarniOqi(files) {
