@@ -1,0 +1,30 @@
+# vazifalar/docx/ ga yangi .docx yuklanganda vazifalar/baza.js ni avtomatik yangilaydi.
+name: Vazifalar bazasini yangilash
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'vazifalar/docx/**'
+      - 'vazifalar/docx_to_baza.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  baza:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install python-docx
+      - run: python vazifalar/docx_to_baza.py
+      - name: baza.js ni saqlash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vazifalar/baza.js
+          git diff --cached --quiet || (git commit -m "Vazifalar bazasi yangilandi" && git push)

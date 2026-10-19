@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O'qituvchi Paneli - FAXR MADAD KONSALT</title>
+    <link rel="icon" type="image/svg+xml" href="../logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --ok: #16a34a;
+            --warn: #b45309;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: #1e293b;
+            margin: 0;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+
+        .wrap { max-width: 1400px; margin: 0 auto; }
+        a.back { color: var(--primary); text-decoration: none; font-weight: 500; }
+        h1 { margin: 12px 0 4px; }
+        .sub { color: var(--muted); margin: 0 0 20px; }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        #drop {
+            border: 2px dashed #a5b4fc;
+            border-radius: 14px;
+            padding: 28px 16px;
+            text-align: center;
+            cursor: pointer;
+            background: #eef2ff;
+            transition: background 0.2s;
+        }
+
+        #drop.over { background: #c7d2fe; }
+
+        .tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; align-items: center; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn.ikkinchi { background: white; color: var(--primary); border: 1px solid var(--primary); }
+        .btn.xavf { background: white; color: #dc2626; border: 1px solid #dc2626; }
+
+        select, input[type=search] {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font: inherit;
+        }
+
+        .scroll { overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+        th { background: #f8fafc; position: sticky; top: 0; font-weight: 600; }
+        th.m, td.m { text-align: center; }
+        th.m { writing-mode: vertical-rl; transform: rotate(180deg); height: 140px; font-weight: 500; }
+        tbody tr { cursor: pointer; }
+        tbody tr:hover { background: #f1f5f9; }
+        .ok { color: var(--ok); font-weight: 700; }
+        .bosh { color: #cbd5e1; }
+        .warn { color: var(--warn); font-weight: 600; }
+        .bo { color: var(--muted); }
+
+        #tafsilot h2 { margin-top: 0; }
+        #tafsilot h3 { margin: 22px 0 8px; color: var(--primary); }
+        #tafsilot h4 { margin: 12px 0 6px; color: var(--muted); font-weight: 500; }
+        #tafsilot table { font-size: 0.82rem; }
+        #tafsilot td { white-space: normal; max-width: 320px; }
+        .vz { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+        .vz h4 { color: #1e293b !important; font-weight: 600 !important; }
+        .juft { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 14px; }
+        .juft > div { background: #f8fafc; border-radius: 8px; padding: 8px 10px; white-space: pre-line; font-size: 0.88rem; }
+        .juft > div.namuna { background: #f0fdf4; }
+        @media (max-width: 700px) { .juft { grid-template-columns: 1fr; } }
+        pre { background: #f8fafc; padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <a class="back" href="../index.html">← Portalga qaytish</a>
+        <h1>🧑‍🏫 O'qituvchi Paneli</h1>
+        <p class="sub">O'quvchilar yuborgan natija fayllarini shu yerga tashlang — hammasi bitta jadvalda chiqadi.
+            Ma'lumotlar faqat shu kompyuterda qoladi, hech qayerga yuborilmaydi.</p>
+
+        <div class="card">
+            <div id="drop">
+                <strong>📂 Natija fayllarini shu yerga tashlang</strong><br>
+                <span class="bo">yoki bosib tanlang (bir vaqtda bir nechta fayl tanlash mumkin)</span>
+                <input type="file" id="fayllar" accept=".json,application/json" multiple hidden>
+            </div>
+            <div class="tools">
+                <button class="btn ikkinchi" id="mahalliy">💻 Shu kompyuterdagi o'quvchilarni ko'rish</button>
+                <select id="guruhFiltr"><option value="">Barcha guruhlar</option></select>
+                <input type="search" id="qidiruv" placeholder="Ism bo'yicha qidirish">
+                <button class="btn" id="excel">📊 Excel'ga (CSV) yuklab olish</button>
+                <button class="btn xavf" id="tozalash">🗑 Ro'yxatni tozalash</button>
+                <span class="bo" id="holat"></span>
+            </div>
+        </div>
+
+        <div class="card scroll">
+            <table id="jadval"></table>
+        </div>
+
+        <div class="card" id="tafsilot" style="display:none"></div>
+    </div>
+
+    <script src="modullar.js"></script>
+    <script src="../vazifalar/baza.js"></script>
+    <script>
+        const SAQLASH_KALITI = 'oqituvchi_natijalar';
+        let natijalar = [];
+        try { natijalar = JSON.parse(localStorage.getItem(SAQLASH_KALITI) || '[]'); } catch (e) { natijalar = []; }
+
+        function saqla() {
+            try { localStorage.setItem(SAQLASH_KALITI, JSON.stringify(natijalar)); }
+            catch (e) { holat("⚠️ Brauzer xotirasi to'ldi — ro'yxat saqlanmadi, lekin ekranda ko'rinadi."); }
+        }
+
+        function holat(t) { document.getElementById('holat').textContent = t; }
+
+        function tekshir(n) {
+            const { kod, ...qolgan } = n;
+            return kod === nazoratKodi(qolgan);
+        }
+
+        // Bir o'quvchi qayta yuborsa, eski natija yangisi bilan almashtiriladi.
+        function qosh(n) {
+            const kalit = (n.ism + '|' + n.guruh).toLowerCase();
+            const i = natijalar.findIndex(x => (x.ism + '|' + x.guruh).toLowerCase() === kalit);
+            if (i === -1) natijalar.push(n);
+            else if (new Date(n.sana) >= new Date(natijalar[i].sana)) natijalar[i] = n;
+        }
+
+        async function fayllarniOqi(files) {
+            let ok = 0, xato = [];
+            for (const f of files) {
+                try {
+                    const n = JSON.parse(await f.text());
+                    if (!n || !n.ism || !n.malumot) throw new Error();
+                    n.togri = n.kod ? tekshir(n) : false;
+                    n.manba = f.name;
+                    qosh(n);
+                    ok++;
+                } catch (e) { xato.push(f.name); }
+            }
+            saqla();
+            chiz();
+            holat(`${ok} ta fayl qo'shildi` + (xato.length ? `; o'qib bo'lmadi: ${xato.join(', ')}` : ''));
+        }
+
+        const drop = document.getElementById('drop');
+        const input = document.getElementById('fayllar');
+        drop.addEventListener('click', () => input.click());
+        input.addEventListener('change', () => { fayllarniOqi(input.files); input.value = ''; });
+        drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+        drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+        drop.addEventListener('drop', e => {
+            e.preventDefault();
+            drop.classList.remove('over');
+            fayllarniOqi(e.dataTransfer.files);
+        });
+
+        document.getElementById('mahalliy').addEventListener('click', () => {
+            const oquvchilar = brauzerdagiOquvchilar();
+            const ismlar = Object.keys(oquvchilar);
+            for (const ism of ismlar) {
+                qosh({
+                    ism, guruh: 'shu kompyuter', sana: new Date().toISOString(),
+                    xulosa: modulXulosasi(oquvchilar[ism]), malumot: oquvchilar[ism],
+                    togri: true, manba: 'brauzer',
+                });
+            }
+            saqla();
+            chiz();
+            holat(ismlar.length ? `Shu kompyuterdan ${ismlar.length} ta o'quvchi topildi` : "Shu kompyuterda o'quvchi ma'lumoti topilmadi");
+        });
+
+        document.getElementById('tozalash').addEventListener('click', () => {
+            if (!confirm("Barcha yuklangan natijalar ro'yxatdan o'chirilsinmi? (O'quvchilarning fayllari o'chmaydi)")) return;
+            natijalar = [];
+            saqla();
+            chiz();
+            document.getElementById('tafsilot').style.display = 'none';
+        });
+
+        document.getElementById('guruhFiltr').addEventListener('change', chiz);
+        document.getElementById('qidiruv').addEventListener('input', chiz);
+
+        function korinadigan() {
+            const g = document.getElementById('guruhFiltr').value;
+            const q = document.getElementById('qidiruv').value.trim().toLowerCase();
+            return natijalar
+                .filter(n => (!g || n.guruh === g) && (!q || n.ism.toLowerCase().includes(q)))
+                .sort((a, b) => a.guruh.localeCompare(b.guruh) || a.ism.localeCompare(b.ism));
+        }
+
+        function bajarilgan(n) { return MODULLAR.filter(m => (n.xulosa || {})[m.id] > 0).length; }
+        function sanaMatn(s) { const d = new Date(s); return isNaN(d) ? '' : d.toLocaleString('uz-UZ'); }
+
+        function chiz() {
+            const gf = document.getElementById('guruhFiltr');
+            const tanlangan = gf.value;
+            const guruhlar = [...new Set(natijalar.map(n => n.guruh))].sort();
+            gf.innerHTML = '<option value="">Barcha guruhlar</option>' +
+                guruhlar.map(g => `<option ${g === tanlangan ? 'selected' : ''}>${htmlXavfsiz(g)}</option>`).join('');
+
+            const qatorlar = korinadigan();
+            const jadval = document.getElementById('jadval');
+            if (!natijalar.length) {
+                jadval.innerHTML = '<tr><td class="bo">Hali natija yuklanmagan.</td></tr>';
+                return;
+            }
+            jadval.innerHTML = `<thead><tr><th>#</th><th>F.I.Sh</th><th>Guruh</th><th>Topshirilgan</th>
+                ${MODULLAR.map(m => `<th class="m">${m.nomi}</th>`).join('')}
+                <th>Jami</th><th>Fayl</th></tr></thead><tbody>` +
+                qatorlar.map((n, i) => `<tr data-i="${natijalar.indexOf(n)}">
+                    <td>${i + 1}</td><td><b>${htmlXavfsiz(n.ism)}</b></td><td>${htmlXavfsiz(n.guruh)}</td>
+                    <td class="bo">${sanaMatn(n.sana)}</td>
+                    ${MODULLAR.map(m => { const c = (n.xulosa || {})[m.id] || 0; return `<td class="m ${c ? 'ok' : 'bosh'}" title="${c} ta yozuv">${c ? '✓' : '—'}</td>`; }).join('')}
+                    <td><b>${bajarilgan(n)}/${MODULLAR.length}</b></td>
+                    <td>${n.togri ? '<span class="ok">✅ asl</span>' : '<span class="warn">⚠️ o\'zgartirilgan</span>'}</td>
+                </tr>`).join('') + '</tbody>';
+        }
+
+        document.getElementById('jadval').addEventListener('click', e => {
+            const tr = e.target.closest('tr[data-i]');
+            if (tr) tafsilot(natijalar[+tr.dataset.i]);
+        });
+
+        function qiymatJadvali(v) {
+            if (Array.isArray(v) && v.length && v.every(x => x && typeof x === 'object' && !Array.isArray(x))) {
+                const ustunlar = [...new Set(v.flatMap(Object.keys))];
+                const yach = x => x === undefined || x === null ? '' : typeof x === 'object' ? JSON.stringify(x) : x;
+                return `<div class="scroll"><table><thead><tr>${ustunlar.map(u => `<th>${htmlXavfsiz(u)}</th>`).join('')}</tr></thead>
+                    <tbody>${v.map(r => `<tr>${ustunlar.map(u => `<td>${htmlXavfsiz(yach(r[u]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+            }
+            return `<pre>${htmlXavfsiz(JSON.stringify(v, null, 2))}</pre>`;
+        }
+
+        function tafsilot(n) {
+            const el = document.getElementById('tafsilot');
+            el.style.display = 'block';
+            const bolimlar = MODULLAR.filter(m => n.malumot[m.id]).map(m => m.id === 'vazifa'
+                ? `<h3>${m.nomi}</h3>` + (n.malumot.vazifa['vazifa_natija_'] || []).map(vazifaTafsiloti).join('') :
+                `<h3>${m.nomi} — ${(n.xulosa || {})[m.id] || 0} ta yozuv</h3>` +
+                Object.entries(n.malumot[m.id]).map(([prefix, v]) =>
+                    `<h4>${htmlXavfsiz(prefix.replace(/_$/, ''))}</h4>${qiymatJadvali(v)}`).join('')
+            ).join('');
+            el.innerHTML = `<h2>${htmlXavfsiz(n.ism)} <span class="bo">(${htmlXavfsiz(n.guruh)})</span></h2>
+                <p class="bo">Topshirilgan: ${sanaMatn(n.sana)} · Fayl: ${htmlXavfsiz(n.manba || '')} ·
+                ${n.togri ? '<span class="ok">✅ Fayl asl holatda</span>' : '<span class="warn">⚠️ Fayl qo\'lda o\'zgartirilgan bo\'lishi mumkin</span>'}</p>
+                ${bolimlar || '<p class="bo">Ma\'lumot yo\'q.</p>'}`;
+            el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ---------- Mavzu vazifalari (vazifalar/baza.js) ----------
+        const BAZA = window.VAZIFALAR_BAZASI || [];
+        function kalitniOch(m) {
+            return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(m.k), c => c.charCodeAt(0))));
+        }
+        function vazifaNatijalari(n) { return ((n.malumot || {}).vazifa || {})['vazifa_natija_'] || []; }
+        const sum = x => Number(String(x).replace(/\D/g, '') || 0).toLocaleString('ru-RU');
+        const provMatn = r => r.map(p => `Dt ${p.dt}  Kt ${p.kt} — ${sum(p.summa)}`).join('\n') || '—';
+
+        function vazifaTafsiloti(r) {
+            const m = BAZA.find(x => x.id === r.mavzu_id);
+            const k = m ? kalitniOch(m) : null;
+            const nomlar = { test1: "Testlar (2-bo'lim)", moslik: 'Moslashtirish', provodka: 'Provodkalar', test2: "Testlar (7-bo'lim)" };
+            let h = `<div class="vz"><h4>${htmlXavfsiz(r.mavzu)} — <span class="${r.foiz >= 60 ? 'ok' : 'warn'}">${r.foiz}% (${r.ball}/${r.maks})</span>
+                <span class="bo">· ${r.urinish}-urinish · ${sanaMatn(r.sana)}</span></h4>
+                <p>${Object.entries(r.bolimlar).map(([b, v]) => `${nomlar[b] || b}: <b>${v.ball}/${v.maks}</b>`).join(' · ')}</p>
+                ${['test1', 'test2'].filter(t => r.xatolar?.[t]?.length).map(t => `<p class="bo">${nomlar[t]} xatolar: ${r.xatolar[t].join(', ')}-savollar</p>`).join('')}`;
+            if (!m) return h + '<p class="warn">Bu mavzu bazada topilmadi — namunaviy javoblarni ko\'rsatib bo\'lmaydi.</p></div>';
+
+            const juft = (sarlavha, oquvchi, namuna) => `<b>${htmlXavfsiz(sarlavha)}</b><div class="juft">
+                <div><span class="bo">O'quvchi:</span>\n${htmlXavfsiz(oquvchi || '— javob yo\'q —')}</div>
+                <div class="namuna"><span class="bo">Namuna javob:</span>\n${htmlXavfsiz(namuna || '—')}</div></div>`;
+            const p = r.provodka || {}, mt = r.matn || {};
+            const qisqa = b => { const t = (b || []).map(x => x.p || x.t.map(q => q.join(' | ')).join('\n')).join('\n'); return t.length > 160 ? t.slice(0, 160) + '…' : t; };
+            if (k.masala_provodkalar.length)
+                h += juft(`Ko'rgazmali masala — provodkalar (${r.prov?.masala?.ball ?? 0}/${r.prov?.masala?.maks ?? 0})`,
+                    provMatn(p.masala || []), provMatn(k.masala_provodkalar));
+            h += juft("Ko'rgazmali masala — yechim va hisob-kitoblar", mt.masala, k.namuna.masala);
+            m.muhokama.forEach(s => { h += juft(`Muhokama ${s.n}. ${s.savol}`, mt['muhokama-' + s.n], k.namuna.muhokama[s.n]); });
+            m.mashqlar.forEach(x => {
+                const y = k.mashqlar[x.n] || {};
+                const pr = x.provodka ? provMatn(p['mashq-' + x.n] || []) + '\n' : '';
+                h += juft(`Mashq ${x.n}. ${qisqa(x.bloklar)}`, pr + (mt['mashq-' + x.n] || ''), y.yechim);
+            });
+            m.amaliy.forEach(x => {
+                const y = k.amaliy[x.n] || {};
+                const pr = x.provodka ? provMatn(p['amaliy-' + x.n] || []) + '\n' : '';
+                h += juft(`${x.n}-amaliy topshiriq. ${qisqa(x.bloklar)}`, pr + (mt['amaliy-' + x.n] || ''), y.yechim);
+            });
+            m.keyslar.forEach(x => { h += juft(`${x.n}-Keys`, mt['keys-' + x.n], k.namuna.keyslar[x.n]); });
+            return h + '</div>';
+        }
+
+        document.getElementById('excel').addEventListener('click', () => {
+            const q = korinadigan();
+            if (!q.length) { alert("Yuklab olish uchun natija yo'q"); return; }
+            const esc = s => `"${String(s).replace(/"/g, '""')}"`;
+            const sarlavha = ['F.I.Sh', 'Guruh', 'Topshirilgan', ...MODULLAR.map(m => m.nomi), 'Jami', 'Fayl holati',
+                ...BAZA.map(m => m.nomi + ' (%)')];
+            const qatorlar = q.map(n => [n.ism, n.guruh, sanaMatn(n.sana),
+                ...MODULLAR.map(m => (n.xulosa || {})[m.id] || 0),
+                `${bajarilgan(n)}/${MODULLAR.length}`, n.togri ? 'asl' : "o'zgartirilgan",
+                ...BAZA.map(m => { const r = vazifaNatijalari(n).find(x => x.mavzu_id === m.id); return r ? r.foiz : ''; })]);
+            const csv = '﻿' + [sarlavha, ...qatorlar].map(r => r.map(esc).join(';')).join('\r\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+            a.download = `natijalar_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        });
+
+        chiz();
+    </script>
+</body>
+
+</html>
