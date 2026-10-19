@@ -93,6 +93,12 @@
         #tafsilot h4 { margin: 12px 0 6px; color: var(--muted); font-weight: 500; }
         #tafsilot table { font-size: 0.82rem; }
         #tafsilot td { white-space: normal; max-width: 320px; }
+        .vz { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+        .vz h4 { color: #1e293b !important; font-weight: 600 !important; }
+        .juft { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 14px; }
+        .juft > div { background: #f8fafc; border-radius: 8px; padding: 8px 10px; white-space: pre-line; font-size: 0.88rem; }
+        .juft > div.namuna { background: #f0fdf4; }
+        @media (max-width: 700px) { .juft { grid-template-columns: 1fr; } }
         pre { background: #f8fafc; padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; }
     </style>
 </head>
@@ -128,6 +134,7 @@
     </div>
 
     <script src="modullar.js"></script>
+    <script src="../vazifalar/baza.js"></script>
     <script>
         const SAQLASH_KALITI = 'oqituvchi_natijalar';
         let natijalar = [];
@@ -262,7 +269,8 @@
         function tafsilot(n) {
             const el = document.getElementById('tafsilot');
             el.style.display = 'block';
-            const bolimlar = MODULLAR.filter(m => n.malumot[m.id]).map(m =>
+            const bolimlar = MODULLAR.filter(m => n.malumot[m.id]).map(m => m.id === 'vazifa'
+                ? `<h3>${m.nomi}</h3>` + (n.malumot.vazifa['vazifa_natija_'] || []).map(vazifaTafsiloti).join('') :
                 `<h3>${m.nomi} — ${(n.xulosa || {})[m.id] || 0} ta yozuv</h3>` +
                 Object.entries(n.malumot[m.id]).map(([prefix, v]) =>
                     `<h4>${htmlXavfsiz(prefix.replace(/_$/, ''))}</h4>${qiymatJadvali(v)}`).join('')
@@ -274,14 +282,58 @@
             el.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // ---------- Mavzu vazifalari (vazifalar/baza.js) ----------
+        const BAZA = window.VAZIFALAR_BAZASI || [];
+        function kalitniOch(m) {
+            return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(m.k), c => c.charCodeAt(0))));
+        }
+        function vazifaNatijalari(n) { return ((n.malumot || {}).vazifa || {})['vazifa_natija_'] || []; }
+        const sum = x => Number(String(x).replace(/\D/g, '') || 0).toLocaleString('ru-RU');
+        const provMatn = r => r.map(p => `Dt ${p.dt}  Kt ${p.kt} — ${sum(p.summa)}`).join('\n') || '—';
+
+        function vazifaTafsiloti(r) {
+            const m = BAZA.find(x => x.id === r.mavzu_id);
+            const k = m ? kalitniOch(m) : null;
+            const nomlar = { test1: "Testlar (2-bo'lim)", moslik: 'Moslashtirish', provodka: 'Provodkalar', test2: "Testlar (7-bo'lim)" };
+            let h = `<div class="vz"><h4>${htmlXavfsiz(r.mavzu)} — <span class="${r.foiz >= 60 ? 'ok' : 'warn'}">${r.foiz}% (${r.ball}/${r.maks})</span>
+                <span class="bo">· ${r.urinish}-urinish · ${sanaMatn(r.sana)}</span></h4>
+                <p>${Object.entries(r.bolimlar).map(([b, v]) => `${nomlar[b] || b}: <b>${v.ball}/${v.maks}</b>`).join(' · ')}</p>
+                ${['test1', 'test2'].filter(t => r.xatolar?.[t]?.length).map(t => `<p class="bo">${nomlar[t]} xatolar: ${r.xatolar[t].join(', ')}-savollar</p>`).join('')}`;
+            if (!m) return h + '<p class="warn">Bu mavzu bazada topilmadi — namunaviy javoblarni ko\'rsatib bo\'lmaydi.</p></div>';
+
+            const juft = (sarlavha, oquvchi, namuna) => `<b>${htmlXavfsiz(sarlavha)}</b><div class="juft">
+                <div><span class="bo">O'quvchi:</span>\n${htmlXavfsiz(oquvchi || '— javob yo\'q —')}</div>
+                <div class="namuna"><span class="bo">Namuna javob:</span>\n${htmlXavfsiz(namuna || '—')}</div></div>`;
+            const p = r.provodka || {}, mt = r.matn || {};
+            h += juft(`Ko'rgazmali masala — provodkalar (${r.prov?.masala?.ball ?? 0}/${r.prov?.masala?.maks ?? 0})`,
+                provMatn(p.masala || []), provMatn(k.masala_provodkalar));
+            const balans = (k.namuna.masala_jadvallar || []).map(t => t.map(q => q.join(' | ')).join('\n')).join('\n\n');
+            h += juft("Ko'rgazmali masala — hisob-kitob va balans", mt.masala, k.namuna.masala + (balans ? '\n' + balans : ''));
+            m.muhokama.forEach(s => { h += juft(`Muhokama ${s.n}. ${s.savol}`, mt['muhokama-' + s.n], k.namuna.muhokama[s.n]); });
+            m.mashqlar.forEach(x => {
+                const y = k.mashqlar[x.n] || {};
+                const pr = x.provodka ? provMatn(p['mashq-' + x.n] || []) + '\n' : '';
+                h += juft(`Mashq ${x.n}. ${x.matn}`, pr + (mt['mashq-' + x.n] || ''), y.yechim);
+            });
+            m.amaliy.forEach(x => {
+                const y = k.amaliy[x.n] || {};
+                const pr = x.provodka ? provMatn(p['amaliy-' + x.n] || []) + '\n' : '';
+                h += juft(`${x.n}-amaliy topshiriq`, pr + (mt['amaliy-' + x.n] || ''), y.yechim);
+            });
+            m.keyslar.forEach(x => { h += juft(`${x.n}-Keys`, mt['keys-' + x.n], k.namuna.keyslar[x.n]); });
+            return h + '</div>';
+        }
+
         document.getElementById('excel').addEventListener('click', () => {
             const q = korinadigan();
             if (!q.length) { alert("Yuklab olish uchun natija yo'q"); return; }
             const esc = s => `"${String(s).replace(/"/g, '""')}"`;
-            const sarlavha = ['F.I.Sh', 'Guruh', 'Topshirilgan', ...MODULLAR.map(m => m.nomi), 'Jami', 'Fayl holati'];
+            const sarlavha = ['F.I.Sh', 'Guruh', 'Topshirilgan', ...MODULLAR.map(m => m.nomi), 'Jami', 'Fayl holati',
+                ...BAZA.map(m => m.nomi + ' (%)')];
             const qatorlar = q.map(n => [n.ism, n.guruh, sanaMatn(n.sana),
                 ...MODULLAR.map(m => (n.xulosa || {})[m.id] || 0),
-                `${bajarilgan(n)}/${MODULLAR.length}`, n.togri ? 'asl' : "o'zgartirilgan"]);
+                `${bajarilgan(n)}/${MODULLAR.length}`, n.togri ? 'asl' : "o'zgartirilgan",
+                ...BAZA.map(m => { const r = vazifaNatijalari(n).find(x => x.mavzu_id === m.id); return r ? r.foiz : ''; })]);
             const csv = '﻿' + [sarlavha, ...qatorlar].map(r => r.map(esc).join(';')).join('\r\n');
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));

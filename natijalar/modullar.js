@@ -16,6 +16,7 @@ const MODULLAR = [
     { id: 'mfg', nomi: 'Ishlab Chiqarish', prefixlar: ['mfg_materials_', 'mfg_history_'] },
     { id: 'soliq', nomi: 'Soliq', prefixlar: ['soliq_reports_multi_'] },
     { id: 'bk', nomi: 'Bosh Kitob (Jurnal)', prefixlar: ['b_journal_'] },
+    { id: 'vazifa', nomi: 'Mavzu vazifalari (testlar)', prefixlar: ['vazifa_natija_'] },
 ];
 
 // Uzunroq prefikslar avval tekshiriladi ('ombor_materials_fifo_' > 'ombor_materials_').

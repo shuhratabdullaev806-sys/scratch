@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mavzular bo'yicha Vazifalar - FAXR MADAD KONSALT</title>
+    <link rel="icon" type="image/svg+xml" href="../logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --ok: #16a34a;
+            --err: #dc2626;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: #1e293b;
+            margin: 0;
+            padding: 24px 16px 80px;
+            min-height: 100vh;
+        }
+
+        .wrap { max-width: 860px; margin: 0 auto; }
+        a.back, .link { color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer; background: none; border: none; font: inherit; padding: 0; }
+        h1 { margin: 12px 0 4px; }
+        .sub { color: var(--muted); margin: 0 0 20px; }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .card h2 { margin: 0 0 12px; font-size: 1.2rem; color: var(--primary); }
+        .matn { white-space: pre-line; line-height: 1.55; }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font: inherit;
+        }
+
+        textarea { min-height: 90px; resize: vertical; margin-top: 8px; }
+        label.f { font-weight: 600; font-size: 0.9rem; display: block; margin: 0 0 6px; }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn.ikkinchi { background: white; color: var(--primary); border: 1px solid var(--primary); padding: 6px 12px; font-size: 0.9rem; }
+
+        .mavzular { display: grid; gap: 14px; }
+        .mavzu { display: flex; justify-content: space-between; align-items: center; gap: 12px; cursor: pointer; transition: transform 0.15s; }
+        .mavzu:hover { transform: translateY(-2px); }
+        .mavzu h3 { margin: 0 0 4px; font-size: 1.05rem; }
+        .mavzu p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+        .belgi { white-space: nowrap; font-weight: 700; }
+
+        .savol { margin: 18px 0; }
+        .savol > b { display: block; margin-bottom: 8px; }
+        .variant { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; cursor: pointer; }
+        .variant input { width: auto; margin-top: 4px; }
+        .variant:has(input:checked) { border-color: var(--primary); background: #eef2ff; }
+
+        table.prov { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table.prov th { text-align: left; font-size: 0.85rem; color: var(--muted); font-weight: 500; padding: 4px; }
+        table.prov td { padding: 4px; }
+        table.prov td:last-child { width: 36px; }
+        .del { background: none; border: none; color: var(--err); font-size: 1.2rem; cursor: pointer; }
+
+        .moslik-qator { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: center; margin-bottom: 8px; }
+        .tariflar { background: #f8fafc; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; }
+        .tariflar div { margin: 4px 0; }
+
+        .topshir { position: sticky; bottom: 16px; text-align: center; }
+        .topshir .btn { box-shadow: 0 10px 25px -5px rgba(67, 97, 238, 0.5); padding: 14px 30px; font-size: 1.05rem; }
+
+        .natija-jami { font-size: 2.4rem; font-weight: 700; margin: 4px 0; }
+        .ok { color: var(--ok); }
+        .err { color: var(--err); }
+        .bo { color: var(--muted); }
+        .chiplar { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chip { padding: 3px 9px; border-radius: 999px; font-size: 0.85rem; background: #f1f5f9; }
+        .chip.ok { background: #dcfce7; }
+        .chip.err { background: #fee2e2; }
+
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+        .modal .card { max-width: 420px; width: 100%; }
+        .modal input { margin-bottom: 12px; }
+
+        @media (max-width: 560px) {
+            .mavzu { flex-direction: column; align-items: flex-start; }
+            .moslik-qator { grid-template-columns: 1fr 90px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap" id="ilova"></div>
+
+    <div class="modal" id="kirish" style="display:none">
+        <div class="card">
+            <h2>👤 Tizimga kirish</h2>
+            <input id="k-ism" placeholder="F.I.Sh (Masalan: Aliyev Vali)">
+            <input id="k-guruh" placeholder="Guruh (Masalan: 304-guruh)">
+            <button class="btn" style="width:100%" onclick="kirish()">Kirish</button>
+            <p class="bo" style="font-size:0.85rem">Boshqa modullarda qaysi ism bilan kirgan bo'lsangiz, xuddi shu ismni yozing.</p>
+        </div>
+    </div>
+
+    <script src="baza.js"></script>
+    <script>
+        const BAZA = window.VAZIFALAR_BAZASI || [];
+        let ism = sessionStorage.getItem('vazifa_user');
+        let guruh = sessionStorage.getItem('vazifa_group');
+        const ilova = document.getElementById('ilova');
+
+        function esc(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function kalitniOch(m) {
+            return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(m.k), c => c.charCodeAt(0))));
+        }
+
+        function ol(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch (e) { return def; } }
+        function yoz(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+        const natijaKaliti = () => 'vazifa_natija_' + ism;
+        const qoralamaKaliti = id => 'vazifa_qoralama_' + id + '__' + ism;
+
+        // Variantlar har bir o'quvchiga boshqacha tartibda chiqadi (ism bo'yicha barqaror).
+        function aralashtir(arr, urug) {
+            let h = 2166136261;
+            for (const c of urug) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
+                const j = h % (i + 1);
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function kirish() {
+            const i = document.getElementById('k-ism').value.trim();
+            const g = document.getElementById('k-guruh').value.trim();
+            if (!i || !g) { alert("Iltimos, F.I.Sh va Guruhni kiriting!"); return; }
+            ism = i; guruh = g;
+            sessionStorage.setItem('vazifa_user', i);
+            sessionStorage.setItem('vazifa_group', g);
+            document.getElementById('kirish').style.display = 'none';
+            yonalish();
+        }
+
+        function chiqish() {
+            sessionStorage.removeItem('vazifa_user');
+            sessionStorage.removeItem('vazifa_group');
+            location.hash = '';
+            location.reload();
+        }
+
+        function yonalish() {
+            if (!ism) { document.getElementById('kirish').style.display = 'flex'; return; }
+            const id = decodeURIComponent(location.hash.slice(1));
+            const m = BAZA.find(x => x.id === id);
+            if (m) mavzuSahifasi(m); else royxat();
+            window.scrollTo(0, 0);
+        }
+        window.addEventListener('hashchange', yonalish);
+
+        function sarlavha() {
+            return `<a class="back" href="../index.html">← Portalga qaytish</a>
+                <div style="float:right" class="bo">👤 ${esc(ism)} · ${esc(guruh)} · <button class="link" onclick="chiqish()">Chiqish</button></div>`;
+        }
+
+        function royxat() {
+            const natijalar = ol(natijaKaliti(), []);
+            ilova.innerHTML = sarlavha() + `<h1>📝 Mavzular bo'yicha Vazifalar</h1>
+                <p class="sub">Mavzuni tanlang, barcha bo'limlarni bajaring va oxirida "Topshirish" tugmasini bosing.</p>
+                <div class="mavzular">${BAZA.length ? BAZA.map(m => {
+                    const n = natijalar.find(r => r.mavzu_id === m.id);
+                    const q = ol(qoralamaKaliti(m.id), null);
+                    const holat = n ? `<span class="belgi ${n.foiz >= 60 ? 'ok' : 'err'}">✅ ${n.foiz}%</span>`
+                        : q ? '<span class="belgi bo">✏️ Boshlangan</span>' : '<span class="belgi bo">Yangi</span>';
+                    return `<div class="card mavzu" onclick="location.hash='${encodeURIComponent(m.id)}'">
+                        <div><h3>${esc(m.nomi)}</h3><p>${esc(m.izoh || '')}</p></div>${holat}</div>`;
+                }).join('') : '<div class="card bo">Hali vazifalar bazasi bo\'sh.</div>'}</div>`;
+        }
+
+        // ---------- Vazifa sahifasi ----------
+        function provodkaJadvali(kalit) {
+            return `<table class="prov" data-prov="${kalit}"><thead><tr><th>Debet</th><th>Kredit</th><th>Summa (so'm)</th><th></th></tr></thead>
+                <tbody></tbody></table>
+                <button class="btn ikkinchi" type="button" onclick="qatorQosh('${kalit}')" style="margin-top:6px">+ Provodka qo'shish</button>`;
+        }
+
+        function qatorQosh(kalit, q = {}) {
+            const tb = document.querySelector(`[data-prov="${kalit}"] tbody`);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input inputmode="numeric" maxlength="4" placeholder="Dt" value="${esc(q.dt || '')}"></td>
+                <td><input inputmode="numeric" maxlength="4" placeholder="Kt" value="${esc(q.kt || '')}"></td>
+                <td><input inputmode="numeric" placeholder="Summa" value="${esc(q.summa || '')}"></td>
+                <td><button class="del" type="button" title="O'chirish">×</button></td>`;
+            tr.querySelector('.del').onclick = () => { tr.remove(); saqlaQoralama(); };
+            tb.appendChild(tr);
+        }
+
+        function testBolimi(nom, savollar, m) {
+            return savollar.map(s => {
+                const v = aralashtir(s.variantlar, ism + m.id + nom + s.n);
+                return `<div class="savol"><b>${s.n}. ${esc(s.savol)}</b>
+                    ${v.map((x, i) => `<label class="variant"><input type="radio" name="${nom}-${s.n}" value="${x.harf}">
+                        <span><b>${'ABCDE'[i]})</b> ${esc(x.matn)}</span></label>`).join('')}</div>`;
+            }).join('');
+        }
+
+        let joriy = null;
+
+        function mavzuSahifasi(m) {
+            joriy = m;
+            const oldingi = ol(natijaKaliti(), []).find(r => r.mavzu_id === m.id);
+            let h = sarlavha() + `<p><button class="link" onclick="location.hash=''">← Mavzular ro'yxati</button></p>
+                <h1>${esc(m.nomi)}</h1><p class="sub">${esc(m.izoh || '')}</p>`;
+            if (oldingi) h += natijaKartasi(oldingi, true);
+
+            h += `<form id="forma">
+                <div class="card"><h2>1. Ko'rgazmali masala</h2><div class="matn">${esc(m.masala)}</div>
+                    <p class="f" style="margin-top:16px"><b>Buxgalteriya provodkalari:</b></p>${provodkaJadvali('masala')}
+                    <label class="f" style="margin-top:14px">Hisob-kitoblar va balans:</label>
+                    <textarea name="matn-masala" placeholder="Davlat boji hisobi, dastlabki balans va boshqa hisob-kitoblarni yozing"></textarea></div>
+
+                <div class="card"><h2>2. O'z-o'zini tekshirish testlari</h2>${testBolimi('test1', m.test1, m)}</div>
+
+                <div class="card"><h2>3. Muhokama savollari</h2>${m.muhokama.map(s => `<div class="savol"><b>${s.n}. ${esc(s.savol)}</b>
+                    <textarea name="matn-muhokama-${s.n}" placeholder="Javobingiz"></textarea></div>`).join('')}</div>
+
+                <div class="card"><h2>4. Qisqa mashqlar</h2>`;
+            if (m.moslik) {
+                h += `<b>Mashq 1. Atamalar va ta'riflarni moslashtiring:</b>
+                    <div class="tariflar">${m.moslik.tariflar.map(t => `<div><b>${t.harf})</b> ${esc(t.matn)}</div>`).join('')}</div>
+                    ${m.moslik.atamalar.map((a, i) => `<div class="moslik-qator"><span>${i + 1}. ${esc(a)}</span>
+                        <select name="moslik-${i + 1}"><option value="">—</option>${m.moslik.tariflar.map(t => `<option>${t.harf}</option>`).join('')}</select></div>`).join('')}`;
+            }
+            h += m.mashqlar.map(x => topshiriq('mashq', x, `Mashq ${x.n}.`)).join('') + `</div>
+                <div class="card"><h2>5. Amaliy mashqlar</h2>${m.amaliy.map(x => topshiriq('amaliy', x, `${x.n}-amaliy topshiriq`)).join('')}</div>
+                <div class="card"><h2>6. Tanqidiy fikrlash keyslari</h2>${m.keyslar.map(x => `<div class="savol"><b>${x.n}-Keys</b>
+                    <div class="matn">${esc(x.matn)}</div><textarea name="matn-keys-${x.n}" placeholder="Javobingiz"></textarea></div>`).join('')}</div>
+                <div class="card"><h2>7. Buxgalteriya o'tkazmalariga oid testlar</h2>${testBolimi('test2', m.test2, m)}</div>
+                <div class="topshir"><button class="btn" type="button" onclick="topshir()">📤 Topshirish</button></div>
+            </form>`;
+            ilova.innerHTML = h;
+
+            const q = ol(qoralamaKaliti(m.id), {});
+            const provlar = q.provodka || {};
+            document.querySelectorAll('[data-prov]').forEach(t => {
+                const k = t.dataset.prov;
+                const qatorlar = provlar[k] && provlar[k].length ? provlar[k] : [{}, {}, {}].slice(0, k === 'masala' ? 3 : 1);
+                qatorlar.forEach(r => qatorQosh(k, r));
+            });
+            for (const [nom, qiymat] of Object.entries(q.maydon || {})) {
+                const el = document.querySelectorAll(`[name="${CSS.escape(nom)}"]`);
+                el.forEach(e => { if (e.type === 'radio') e.checked = e.value === qiymat; else e.value = qiymat; });
+            }
+            document.getElementById('forma').addEventListener('input', saqlaQoralama);
+            document.getElementById('forma').addEventListener('change', saqlaQoralama);
+        }
+
+        function topshiriq(tur, x, nom) {
+            return `<div class="savol"><b>${esc(nom)}</b><div class="matn">${esc(x.matn)}</div>
+                ${x.provodka ? provodkaJadvali(`${tur}-${x.n}`) : ''}
+                <textarea name="matn-${tur}-${x.n}" placeholder="${x.provodka ? 'Izoh / hisob-kitob (ixtiyoriy)' : 'Javobingiz / hisob-kitob'}"></textarea></div>`;
+        }
+
+        function formaniYigish() {
+            const maydon = {};
+            document.querySelectorAll('#forma [name]').forEach(e => {
+                if (e.type === 'radio') { if (e.checked) maydon[e.name] = e.value; }
+                else if (e.value.trim()) maydon[e.name] = e.value;
+            });
+            const provodka = {};
+            document.querySelectorAll('[data-prov]').forEach(t => {
+                provodka[t.dataset.prov] = [...t.querySelectorAll('tbody tr')].map(tr => {
+                    const [dt, kt, s] = [...tr.querySelectorAll('input')].map(i => i.value.trim());
+                    return { dt, kt, summa: s };
+                }).filter(r => r.dt || r.kt || r.summa);
+            });
+            return { maydon, provodka };
+        }
+
+        function saqlaQoralama() {
+            if (joriy) yoz(qoralamaKaliti(joriy.id), formaniYigish());
+        }
+
+        const raqam = s => String(s ?? '').replace(/\D/g, '');
+
+        function provodkaBaholash(kerak, berilgan) {
+            const qolgan = berilgan.map(r => ({ dt: raqam(r.dt), kt: raqam(r.kt), summa: +raqam(r.summa) }));
+            let ball = 0;
+            for (const k of kerak) {
+                const i = qolgan.findIndex(r => r.dt === k.dt && r.kt === k.kt && r.summa === k.summa);
+                if (i !== -1) { ball++; qolgan.splice(i, 1); }
+            }
+            return { ball, maks: kerak.length, ortiqcha: qolgan.length };
+        }
+
+        function topshir() {
+            const m = joriy;
+            const { maydon, provodka } = formaniYigish();
+            const bosh = m.test1.filter(s => !maydon['test1-' + s.n]).length + m.test2.filter(s => !maydon['test2-' + s.n]).length;
+            if (!confirm((bosh ? `${bosh} ta test savoliga javob berilmagan. ` : '') + 'Vazifani topshirasizmi?')) return;
+
+            const k = kalitniOch(m);
+            const bolimlar = {}, xatolar = {};
+            for (const t of ['test1', 'test2']) {
+                const sav = m[t];
+                const togri = sav.filter(s => maydon[`${t}-${s.n}`] === k[t][s.n]);
+                bolimlar[t] = { ball: togri.length, maks: sav.length };
+                xatolar[t] = sav.filter(s => !togri.includes(s)).map(s => s.n);
+            }
+            if (m.moslik) {
+                const n = m.moslik.atamalar.length;
+                const togri = [...Array(n)].map((_, i) => i + 1).filter(i => maydon['moslik-' + i] === k.moslik[i]);
+                bolimlar.moslik = { ball: togri.length, maks: n };
+            }
+            const prov = { masala: provodkaBaholash(k.masala_provodkalar, provodka.masala || []) };
+            for (const tur of ['mashqlar', 'amaliy']) {
+                for (const [n, y] of Object.entries(k[tur] || {})) {
+                    if (!y.provodkalar.length) continue;
+                    const nom = (tur === 'mashqlar' ? 'mashq-' : 'amaliy-') + n;
+                    prov[nom] = provodkaBaholash(y.provodkalar, provodka[nom] || []);
+                }
+            }
+            bolimlar.provodka = Object.values(prov).reduce((a, p) => ({ ball: a.ball + p.ball, maks: a.maks + p.maks }), { ball: 0, maks: 0 });
+
+            const ball = Object.values(bolimlar).reduce((s, b) => s + b.ball, 0);
+            const maks = Object.values(bolimlar).reduce((s, b) => s + b.maks, 0);
+            const matn = Object.fromEntries(Object.entries(maydon).filter(([n]) => n.startsWith('matn-')).map(([n, v]) => [n.slice(5), v]));
+            const javob = Object.fromEntries(Object.entries(maydon).filter(([n]) => !n.startsWith('matn-')));
+
+            const hammasi = ol(natijaKaliti(), []);
+            const eski = hammasi.find(r => r.mavzu_id === m.id);
+            const natija = {
+                mavzu_id: m.id, mavzu: m.nomi, guruh, sana: new Date().toISOString(),
+                urinish: (eski?.urinish || 0) + 1,
+                ball, maks, foiz: maks ? Math.round(ball / maks * 100) : 0,
+                bolimlar, xatolar, prov, javob, provodka, matn,
+            };
+            yoz(natijaKaliti(), [...hammasi.filter(r => r.mavzu_id !== m.id), natija]);
+            mavzuSahifasi(m);
+            window.scrollTo(0, 0);
+        }
+
+        const BOLIM_NOMI = { test1: "Testlar (2-bo'lim)", moslik: 'Moslashtirish', provodka: 'Provodkalar', test2: "Testlar (7-bo'lim)" };
+
+        function natijaKartasi(n, qisqa) {
+            const qator = Object.entries(n.bolimlar).map(([k, b]) =>
+                `<span class="chip ${b.ball === b.maks ? 'ok' : ''}">${BOLIM_NOMI[k] || k}: <b>${b.ball}/${b.maks}</b></span>`).join('');
+            const xato = ['test1', 'test2'].filter(t => n.xatolar?.[t]?.length).map(t =>
+                `<div style="margin-top:8px"><span class="bo">${BOLIM_NOMI[t]} — xato javoblar:</span>
+                <div class="chiplar">${n.xatolar[t].map(x => `<span class="chip err">${x}-savol</span>`).join('')}</div></div>`).join('');
+            return `<div class="card" style="border:2px solid ${n.foiz >= 60 ? '#86efac' : '#fca5a5'}">
+                <h2>📊 Natija (${n.urinish}-urinish, ${new Date(n.sana).toLocaleString('uz-UZ')})</h2>
+                <div class="natija-jami ${n.foiz >= 60 ? 'ok' : 'err'}">${n.foiz}% <span class="bo" style="font-size:1rem">(${n.ball}/${n.maks} ball)</span></div>
+                <div class="chiplar">${qator}</div>${xato}
+                <p class="bo" style="margin-bottom:0">Ochiq savollar (muhokama, keyslar, hisob-kitoblar) o'qituvchi tomonidan alohida tekshiriladi.
+                Natijani o'qituvchiga yuborish uchun <a class="link" href="../natijalar/topshirish.html">"Natijani Topshirish"</a> sahifasidan faylni yuklab oling.
+                ${qisqa ? "<br>Xohlasangiz, javoblarni tuzatib qayta topshirishingiz mumkin (urinishlar soni o'qituvchiga ko'rinadi)." : ''}</p></div>`;
+        }
+
+        yonalish();
+    </script>
+</body>
+
+</html>
