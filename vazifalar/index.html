@@ -93,6 +93,12 @@
         .topshir { position: sticky; bottom: 16px; text-align: center; }
         .topshir .btn { box-shadow: 0 10px 25px -5px rgba(67, 97, 238, 0.5); padding: 14px 30px; font-size: 1.05rem; }
 
+        .matn + .matn, .jadval + .matn, .matn + .jadval { margin-top: 10px; }
+        .jadval { overflow-x: auto; margin: 10px 0; }
+        .jadval table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+        .jadval th, .jadval td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+        .jadval th { background: #f8fafc; font-weight: 600; }
+
         .natija-jami { font-size: 2.4rem; font-weight: 700; margin: 4px 0; }
         .ok { color: var(--ok); }
         .err { color: var(--err); }
@@ -201,7 +207,7 @@
                     const holat = n ? `<span class="belgi ${n.foiz >= 60 ? 'ok' : 'err'}">✅ ${n.foiz}%</span>`
                         : q ? '<span class="belgi bo">✏️ Boshlangan</span>' : '<span class="belgi bo">Yangi</span>';
                     return `<div class="card mavzu" onclick="location.hash='${encodeURIComponent(m.id)}'">
-                        <div><h3>${esc(m.nomi)}</h3><p>${esc(m.izoh || '')}</p></div>${holat}</div>`;
+                        <div><p>${m.raqam ? m.raqam + '-mavzu' : ''}</p><h3>${esc(m.nomi)}</h3></div>${holat}</div>`;
                 }).join('') : '<div class="card bo">Hali vazifalar bazasi bo\'sh.</div>'}</div>`;
         }
 
@@ -232,39 +238,45 @@
             }).join('');
         }
 
+        // docx dagi matn va jadvallarni ko'rsatadi: [{p: 'matn'} | {t: [[katak, ...], ...]}]
+        function bloklar(b) {
+            return (b || []).map(x => x.t
+                ? `<div class="jadval"><table>${x.t.map((q, i) => `<tr>${q.map(k => i === 0 ? `<th>${esc(k)}</th>` : `<td>${esc(k)}</td>`).join('')}</tr>`).join('')}</table></div>`
+                : `<div class="matn">${esc(x.p)}</div>`).join('');
+        }
+
         let joriy = null;
 
         function mavzuSahifasi(m) {
             joriy = m;
             const oldingi = ol(natijaKaliti(), []).find(r => r.mavzu_id === m.id);
             let h = sarlavha() + `<p><button class="link" onclick="location.hash=''">← Mavzular ro'yxati</button></p>
-                <h1>${esc(m.nomi)}</h1><p class="sub">${esc(m.izoh || '')}</p>`;
+                <h1>${esc(m.nomi)}</h1>`;
             if (oldingi) h += natijaKartasi(oldingi, true);
 
+            const bolim = (sarlavha, ichi) => ichi ? `<div class="card"><h2>${sarlavha}</h2>${ichi}</div>` : '';
             h += `<form id="forma">
-                <div class="card"><h2>1. Ko'rgazmali masala</h2><div class="matn">${esc(m.masala)}</div>
-                    <p class="f" style="margin-top:16px"><b>Buxgalteriya provodkalari:</b></p>${provodkaJadvali('masala')}
-                    <label class="f" style="margin-top:14px">Hisob-kitoblar va balans:</label>
-                    <textarea name="matn-masala" placeholder="Davlat boji hisobi, dastlabki balans va boshqa hisob-kitoblarni yozing"></textarea></div>
-
-                <div class="card"><h2>2. O'z-o'zini tekshirish testlari</h2>${testBolimi('test1', m.test1, m)}</div>
-
-                <div class="card"><h2>3. Muhokama savollari</h2>${m.muhokama.map(s => `<div class="savol"><b>${s.n}. ${esc(s.savol)}</b>
-                    <textarea name="matn-muhokama-${s.n}" placeholder="Javobingiz"></textarea></div>`).join('')}</div>
-
-                <div class="card"><h2>4. Qisqa mashqlar</h2>`;
+                <div class="card"><h2>1. Ko'rgazmali masala</h2>${bloklar(m.masala)}
+                    ${m.masala_provodka ? `<p class="f" style="margin-top:16px"><b>Buxgalteriya provodkalari:</b></p>${provodkaJadvali('masala')}` : ''}
+                    <label class="f" style="margin-top:14px">Yechim va hisob-kitoblar:</label>
+                    <textarea name="matn-masala" placeholder="Topshiriqlar bo'yicha hisob-kitoblar, jadvallar va xulosalarni yozing"></textarea></div>
+                ${bolim("2. O'z-o'zini tekshirish testlari", testBolimi('test1', m.test1, m))}
+                ${bolim('3. Muhokama savollari', m.muhokama.map(s => `<div class="savol"><b>${s.n}. ${esc(s.savol)}</b>
+                    <textarea name="matn-muhokama-${s.n}" placeholder="Javobingiz"></textarea></div>`).join(''))}`;
+            let mashq = '';
             if (m.moslik) {
-                h += `<b>Mashq 1. Atamalar va ta'riflarni moslashtiring:</b>
+                mashq += `<b>Mashq 1. Atamalar va ta'riflarni moslashtiring:</b>
                     <div class="tariflar">${m.moslik.tariflar.map(t => `<div><b>${t.harf})</b> ${esc(t.matn)}</div>`).join('')}</div>
                     ${m.moslik.atamalar.map((a, i) => `<div class="moslik-qator"><span>${i + 1}. ${esc(a)}</span>
                         <select name="moslik-${i + 1}"><option value="">—</option>${m.moslik.tariflar.map(t => `<option>${t.harf}</option>`).join('')}</select></div>`).join('')}`;
             }
-            h += m.mashqlar.map(x => topshiriq('mashq', x, `Mashq ${x.n}.`)).join('') + `</div>
-                <div class="card"><h2>5. Amaliy mashqlar</h2>${m.amaliy.map(x => topshiriq('amaliy', x, `${x.n}-amaliy topshiriq`)).join('')}</div>
-                <div class="card"><h2>6. Tanqidiy fikrlash keyslari</h2>${m.keyslar.map(x => `<div class="savol"><b>${x.n}-Keys</b>
-                    <div class="matn">${esc(x.matn)}</div><textarea name="matn-keys-${x.n}" placeholder="Javobingiz"></textarea></div>`).join('')}</div>
-                <div class="card"><h2>7. Buxgalteriya o'tkazmalariga oid testlar</h2>${testBolimi('test2', m.test2, m)}</div>
-                <div class="topshir"><button class="btn" type="button" onclick="topshir()">📤 Topshirish</button></div>
+            mashq += m.mashqlar.map(x => topshiriq('mashq', x, `Mashq ${x.n}.`)).join('');
+            h += bolim('4. Qisqa mashqlar', mashq)
+                + bolim('5. Amaliy mashqlar', m.amaliy.map(x => topshiriq('amaliy', x, `${x.n}-amaliy topshiriq`)).join(''))
+                + bolim('6. Tanqidiy fikrlash keyslari', m.keyslar.map(x => `<div class="savol"><b>${x.n}-Keys</b>
+                    ${bloklar(x.bloklar)}<textarea name="matn-keys-${x.n}" placeholder="Javobingiz"></textarea></div>`).join(''))
+                + bolim("7. Buxgalteriya o'tkazmalariga oid testlar", testBolimi('test2', m.test2, m))
+                + `<div class="topshir"><button class="btn" type="button" onclick="topshir()">📤 Topshirish</button></div>
             </form>`;
             ilova.innerHTML = h;
 
@@ -284,7 +296,7 @@
         }
 
         function topshiriq(tur, x, nom) {
-            return `<div class="savol"><b>${esc(nom)}</b><div class="matn">${esc(x.matn)}</div>
+            return `<div class="savol"><b>${esc(nom)}</b>${bloklar(x.bloklar)}
                 ${x.provodka ? provodkaJadvali(`${tur}-${x.n}`) : ''}
                 <textarea name="matn-${tur}-${x.n}" placeholder="${x.provodka ? 'Izoh / hisob-kitob (ixtiyoriy)' : 'Javobingiz / hisob-kitob'}"></textarea></div>`;
         }
@@ -331,6 +343,7 @@
             const bolimlar = {}, xatolar = {};
             for (const t of ['test1', 'test2']) {
                 const sav = m[t];
+                if (!sav.length) continue;
                 const togri = sav.filter(s => maydon[`${t}-${s.n}`] === k[t][s.n]);
                 bolimlar[t] = { ball: togri.length, maks: sav.length };
                 xatolar[t] = sav.filter(s => !togri.includes(s)).map(s => s.n);
@@ -340,7 +353,8 @@
                 const togri = [...Array(n)].map((_, i) => i + 1).filter(i => maydon['moslik-' + i] === k.moslik[i]);
                 bolimlar.moslik = { ball: togri.length, maks: n };
             }
-            const prov = { masala: provodkaBaholash(k.masala_provodkalar, provodka.masala || []) };
+            const prov = {};
+            if (k.masala_provodkalar.length) prov.masala = provodkaBaholash(k.masala_provodkalar, provodka.masala || []);
             for (const tur of ['mashqlar', 'amaliy']) {
                 for (const [n, y] of Object.entries(k[tur] || {})) {
                     if (!y.provodkalar.length) continue;
@@ -348,7 +362,8 @@
                     prov[nom] = provodkaBaholash(y.provodkalar, provodka[nom] || []);
                 }
             }
-            bolimlar.provodka = Object.values(prov).reduce((a, p) => ({ ball: a.ball + p.ball, maks: a.maks + p.maks }), { ball: 0, maks: 0 });
+            if (Object.keys(prov).length)
+                bolimlar.provodka = Object.values(prov).reduce((a, p) => ({ ball: a.ball + p.ball, maks: a.maks + p.maks }), { ball: 0, maks: 0 });
 
             const ball = Object.values(bolimlar).reduce((s, b) => s + b.ball, 0);
             const maks = Object.values(bolimlar).reduce((s, b) => s + b.maks, 0);

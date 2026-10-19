@@ -305,20 +305,21 @@
                 <div><span class="bo">O'quvchi:</span>\n${htmlXavfsiz(oquvchi || '— javob yo\'q —')}</div>
                 <div class="namuna"><span class="bo">Namuna javob:</span>\n${htmlXavfsiz(namuna || '—')}</div></div>`;
             const p = r.provodka || {}, mt = r.matn || {};
-            h += juft(`Ko'rgazmali masala — provodkalar (${r.prov?.masala?.ball ?? 0}/${r.prov?.masala?.maks ?? 0})`,
-                provMatn(p.masala || []), provMatn(k.masala_provodkalar));
-            const balans = (k.namuna.masala_jadvallar || []).map(t => t.map(q => q.join(' | ')).join('\n')).join('\n\n');
-            h += juft("Ko'rgazmali masala — hisob-kitob va balans", mt.masala, k.namuna.masala + (balans ? '\n' + balans : ''));
+            const qisqa = b => { const t = (b || []).map(x => x.p || x.t.map(q => q.join(' | ')).join('\n')).join('\n'); return t.length > 160 ? t.slice(0, 160) + '…' : t; };
+            if (k.masala_provodkalar.length)
+                h += juft(`Ko'rgazmali masala — provodkalar (${r.prov?.masala?.ball ?? 0}/${r.prov?.masala?.maks ?? 0})`,
+                    provMatn(p.masala || []), provMatn(k.masala_provodkalar));
+            h += juft("Ko'rgazmali masala — yechim va hisob-kitoblar", mt.masala, k.namuna.masala);
             m.muhokama.forEach(s => { h += juft(`Muhokama ${s.n}. ${s.savol}`, mt['muhokama-' + s.n], k.namuna.muhokama[s.n]); });
             m.mashqlar.forEach(x => {
                 const y = k.mashqlar[x.n] || {};
                 const pr = x.provodka ? provMatn(p['mashq-' + x.n] || []) + '\n' : '';
-                h += juft(`Mashq ${x.n}. ${x.matn}`, pr + (mt['mashq-' + x.n] || ''), y.yechim);
+                h += juft(`Mashq ${x.n}. ${qisqa(x.bloklar)}`, pr + (mt['mashq-' + x.n] || ''), y.yechim);
             });
             m.amaliy.forEach(x => {
                 const y = k.amaliy[x.n] || {};
                 const pr = x.provodka ? provMatn(p['amaliy-' + x.n] || []) + '\n' : '';
-                h += juft(`${x.n}-amaliy topshiriq`, pr + (mt['amaliy-' + x.n] || ''), y.yechim);
+                h += juft(`${x.n}-amaliy topshiriq. ${qisqa(x.bloklar)}`, pr + (mt['amaliy-' + x.n] || ''), y.yechim);
             });
             m.keyslar.forEach(x => { h += juft(`${x.n}-Keys`, mt['keys-' + x.n], k.namuna.keyslar[x.n]); });
             return h + '</div>';
