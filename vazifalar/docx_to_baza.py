@@ -128,6 +128,13 @@ def bolimlarga(elems, ikkinchi_qism):
     for tur, t in elems:
         if tur == 'p':
             n = bolim_sarlavhasi(t, joriy, ikkinchi_qism)
+            # Birlashgan bo'lim ichidagi kichik sarlavha: "7-bo'lim (Provodka testlari) javoblari:"
+            ichki = ikkinchi_qism and not n and len(t) < 120 and \
+                re.match(rf"^\s*([1-7])\s*-\s*bo{A}lim\b.*(?:javob|kalit|yechim)", t, I)
+            if ichki:
+                nomlar = [BOLIM_NOMI[int(ichki.group(1))]]
+                bolimlar.setdefault(nomlar[0], [])
+                continue
             if n:
                 joriy = n
                 nomlar = yechim_bolimlari(t, n, 'test1' in bolimlar) if ikkinchi_qism else [BOLIM_NOMI[n]]
@@ -218,6 +225,11 @@ def test_kaliti(elems):
             m = re.match(rf"{BOSH}(\d+)\s*-\s*savol\W+to{A}g{A}ri javob\W+([A-E])\b", t, I)
             if m:
                 kalit.setdefault(int(m.group(1)), m.group(2).upper())
+            elif re.match(rf"{BOSH}(\d+)\s*-\s*([A-E])(?![\w)])", t):  # "1-A (12% — ...)"
+                m = re.match(rf"{BOSH}(\d+)\s*-\s*([A-E])", t)
+                kalit.setdefault(int(m.group(1)), m.group(2))
+                for n, h in re.findall(r"[|,;]\s*(\d+)\s*-\s*([A-E])\b", t):
+                    kalit.setdefault(int(n), h)
             elif re.search(r"\d+\s*-\s*[A-E]\b\s*[|,;]", t):
                 for n, h in re.findall(r"(\d+)\s*-\s*([A-E])\b", t):
                     kalit.setdefault(int(n), h)
