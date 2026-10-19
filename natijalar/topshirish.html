@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natijani Topshirish - FAXR MADAD KONSALT</title>
+    <link rel="icon" type="image/svg+xml" href="../logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --ok: #16a34a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: #1e293b;
+            margin: 0;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+
+        .wrap { max-width: 760px; margin: 0 auto; }
+        a.back { color: var(--primary); text-decoration: none; font-weight: 500; }
+        h1 { margin: 12px 0 4px; }
+        .sub { color: var(--muted); margin: 0 0 20px; }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px; }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font: inherit;
+            margin-bottom: 14px;
+        }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 8px 4px; border-bottom: 1px solid var(--border); }
+        td.n { text-align: right; color: var(--muted); white-space: nowrap; }
+        .ok { color: var(--ok); font-weight: 600; }
+        .bosh { color: #94a3b8; }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        .jami { font-size: 1.1rem; font-weight: 700; margin: 14px 0; }
+        .yoriq { background: #f0f9ff; border: 1px solid #bae6fd; }
+        .yoriq ol { margin: 8px 0 0; padding-left: 20px; }
+        .xabar { color: #b45309; }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <a class="back" href="../index.html">← Portalga qaytish</a>
+        <h1>📤 Natijani Topshirish</h1>
+        <p class="sub">Bajargan ishlaringizni bitta faylga yig'ib, o'qituvchiga yuboring. Internet yoki bot shart emas.</p>
+
+        <div class="card">
+            <div class="row">
+                <div>
+                    <label for="ism">F.I.Sh (modullarga qaysi ism bilan kirgan bo'lsangiz)</label>
+                    <select id="ism"></select>
+                </div>
+                <div>
+                    <label for="guruh">Guruh</label>
+                    <input id="guruh" placeholder="Masalan: 304-guruh">
+                </div>
+            </div>
+            <p id="xabar" class="xabar" style="display:none"></p>
+
+            <table id="jadval"></table>
+            <div class="jami" id="jami"></div>
+            <button class="btn" id="yuklash">⬇️ Natija faylini yuklab olish</button>
+        </div>
+
+        <div class="card yoriq">
+            <strong>Faylni qanday yuboraman?</strong>
+            <ol>
+                <li>Yuqoridagi tugmani bosing — <code>.json</code> fayl yuklanadi.</li>
+                <li>Faylni o'qituvchiga istalgan yo'l bilan yuboring: Telegram (oddiy xabar sifatida), e-mail,
+                    Google Classroom yoki fleshka.</li>
+                <li>Faylni ochib o'zgartirmang — o'qituvchi paneli o'zgartirilgan faylni aniqlaydi.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="modullar.js"></script>
+    <script>
+        const oquvchilar = brauzerdagiOquvchilar();
+        const ismlar = Object.keys(oquvchilar).sort();
+        const ismSelect = document.getElementById('ism');
+        const guruhInput = document.getElementById('guruh');
+
+        if (ismlar.length === 0) {
+            ismSelect.innerHTML = '<option value="">— ma\'lumot topilmadi —</option>';
+            const x = document.getElementById('xabar');
+            x.style.display = 'block';
+            x.textContent = "Bu brauzerda hali hech qanday bajarilgan ish topilmadi. Avval modullarda vazifalarni bajaring (o'sha kompyuter va brauzerda).";
+        } else {
+            ismSelect.innerHTML = ismlar.map(i => `<option value="${htmlXavfsiz(i)}">${htmlXavfsiz(i)}</option>`).join('');
+        }
+
+        // Guruhni modullar login sahifasidan olishga harakat qilamiz.
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const k = sessionStorage.key(i);
+            if (k.endsWith('_group') && sessionStorage.getItem(k)) { guruhInput.value = sessionStorage.getItem(k); break; }
+        }
+
+        function chiz() {
+            const ism = ismSelect.value;
+            const xulosa = modulXulosasi(oquvchilar[ism] || {});
+            const bajarilgan = MODULLAR.filter(m => xulosa[m.id] > 0).length;
+            document.getElementById('jadval').innerHTML = MODULLAR.map(m => {
+                const n = xulosa[m.id];
+                return `<tr><td class="${n ? 'ok' : 'bosh'}">${n ? '✅' : '⬜'} ${m.nomi}</td>
+                        <td class="n">${n ? n + ' ta yozuv' : 'bajarilmagan'}</td></tr>`;
+            }).join('');
+            document.getElementById('jami').textContent = `Bajarilgan modullar: ${bajarilgan} / ${MODULLAR.length}`;
+            document.getElementById('yuklash').disabled = !ism;
+        }
+
+        ismSelect.addEventListener('change', chiz);
+        chiz();
+
+        document.getElementById('yuklash').addEventListener('click', () => {
+            const ism = ismSelect.value;
+            const guruh = guruhInput.value.trim();
+            if (!guruh) { alert('Iltimos, guruhingizni kiriting!'); guruhInput.focus(); return; }
+
+            const natija = {
+                versiya: 1,
+                ism,
+                guruh,
+                sana: new Date().toISOString(),
+                xulosa: modulXulosasi(oquvchilar[ism]),
+                malumot: oquvchilar[ism],
+            };
+            natija.kod = nazoratKodi(natija);
+
+            const blob = new Blob([JSON.stringify(natija)], { type: 'application/json' });
+            const a = document.createElement('a');
+            const fayl = `${ism}_${guruh}_${natija.sana.slice(0, 10)}`.replace(/[\\/:*?"<>|\s]+/g, '_');
+            a.href = URL.createObjectURL(blob);
+            a.download = fayl + '.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        });
+    </script>
+</body>
+
+</html>
