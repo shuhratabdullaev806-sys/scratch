@@ -566,8 +566,11 @@
             document.getElementById('total_capital').value = total.toLocaleString() + " so'm";
         }
 
+        let currentUser = null;
+
         // STORAGE LOGIC
         function saveData() {
+            if (!currentUser) return;
             const data = {};
             // Inputs
             document.querySelectorAll('input:not(.f_name):not(.f_percent):not(.f_sum), select:not(.f_type), textarea').forEach(el => {
@@ -585,7 +588,7 @@
                 });
             });
 
-            localStorage.setItem('company_profile', JSON.stringify(data));
+            localStorage.setItem('company_profile_' + currentUser, JSON.stringify(data));
 
             // Visual feedback
             const btn = document.querySelector('.btn-primary');
@@ -595,10 +598,23 @@
         }
 
         function loadData() {
-            const raw = localStorage.getItem('company_profile');
+            if (!currentUser) return;
+            const raw = localStorage.getItem('company_profile_' + currentUser);
+
+            // Clear inputs first
+            document.querySelectorAll('input:not(.f_name):not(.f_percent):not(.f_sum), select:not(.f_type), textarea').forEach(el => {
+                if (el.id) {
+                    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                    else el.value = '';
+                }
+            });
+            const tbody = document.querySelector('#foundersTable tbody');
+            tbody.innerHTML = '';
+
             if (!raw) {
-                // Default placeholder row
+                // Default placeholder row if no data
                 addFounder();
+                calcTotal();
                 return;
             }
 
@@ -612,8 +628,6 @@
             }
 
             // Founders
-            const tbody = document.querySelector('#foundersTable tbody');
-            tbody.innerHTML = '';
             if (data.founders && data.founders.length > 0) {
                 data.founders.forEach(f => addFounder(f.name, f.type, f.percent, f.sum));
             } else {
@@ -622,9 +636,6 @@
             calcTotal();
             toggleAccountantField(); // Update state based on loaded value
         }
-
-        // INIT
-        window.addEventListener('DOMContentLoaded', loadData);
 
     </script>
     <script>
@@ -755,7 +766,9 @@
             const user = sessionStorage.getItem('cp_calaba_name');
             const group = sessionStorage.getItem('cp_calaba_group');
             if (user && group) {
+                currentUser = user;
                 showStudentInfo(user, group);
+                loadData();
             } else {
                 document.getElementById('login-modal').style.display = 'flex';
             }
@@ -769,8 +782,9 @@
                 sessionStorage.setItem('cp_calaba_name', name);
                 sessionStorage.setItem('cp_calaba_group', group);
                 document.getElementById('login-modal').style.display = 'none';
+                currentUser = name;
                 showStudentInfo(name, group);
-                loadData(); // Reload data to potentially match user (future proofing)
+                loadData();
             } else {
                 alert("Iltimos, barcha ma'lumotlarni kiriting!");
             }

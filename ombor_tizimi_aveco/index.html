@@ -473,9 +473,12 @@
             <div class="main-layout">
                 <!-- Forms -->
                 <div class="card">
-                    <div class="tabs" style="margin-bottom: 1rem;">
+                    <div class="tabs"
+                        style="margin-bottom: 1rem; overflow-x:auto; white-space:nowrap; padding-bottom:5px;">
                         <button class="tab-btn active" onclick="switchTab('kirim')">▼ Kirim (M-4)</button>
                         <button class="tab-btn" onclick="switchTab('chiqim')">▲ Chiqim (M-11)</button>
+                        <button class="tab-btn" onclick="switchTab('m17')">📋 Kartochka (M-17)</button>
+                        <button class="tab-btn" onclick="switchTab('xatlov')">🔎 Xatlov (Inv)</button>
                     </div>
 
                     <!-- Kirim Form (M-4) -->
@@ -570,6 +573,69 @@
                                 qilish</button>
                         </div>
                     </form>
+
+                    <!-- Oborotka (M-17) Form -->
+                    <div id="m17-view" style="display:none;">
+                        <div class="form-group">
+                            <label>Materialni tanlang (Harakatlarni ko'rish uchun)</label>
+                            <select id="m17-name" required onchange="renderM17()">
+                                <option value="">Tanlang...</option>
+                            </select>
+                        </div>
+                        <button onclick="printM17()" class="print-btn" style="margin-bottom:10px;">🖨️ M-17 Chop
+                            etish</button>
+                        <div style="overflow-x:auto; max-height:450px;">
+                            <table class="inventory-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sana</th>
+                                        <th>Hujjat turi</th>
+                                        <th class="num-col">Kirim</th>
+                                        <th class="num-col">Chiqim</th>
+                                        <th class="num-col">Qoldiq</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="m17-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; color:#888;">Material mavjud emas...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Inventarizatsiya Form -->
+                    <div id="xatlov-view" style="display:none;">
+                        <div class="form-group">
+                            <label>Materialni tanlang (Xatlov o'tkazish uchun)</label>
+                            <select id="inv-name" required onchange="updateInvInfo()">
+                                <option value="">Tanlang...</option>
+                            </select>
+                        </div>
+                        <div id="inv-info" style="margin-bottom:10px; font-weight:bold; color:var(--primary-dark)">
+                        </div>
+                        <form id="xatlov-form">
+                            <div class="form-group">
+                                <label>Haqiqiy (Fakt) qoldiq miqdorini kiriting</label>
+                                <input type="number" id="inv-fact-qty" placeholder="Joyida bor miqdor" min="0"
+                                    step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Sana</label>
+                                <input type="date" id="inv-date" required>
+                            </div>
+                            <div
+                                style="background:#fef3c7; padding:10px; border-radius:5px; font-size:0.9rem; margin-bottom:10px; color:#92400e; border:1px solid #fde68a;">
+                                <strong>Kamomad:</strong> Dt 5910 - Kt 1010<br>
+                                <strong>Ortiqchalik:</strong> Dt 1010 - Kt 9390
+                            </div>
+                            <button type="submit" class="submit-btn" style="background-color:#0d9488;">Taqqoslash va
+                                Saqlash</button>
+                        </form>
+                        <div id="inv-result" style="margin-top:15px;"></div>
+                    </div>
+
                 </div>
 
                 <!-- History -->
@@ -678,18 +744,49 @@
 
             function switchTab(tab) {
                 cancelEdit();
+                // Hide all tab content
+                document.getElementById('kirim-form').style.display = 'none';
+                document.getElementById('chiqim-form').style.display = 'none';
+                document.getElementById('m17-view').style.display = 'none';
+                document.getElementById('xatlov-view').style.display = 'none';
+
+                // Remove active from all buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
                 if (tab === 'kirim') {
                     document.getElementById('kirim-form').style.display = 'block';
-                    document.getElementById('chiqim-form').style.display = 'none';
                     document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                    document.querySelectorAll('.tab-btn')[1].classList.remove('active');
-                } else {
-                    document.getElementById('kirim-form').style.display = 'none';
+                } else if (tab === 'chiqim') {
                     document.getElementById('chiqim-form').style.display = 'block';
-                    document.querySelectorAll('.tab-btn')[0].classList.remove('active');
                     document.querySelectorAll('.tab-btn')[1].classList.add('active');
                     updateChiqimInfo();
+                } else if (tab === 'm17') {
+                    document.getElementById('m17-view').style.display = 'block';
+                    document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                    updateM17Select();
+                } else if (tab === 'xatlov') {
+                    document.getElementById('xatlov-view').style.display = 'block';
+                    document.querySelectorAll('.tab-btn')[3].classList.add('active');
+                    updateInvSelect();
+                    document.getElementById('inv-date').value = document.getElementById('k-date').value;
                 }
+            }
+
+            function updateM17Select() {
+                const sel = document.getElementById('m17-name');
+                sel.innerHTML = '<option value="">Tanlang...</option>';
+                Object.keys(materials).sort().forEach(m => {
+                    sel.innerHTML += `<option value="${m}">${m}</option>`;
+                });
+            }
+
+            function updateInvSelect() {
+                const sel = document.getElementById('inv-name');
+                sel.innerHTML = '<option value="">Tanlang...</option>';
+                Object.keys(materials).sort().forEach(m => {
+                    sel.innerHTML += `<option value="${m}">${m}</option>`;
+                });
+                document.getElementById('inv-info').innerText = '';
             }
 
             // --- KIRIM LOGIC (M-4) AVECO ---
@@ -989,78 +1086,201 @@
                 saveData();
             }
 
+            // --- M-17 (Kartocha) LOGIC FOR AVECO ---
+            function renderM17() {
+                const name = document.getElementById('m17-name').value;
+                const tbody = document.getElementById('m17-body');
+                tbody.innerHTML = '';
+
+                if (!name) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Materialni tanlang...</td></tr>';
+                    return;
+                }
+
+                // Reverse history to show chronological order
+                let materialHistory = [...history].reverse().filter(h => h.name === name);
+                if (materialHistory.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Bu material bo\'yicha harakatlar yo\'q</td></tr>';
+                    return;
+                }
+
+                let currentQty = 0;
+                let rows = '';
+
+                materialHistory.forEach(h => {
+                    const isKirim = h.type.includes('Kirim');
+                    const isInv = h.type.includes('Xatlov');
+
+                    let kirimQty = 0;
+                    let chiqimQty = 0;
+
+                    if (isKirim || h.kredit === '9390' || h.kredit === '6010' || h.kredit === '2010') {
+                        kirimQty = h.qty;
+                        currentQty += kirimQty;
+                    } else {
+                        chiqimQty = h.qty;
+                        currentQty -= chiqimQty;
+                    }
+
+                    currentQty = Math.max(0, currentQty);
+
+                    rows += `
+                        < tr >
+                            <td>${h.date}</td>
+                            <td>${h.type} ${h.party ? '<br><small>(' + h.party + ')</small>' : ''}</td>
+                            <td class="num-col" style="color:var(--primary-dark)">${kirimQty > 0 ? kirimQty.toLocaleString() : '-'}</td>
+                            <td class="num-col" style="color:#d97706">${chiqimQty > 0 ? chiqimQty.toLocaleString() : '-'}</td>
+                            <td class="num-col" style="font-weight:bold">${currentQty.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                        </tr >
+                        `;
+                });
+
+                tbody.innerHTML = rows;
+            }
+
+            function printM17() {
+                const name = document.getElementById('m17-name').value;
+                if (!name) return alert('Avval materialni tanlang!');
+
+                const tbodyContent = document.getElementById('m17-body').innerHTML;
+                const printArea = document.getElementById('print-area');
+
+                printArea.innerHTML = `
+                        < div class="m-form" >
+                        <div class="m-title">MATERIAL HISOBI KARTOCHKASI (M-17 Shakli)<br><small>Material: ${name}</small></div>
+                        <table class="m-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Sana</th>
+                                    <th>Hujjat turi va nomi</th>
+                                    <th>Kirim</th>
+                                    <th>Chiqim</th>
+                                    <th>Qoldiq</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tbodyContent}
+                            </tbody>
+                        </table>
+                        <div class="m-footer">
+                            <div>Moddiy javobgar shaxs: __________________</div>
+                            <div>Tekshirdi: __________________</div>
+                        </div>
+                    </div >
+                        `;
+                document.getElementById('print-overlay').style.display = 'flex';
+            }
+
+            // --- XATLOV (Inventarizatsiya) LOGIC FOR AVECO ---
+            function updateInvInfo() {
+                const name = document.getElementById('inv-name').value;
+                const infoBox = document.getElementById('inv-info');
+
+                if (!name || !materials[name]) {
+                    infoBox.innerHTML = '';
+                    return;
+                }
+                const m = materials[name];
+                infoBox.innerHTML = `Buxgalteriya bo'yicha qoldiq (Dasturda): <span style="font-size:1.2rem; color:black;">${m.qty.toLocaleString()} ${m.unit}</span>`;
+
+                document.getElementById('inv-fact-qty').value = m.qty;
+            }
+
+            document.getElementById('xatlov-form').onsubmit = function (e) {
+                e.preventDefault();
+                const name = document.getElementById('inv-name').value;
+                const factQty = parseFloat(document.getElementById('inv-fact-qty').value);
+                const date = document.getElementById('inv-date').value;
+
+                if (!name || !materials[name]) return alert("Material tanlanmagan!");
+
+                const m = materials[name];
+                const diff = factQty - m.qty;
+                const resultBox = document.getElementById('inv-result');
+
+                if (Math.abs(diff) < 0.0001) {
+                    resultBox.innerHTML = `<div style="padding:10px; background:#ccfbf1; color:#0f766e; border:1px solid #99f6e4; border-radius:5px;">✅ <b>Farq yo'q.</b> Dastur va fakt bir xil!</div>`;
+                    return;
+                }
+
+                let type = '';
+                let debit = '';
+                let kredit = '';
+                let color = '';
+                let msg = '';
+
+                // AVECO usulida bitta o'rtacha narx olinadi
+                const avgPrice = m.qty > 0 ? (m.totalPrice / m.qty) : 0;
+                const diffValue = Math.abs(diff) * avgPrice;
+
+                if (diff > 0) {
+                    // Ortiqchalik
+                    type = 'Xatlov (Ortiqchalik)';
+                    debit = '1010';
+                    kredit = '9390';
+                    color = '#ccfbf1; color:#0f766e';
+                    msg = `<b>Ortiqchalik:</b> +${diff} ${m.unit}`;
+
+                    m.qty += diff;
+                    m.totalPrice += diffValue;
+                } else {
+                    // Kamomad
+                    type = 'Xatlov (Kamomad)';
+                    debit = '5910';
+                    kredit = '1010';
+                    color = '#fee2e2; color:#991b1b';
+                    msg = `<b>Kamomad:</b> ${diff} ${m.unit} (Etishmayapti)`;
+
+                    m.qty -= Math.abs(diff);
+                    m.totalPrice -= diffValue;
+                }
+
+                if (m.qty < 0.0001) { m.qty = 0; m.totalPrice = 0; }
+
+                const record = {
+                    id: Date.now(),
+                    type: type,
+                    date: date,
+                    name: name,
+                    qty: Math.abs(diff),
+                    unit: m.unit,
+                    price: diffValue,
+                    party: 'Xatlov hujjati',
+                    debet: debit,
+                    kredit: kredit
+                };
+
+                history.unshift(record);
+                saveData();
+
+                resultBox.innerHTML = `<div style="padding:10px; background:${color}; border-radius:5px;">
+                    ${msg}<br>Tizimda to'g'irlandi. Farq qiymati: ${diffValue.toLocaleString()} so'm
+                </div>`;
+
+                updateInvInfo();
+                renderAll();
+            };
+
             function openPrint(id) {
                 const item = history.find(h => h.id === id);
                 if (!item) return;
+
                 const printArea = document.getElementById('print-area');
-
                 if (item.type.includes('Kirim')) {
+                    // M-4 FORM
                     printArea.innerHTML = `
-                <div class="m-form">
-                    <div class="m-title">KIRIM ORDERI № ${item.id.toString().slice(-6)} <br> (M-4 Shakli)</div>
-                     
-                    <table class="m-header-table">
-                        <tr>
-                            <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
-                            <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Yetkazib beruvchi:</strong> ${item.party}</td>
-                            <td style="text-align:right"><strong>Ombor:</strong> Asosiy Ombor</td>
-                        </tr>
-                    </table>
-
-                    <table class="m-data-table">
-                        <thead>
+                    <div class="m-form">
+                        <div class="m-title">KIRIM ORDERI № ${item.id.toString().slice(-6)} <br> (M-4 Shakli)</div>
+                        <table class="m-header-table">
                             <tr>
-                                <th>Material Nomi</th>
-                                <th>O'lchov bir.</th>
-                                <th>Miqdor</th>
-                                <th>Narxi</th>
-                                <th>Summasi</th>
-                                <th>Schyot (Dt)</th>
-                                <th>Schyot (Kt)</th>
+                                <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
+                                <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
                             </tr>
-                        </thead>
-                        <tbody>
                             <tr>
-                                <td>${item.name}</td>
-                                <td>${item.unit}</td>
-                                <td>${item.qty.toLocaleString()}</td>
-                                <td>${(item.price / item.qty).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                                <td>${item.price.toLocaleString()}</td>
-                                <td>${item.debet}</td>
-                                <td>${item.kredit}</td>
+                                <td><strong>Yetkazib beruvchi:</strong> ${item.party}</td>
+                                <td style="text-align:right"><strong>Ombor:</strong> Asosiy Ombor</td>
                             </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="m-footer">
-                        <div>
-                            Qabul qildi (Omborchi): __________________
-                        </div>
-                        <div>
-                            Topshirdi: __________________
-                        </div>
-                    </div>
-                </div>
-            `;
-                } else {
-                    printArea.innerHTML = `
-                <div class="m-form">
-                    <div class="m-title">TALABNOMA-YUKXATI № ${item.id.toString().slice(-6)} <br> (M-11 Shakli)</div>
-                    <table class="m-header-table">
-                        <tr>
-                            <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
-                            <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Yuboruvchi:</strong> Asosiy Ombor</td>
-                        <tr>
-                            <td><strong>Oluvchi:</strong> ${item.party}</td>
-                            <td style="text-align:right"><strong>Maqsad:</strong> Ishlab chiqarish ehtiyoji uchun</td>
-                        </tr>
-                    </table>
+                        </table>
 
                     <table class="m-data-table">
                         <thead>
@@ -1100,8 +1320,59 @@
                             Oldi: __________________
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+                } else {
+                    // M-11 FORM
+                    printArea.innerHTML = `
+                            < div class="m-form" >
+                        <div class="m-title">TALABNOMA-YUKXATI № ${item.id.toString().slice(-6)} <br> (M-11 Shakli)</div>
+                        <table class="m-header-table">
+                            <tr>
+                                <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
+                                <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Yuboruvchi:</strong> Asosiy Ombor</td>
+                            <tr>
+                                <td><strong>Oluvchi:</strong> ${item.party}</td>
+                                <td style="text-align:right"><strong>Maqsad:</strong> Ishlab chiqarish ehtiyoji uchun</td>
+                            </tr>
+                        </table>
+
+                        <table class="m-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Material Nomi</th>
+                                    <th>O'lchov bir.</th>
+                                    <th>So'raldi</th>
+                                    <th>Berildi</th>
+                                    <th>Narxi (AVECO)</th>
+                                    <th>Summasi</th>
+                                    <th>Schyot (Dt)</th>
+                                    <th>Schyot (Kt)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>${item.unit}</td>
+                                    <td>${item.qty.toLocaleString()}</td>
+                                    <td>${item.qty.toLocaleString()}</td>
+                                    <td>${(item.price / item.qty).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                    <td>${item.price.toLocaleString()}</td>
+                                    <td>${item.debet}</td>
+                                    <td>${item.kredit}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="m-footer">
+                            <div>Ruxsat berdi: __________________</div>
+                            <div>Omborchi: __________________</div>
+                            <div>Oldi: __________________</div>
+                        </div>
+                    </div >
+                `;
                 }
                 document.getElementById('print-overlay').style.display = 'flex';
             }
@@ -1139,7 +1410,7 @@
                 { q: "Omborda ortiqcha material aniqlandi (Kirim) (100,000 so'm)", dt: "1010", kt: "9390", sum: 100000 },
                 { q: "Materiallar sotildi (Chetga) (2,000,000 so'm)", dt: "9220", kt: "1010", sum: 2000000 }
             ];
-            // Note: Questions 1 & 2 are conceptual, users should enter 0 or specific text. 
+            // Note: Questions 1 & 2 are conceptual, users should enter 0 or specific text.
             // Better to stick to accounting entries for consistency. Modified below for pure Accounting.
 
             const quizQuestionsActual = [
@@ -1170,13 +1441,13 @@
             function loadQuestion() {
                 if (currentQIndex >= quizQuestionsActual.length) {
                     document.getElementById('quiz-content').innerHTML = `
-                    <div style="text-align:center; padding:20px;">
+                        < div style = "text-align:center; padding:20px;" >
                         <h2 style="color:#0d9488;">🎉 Tabriklaymiz!</h2>
                         <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
                         <button onclick="closeQuiz()" class="submit-btn" style="width:100%">Yopish</button>
                         <button onclick="openQuiz()" class="submit-btn" style="background-color:#f59e0b; width:100%; margin-top:10px;">Qayta ishlash</button>
-                    </div>
-                `;
+                    </div >
+                        `;
                     return;
                 }
 
@@ -1184,7 +1455,7 @@
                 // Reset content if it was overwritten
                 if (!document.getElementById('q-text')) {
                     document.getElementById('quiz-content').innerHTML = `
-                    <div style="background:#f0fdf4; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#134e4a;" id="q-text"></div>
+                        < div style = "background:#f0fdf4; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#134e4a;" id = "q-text" ></div >
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
                         <div>
                             <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet (Schyot)</label>
@@ -1201,10 +1472,10 @@
                     </div>
                     <div id="q-feedback" style="margin-bottom:15px; padding:10px; background:#fff; border:1px solid #ccc; border-radius:6px; display:none;"></div>
                     <button onclick="checkAnswer()" class="submit-btn" style="background-color:#0d9488; width:100%;">Tekshirish</button>
-                 `;
+                    `;
                 }
 
-                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
+                document.getElementById('q-text').innerText = `${currentQIndex + 1} -Savol: ${q.q} `;
                 document.getElementById('q-dt').value = '';
                 document.getElementById('q-kt').value = '';
                 document.getElementById('q-sum').value = '';
@@ -1228,7 +1499,7 @@
                         loadQuestion();
                     }, 1000);
                 } else {
-                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.innerHTML = `< span style = "color:var(--danger-color); font-weight:bold;" >❌ Xato!</span > <br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
                     feedback.style.display = 'block';
                 }
             }

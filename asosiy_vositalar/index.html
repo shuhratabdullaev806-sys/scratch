@@ -331,12 +331,6 @@
             </div>
         </div>
 
-        <!-- USER DISPLAY -->
-        <div class="user-info no-print" id="user-display" style="cursor: default;">
-            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
-                onclick="logout()" title="Chiqish">❌</span>
-        </div>
-
         <header class="no-print">
             <div style="display:flex; align-items:center; gap:10px;">
                 <div
@@ -347,11 +341,18 @@
                     <div style="font-size:0.8rem; opacity:0.9;">"FAXR MADAD KONSALT"</div>
                 </div>
             </div>
-            <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
                 <button onclick="openQuiz()" class="btn btn-secondary btn-sm"
-                    style="background:#4c1d95; color:white; border:none; box-shadow:0 4px 15px rgba(76, 29, 149, 0.4); margin-right:10px;">🧠
+                    style="background:#4c1d95; color:white; border:none; box-shadow:0 4px 15px rgba(76, 29, 149, 0.4);">🧠
                     Bilimni Sinash</button>
                 <button onclick="window.print()" class="btn btn-secondary btn-sm">🖨️ Chop etish</button>
+
+                <!-- USER DISPLAY -->
+                <div class="user-info no-print" id="user-display"
+                    style="cursor: default; position:static; margin:0; display:none;">
+                    <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                        onclick="logout()" title="Chiqish">❌</span>
+                </div>
             </div>
         </header>
 
@@ -378,9 +379,11 @@
                 <!-- LEFT COLUMN: CONTROLS -->
                 <div>
                     <div class="card no-print">
-                        <div class="tabs">
-                            <button class="tab-btn active" onclick="showForm('kirim')">Kirim (Xarid)</button>
+                        <div class="tabs" style="flex-wrap: wrap;">
+                            <button class="tab-btn active" onclick="showForm('kirim')">Kirim</button>
                             <button class="tab-btn" onclick="showForm('eskirish')">Eskirish</button>
+                            <button class="tab-btn" onclick="showForm('mashq')"
+                                style="background:#f59e0b; color:white;">Mashq (4 usul)</button>
                         </div>
 
                         <!-- KIRIM FORM -->
@@ -397,11 +400,15 @@
                             <div class="form-group">
                                 <label>Guruh (Schyot)</label>
                                 <select id="av-group">
-                                    <option value="0110">0110 - Binolar va inshootlar</option>
-                                    <option value="0120">0120 - Mashina va uskunalar</option>
-                                    <option value="0130">0130 - Mebel va ofis jihozlari</option>
-                                    <option value="0140">0140 - Kompyuter va texnika</option>
-                                    <option value="0150">0150 - Transport vositalari</option>
+                                    <option value="0110">0110 - Yer</option>
+                                    <option value="0120">0120 - Binolar, inshootlar va uzatuvchi moslamalar</option>
+                                    <option value="0130">0130 - Mashina va asbob-uskunalar</option>
+                                    <option value="0140">0140 - Mebel va ofis jihozlari</option>
+                                    <option value="0150">0150 - Kompyuter jihozlari va hisoblash texnikasi</option>
+                                    <option value="0160">0160 - Transport vositalari</option>
+                                    <option value="0170">0170 - Ishchi va mahsuldor hayvonlar</option>
+                                    <option value="0180">0180 - Ko'p yillik o'simliklar</option>
+                                    <option value="0190">0190 - Boshqa asosiy vositalar</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -413,8 +420,27 @@
                                 <input type="number" id="av-cost" min="0" required>
                             </div>
                             <div class="form-group">
-                                <label>Eskirish Normasi (Yillik %)</label>
-                                <input type="number" id="av-rate" placeholder="15" min="0" max="100" required>
+                                <label>Amortizatsiya Usuli</label>
+                                <select id="av-method" onchange="
+                                    const v = this.value; 
+                                    document.getElementById('av-life-label').innerText = v === 'production' ? 'Jami kutilayotgan hajm (dona/soat)' : (v === 'straight_rate' ? 'Eskirish Normasi (Yillik %)' : 'Foydali xizmat muddati (yil)'); 
+                                    document.getElementById('av-rate').placeholder = v === 'straight_rate' ? 'Masalan: 15' : 'Masalan: 5'; 
+                                    document.getElementById('av-salvage-group').style.display = v === 'straight_rate' ? 'none' : 'block';
+                                ">
+                                    <option value="straight_rate">To'g'ri chiziqli (% normasi bilan)</option>
+                                    <option value="straight">To'g'ri chiziqli (Xizmat muddati bilan)</option>
+                                    <option value="production">Ishlab chiqarish usuli</option>
+                                    <option value="double">Ikki karra amortizatsiya usuli</option>
+                                    <option value="cumulative">Kumulyativ (Yillar yig'indisi) usuli</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="av-salvage-group" style="display:none;">
+                                <label>Tugatish (qoldiq) qiymati (so'm)</label>
+                                <input type="number" id="av-salvage" value="0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label id="av-life-label">Eskirish Normasi (Yillik %)</label>
+                                <input type="number" id="av-rate" placeholder="Masalan: 15" min="0" required>
                             </div>
 
                             <button type="submit" class="btn btn-primary" id="btn-save">💾 Saqlash</button>
@@ -439,6 +465,59 @@
                             <button type="submit" class="btn"
                                 style="background:var(--warning-color); color:white; width:100%;">⚙️ Hisoblash va
                                 Saqlash</button>
+                        </form>
+
+                        <!-- MASHQ FORM -->
+                        <form id="av-mashq-form" style="display:none;" onsubmit="event.preventDefault(); checkMashq();">
+                            <h3 class="section-title">Amortizatsiya Hisoblash (4 usul)</h3>
+                            <p style="font-size:0.85rem; color:#6b7280; margin-bottom:10px;">
+                                Berilgan ma'lumotlar asosida 1-yil (yoki davr) eskirishini barcha 4 ta usulda hisoblang.
+                            </p>
+                            <div
+                                style="background:#f5f3ff; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd6fe; font-size:0.9rem;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                    <b>Boshlang'ich qiymat:</b> <span><span id="m-cost">...</span> so'm</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><b>Tugatish
+                                        qiymati:</b> <span><span id="m-salvage">...</span> so'm</span></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><b>Xizmat
+                                        muddati:</b> <span><span id="m-life">...</span> yil</span></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><b>Jami
+                                        mahsulot (m-lj):</b> <span><span id="m-t-units">...</span> dona</span></div>
+                                <div style="display:flex; justify-content:space-between;"><b>Joriy yil mahsuloti:</b>
+                                    <span><span id="m-units">...</span> dona</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <label style="font-size:0.8rem;">1. To'g'ri chiziqli usul</label>
+                                <input type="number" id="ans-straight" placeholder="Summani kiriting..."
+                                    style="padding:0.4rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <label style="font-size:0.8rem;">2. Ishlab chiqarish usuli</label>
+                                <input type="number" id="ans-prod" placeholder="Summani kiriting..."
+                                    style="padding:0.4rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <label style="font-size:0.8rem;">3. Ikki karra amortizatsiya (1-yil)</label>
+                                <input type="number" id="ans-double" placeholder="Summani kiriting..."
+                                    style="padding:0.4rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0.5rem;">
+                                <label style="font-size:0.8rem;">4. Kumulyativ usul (1-yil)</label>
+                                <input type="number" id="ans-cumul" placeholder="Summani kiriting..."
+                                    style="padding:0.4rem;">
+                            </div>
+
+                            <div id="mashq-feedback"
+                                style="display:none; margin:10px 0; padding:10px; border-radius:5px; font-size:0.85rem;">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="margin-bottom:10px;">✅
+                                Tekshirish</button>
+                            <button type="button" class="btn btn-secondary" onclick="generateMashq()"
+                                style="width:100%;">🔄 Yangi Masala</button>
                         </form>
                     </div>
                 </div>
@@ -488,6 +567,76 @@
             let logs = [];
             let editingId = null;
             let currentUser = null;
+            let currentMashq = {};
+
+            // MASHQ LOGIC
+            function generateMashq() {
+                const costs = [50000000, 100000000, 120000000, 200000000];
+                const lives = [4, 5, 8, 10];
+                const cost = costs[Math.floor(Math.random() * costs.length)];
+                const salvage = cost * 0.1;
+                const life = lives[Math.floor(Math.random() * lives.length)];
+
+                const possibleUnits = [100000, 200000, 500000];
+                const totalUnits = possibleUnits[Math.floor(Math.random() * possibleUnits.length)];
+                const units = Math.floor(totalUnits * ((Math.floor(Math.random() * 10) + 10) / 100)); // 10-20%
+
+                const base = cost - salvage;
+
+                currentMashq = {
+                    cost, salvage, life, totalUnits, units,
+                    ansStraight: base / life,
+                    ansProd: base * (units / totalUnits),
+                    ansDouble: cost * ((1 / life) * 2), // Year 1, accumulated is 0
+                    ansCumul: base * (life / ((life * (life + 1)) / 2)) // Year 1
+                };
+
+                document.getElementById('m-cost').innerText = cost.toLocaleString();
+                document.getElementById('m-salvage').innerText = salvage.toLocaleString();
+                document.getElementById('m-life').innerText = life;
+                document.getElementById('m-t-units').innerText = totalUnits.toLocaleString();
+                document.getElementById('m-units').innerText = units.toLocaleString();
+
+                document.getElementById('ans-straight').value = '';
+                document.getElementById('ans-prod').value = '';
+                document.getElementById('ans-double').value = '';
+                document.getElementById('ans-cumul').value = '';
+                document.getElementById('mashq-feedback').style.display = 'none';
+            }
+
+            function checkMashq() {
+                const v1 = parseFloat(document.getElementById('ans-straight').value) || 0;
+                const v2 = parseFloat(document.getElementById('ans-prod').value) || 0;
+                const v3 = parseFloat(document.getElementById('ans-double').value) || 0;
+                const v4 = parseFloat(document.getElementById('ans-cumul').value) || 0;
+
+                const isCorrect = (val, target) => Math.abs(val - target) < 1000;
+                const c1 = isCorrect(v1, currentMashq.ansStraight);
+                const c2 = isCorrect(v2, currentMashq.ansProd);
+                const c3 = isCorrect(v3, currentMashq.ansDouble);
+                const c4 = isCorrect(v4, currentMashq.ansCumul);
+
+                const fb = document.getElementById('mashq-feedback');
+                fb.style.display = 'block';
+
+                if (c1 && c2 && c3 && c4) {
+                    fb.style.border = '1px solid #10b981';
+                    fb.style.backgroundColor = '#d1fae5';
+                    fb.style.color = '#065f46';
+                    fb.innerHTML = `✅ Barakalla! Barcha 4 usul to'g'ri hisoblandi.`;
+                    addLog("Amortizatsiya mashqi (4 usul) to'g'ri yechildi.");
+                } else {
+                    fb.style.border = '1px solid #ef4444';
+                    fb.style.backgroundColor = '#fee2e2';
+                    fb.style.color = '#991b1b';
+                    let msg = "❌ Ba'zi javoblarda xato bor:<br>";
+                    msg += c1 ? "✅ To'g'ri chiziqli<br>" : "❌ To'g'ri chiziqli<br>";
+                    msg += c2 ? "✅ Ishlab chiqarish<br>" : "❌ Ishlab chiqarish<br>";
+                    msg += c3 ? "✅ Ikki karra amortizatsiya<br>" : "❌ Ikki karra amortizatsiya<br>";
+                    msg += c4 ? "✅ Kumulyativ" : "❌ Kumulyativ";
+                    fb.innerHTML = msg + "<br><br>Iltimos, xatolarni ko'rib chiqib, qaytadan hisoblang.";
+                }
+            }
 
             // INIT
             window.onload = function () {
@@ -557,24 +706,43 @@
                 cancelEdit();
                 const kirimForm = document.getElementById('av-kirim-form');
                 const calcForm = document.getElementById('av-calc-form');
+                const mashqForm = document.getElementById('av-mashq-form');
                 const btns = document.querySelectorAll('.tab-btn');
+
+                kirimForm.style.display = 'none';
+                calcForm.style.display = 'none';
+                if (mashqForm) mashqForm.style.display = 'none';
+
+                btns.forEach(b => {
+                    b.classList.remove('active');
+                    if (b.innerText.includes('Mashq')) b.style.opacity = '0.5';
+                });
 
                 if (type === 'kirim') {
                     kirimForm.style.display = 'block';
-                    calcForm.style.display = 'none';
                     btns[0].classList.add('active');
-                    btns[1].classList.remove('active');
-                } else {
-                    kirimForm.style.display = 'none';
+                    if (btns[2]) btns[2].style.opacity = '1';
+                } else if (type === 'eskirish') {
                     calcForm.style.display = 'block';
-                    btns[0].classList.remove('active');
                     btns[1].classList.add('active');
+                    if (btns[2]) btns[2].style.opacity = '1';
+                } else if (type === 'mashq') {
+                    if (mashqForm) mashqForm.style.display = 'block';
+                    if (btns[2]) {
+                        btns[2].classList.add('active');
+                        btns[2].style.opacity = '1';
+                    }
+                    if (Object.keys(currentMashq).length === 0) generateMashq();
                 }
             }
 
             // --- ASSET MANAGEMENT ---
             document.getElementById('av-kirim-form').onsubmit = function (e) {
                 e.preventDefault();
+
+                const method = document.getElementById('av-method').value;
+                const paramValue = parseFloat(document.getElementById('av-rate').value);
+                const salvage = parseFloat(document.getElementById('av-salvage').value) || 0;
 
                 const asset = {
                     id: editingId || Date.now(),
@@ -583,7 +751,10 @@
                     account: document.getElementById('av-group').value,
                     date: document.getElementById('av-date').value,
                     cost: parseFloat(document.getElementById('av-cost').value),
-                    rate: parseFloat(document.getElementById('av-rate').value),
+                    method: method,
+                    rate: method === 'straight_rate' ? paramValue : 0,
+                    life: method !== 'straight_rate' ? paramValue : 0,
+                    salvage: salvage,
                     accumulatedDepr: 0, // 0200 count
                     status: 'Active'
                 };
@@ -657,7 +828,16 @@
                 document.getElementById('av-group').value = a.account;
                 document.getElementById('av-date').value = a.date;
                 document.getElementById('av-cost').value = a.cost;
-                document.getElementById('av-rate').value = a.rate;
+
+                const methodCombo = document.getElementById('av-method');
+                if (methodCombo) {
+                    methodCombo.value = a.method || 'straight_rate';
+                    methodCombo.onchange(); // trigger label change
+                }
+                if (document.getElementById('av-salvage')) {
+                    document.getElementById('av-salvage').value = a.salvage || 0;
+                }
+                document.getElementById('av-rate').value = (a.method && a.method !== 'straight_rate') ? a.life : (a.rate || 15);
 
                 document.getElementById('btn-save').innerText = "💾 O'zgartirish";
                 document.getElementById('btn-cancel').style.display = 'block';
@@ -691,17 +871,48 @@
                 let count = 0;
 
                 assets.forEach(a => {
-                    if (a.status === 'Active') {
-                        // Straight line: (Cost * Rate%) / 12
-                        const monthly = (a.cost * (a.rate / 100)) / 12;
-                        // Check if fully depreciated
-                        if (a.accumulatedDepr < a.cost) {
-                            let actualCharge = monthly;
-                            // Avoid over-depreciation
-                            if (a.accumulatedDepr + monthly > a.cost) {
-                                actualCharge = a.cost - a.accumulatedDepr;
-                            }
+                    const method = a.method || 'straight_rate';
+                    const salvage = a.salvage || 0;
 
+                    if (a.status === 'Active' && a.accumulatedDepr < a.cost - salvage) {
+                        let actualCharge = 0;
+
+                        if (method === 'straight_rate') {
+                            actualCharge = (a.cost * ((a.rate || 15) / 100)) / 12;
+                        } else if (method === 'straight') {
+                            const base = a.cost - salvage;
+                            actualCharge = (base / a.life) / 12;
+                        } else if (method === 'production') {
+                            const base = a.cost - salvage;
+                            let qty = prompt(`"${a.name}" (Inv: ${a.inv}) uchun ${month} oyidagi ishlagan hajmini kiriting:`, "0");
+                            if (qty === null) qty = "0"; // Cancelled
+                            actualCharge = base * (parseFloat(qty) / a.life);
+                        } else if (method === 'double') {
+                            const currentBook = a.cost - a.accumulatedDepr; // Ignored salvage for base
+                            actualCharge = (currentBook * (2 / a.life)) / 12;
+                        } else if (method === 'cumulative') {
+                            const startYear = parseInt(a.date.split('-')[0]);
+                            const startMonth = parseInt(a.date.split('-')[1]);
+                            const currentYear = parseInt(month.split('-')[0]);
+                            const currentMonth = parseInt(month.split('-')[1]);
+
+                            const diffMonths = (currentYear - startYear) * 12 + (currentMonth - startMonth);
+                            const yearIndex = Math.floor(diffMonths / 12) + 1;
+
+                            let remainingYears = a.life - yearIndex + 1;
+                            if (remainingYears < 1) remainingYears = 1;
+
+                            const syd = (a.life * (a.life + 1)) / 2;
+                            const base = a.cost - salvage;
+                            actualCharge = (base * (remainingYears / syd)) / 12;
+                        }
+
+                        // Avoid over-depreciation
+                        if (a.accumulatedDepr + actualCharge > a.cost - salvage) {
+                            actualCharge = (a.cost - salvage) - a.accumulatedDepr;
+                        }
+
+                        if (actualCharge > 0) {
                             a.accumulatedDepr += actualCharge;
                             monthTotal += actualCharge;
                             count++;
@@ -747,16 +958,42 @@
         <script>
             // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
             const quizQuestions = [
-                { q: "Korxona yangi bino sotib oldi (1,000,000,000 so'm)", dt: "0110", kt: "6010", sum: 1000000000 },
-                { q: "Uskuna o'rnatish uchun pudratchiga to'lov qilindi (50,000,000 so'm)", dt: "0810", kt: "5110", sum: 50000000 },
-                { q: "Asosiy vositalar (Uskuna) foydalanishga topshirildi (50,000,000 so'm)", dt: "0120", kt: "0810", sum: 50000000 },
-                { q: "Ishlab chiqarish uskunalariga eskirish hisoblandi (2,000,000 so'm)", dt: "2010", kt: "0220", sum: 2000000 },
-                { q: "Ma'muriy bino uchun eskirish hisoblandi (5,000,000 so'm)", dt: "9420", kt: "0210", sum: 5000000 },
-                { q: "Eskirgan kompyuter hisobdan chiqarildi (Boshlang'ich qiymat: 4,000,000 so'm)", dt: "9210", kt: "0140", sum: 4000000 },
-                { q: "Hisobdan chiqarilgan kompyuterning eskirishi (3,500,000 so'm) hisobdan o'chirildi", dt: "0240", kt: "9210", sum: 3500000 },
-                { q: "Ta'sischidan ustav kapitaliga bino qabul qilindi (500,000,000 so'm)", dt: "0110", kt: "4610", sum: 500000000 },
-                { q: "Asosiy vosita (Avtomobil) sotildi (100,000,000 so'm)", dt: "9210", kt: "0150", sum: 100000000 },
-                { q: "Tekshiruvda aniqlangan ortiqcha AV (Kirim) (1,000,000 so'm)", dt: "0130", kt: "9390", sum: 1000000 }
+                // === BINO (0120) — Sotib olish jarayoni ===
+                { q: "Korxona yangi ma'muriy bino sotib oldi (kapital qo'yilma sifatida) (1,000,000,000 so'm)", dt: "0820", kt: "6010", sum: 1000000000 },
+                { q: "Sotib olingan ma'muriy bino (0120) foydalanishga topshirildi (1,000,000,000 so'm)", dt: "0120", kt: "0820", sum: 1000000000 },
+
+                // === MASHINA VA USKUNALAR (0130) — Pudratchiga to'lov jarayoni ===
+                // 1-bosqich: Pudratchidan xizmat qabul qilindi (kapital qo'yilma — kreditorlik qarzdorlik)
+                { q: "Pudratchidan ishlab chiqarish mashinasini (0130) o'rnatish xizmati qabul qilindi (50,000,000 so'm)", dt: "0820", kt: "6010", sum: 50000000 },
+                // 2-bosqich: Kreditorlik qarzni so'ndirish (to'lov qilish)
+                { q: "Ishlab chiqarish mashinasini o'rnatish uchun pudratchiga to'lov qilindi — kreditorlik qarz so'ndirildi (50,000,000 so'm)", dt: "6010", kt: "5110", sum: 50000000 },
+                // 3-bosqich: Asosiy vosita foydalanishga topshirildi
+                { q: "Ishlab chiqarish mashinasi (0130) foydalanishga topshirildi (50,000,000 so'm)", dt: "0130", kt: "0820", sum: 50000000 },
+
+                // === AVANS (BO'NAK) VARIANTI ===
+                { q: "Pudratchiga ishlab chiqarish mashinasini o'rnatish uchun bo'nak (avans) to'landi (30,000,000 so'm)", dt: "4310", kt: "5110", sum: 30000000 },
+                { q: "Pudratchidan xizmat qabul qilingach, avvalgi bo'nak (avans) summasi yopildi (30,000,000 so'm)", dt: "6010", kt: "4310", sum: 30000000 },
+
+                // === KOMPYUTER VA TEXNIKA (0150) — Sotib olish jarayoni ===
+                { q: "Yangi noutbuk kompyuter (0150) sotib olindi (kapital qo'yilma) (8,000,000 so'm)", dt: "0820", kt: "6010", sum: 8000000 },
+                { q: "Sotib olingan noutbuk kompyuter (0150) foydalanishga topshirildi (8,000,000 so'm)", dt: "0150", kt: "0820", sum: 8000000 },
+
+                // === ESKIRISH (AMORTIZATSIYA) ===
+                { q: "Ishlab chiqarish mashinasiga (0130) eskirish hisoblandi (2,000,000 so'm)", dt: "2010", kt: "0230", sum: 2000000 },
+                { q: "Ma'muriy bino (0120) uchun eskirish hisoblandi (5,000,000 so'm)", dt: "9420", kt: "0220", sum: 5000000 },
+
+                // === HISOBDAN CHIQARISH — KOMPYUTER (0150) ===
+                { q: "Eskirgan noutbuk kompyuter (0150) hisobdan chiqarildi (Boshlang'ich qiymat: 4,000,000 so'm)", dt: "9210", kt: "0150", sum: 4000000 },
+                { q: "Hisobdan chiqarilgan noutbuk kompyuterning (0150) eskirishi (3,500,000 so'm) hisobdan o'chirildi", dt: "0250", kt: "9210", sum: 3500000 },
+
+                // === TA'SISCHI HISSASI — BINO (0120) ===
+                { q: "Ta'sischidan ustav kapitaliga ma'muriy bino (0120) qabul qilindi (500,000,000 so'm)", dt: "0120", kt: "4610", sum: 500000000 },
+
+                // === SOTISH — TRANSPORT (0160) ===
+                { q: "Korxona avtomobili (Transport vositasi, 0160) sotildi (100,000,000 so'm)", dt: "9210", kt: "0160", sum: 100000000 },
+
+                // === INVENTARIZATSIYA — MEBEL (0140) ===
+                { q: "Tekshiruvda aniqlangan ortiqcha ofis mebeli (0140) kirim qilindi (1,000,000 so'm)", dt: "0140", kt: "9390", sum: 1000000 }
             ];
 
             let currentQIndex = 0;

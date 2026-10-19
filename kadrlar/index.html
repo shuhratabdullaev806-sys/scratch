@@ -312,6 +312,14 @@
                 <small>"FAXR MADAD KONSALT" | Muallif: Suxrat Abdullaev</small>
             </div>
             <div style="display:flex; align-items:center; gap:15px;">
+                <div
+                    style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px; display:flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,0.3);">
+                    <label style="font-size:0.85rem; font-weight:600; cursor:help;"
+                        title="Mehnatga Haq To'lashning Eng Kam Miqdori (MHTEKM)">MHTEKM:</label>
+                    <input type="number" id="global-mhtekm" onchange="saveMHTEKM()"
+                        style="width:105px; padding:4px 8px; font-weight:600; color:var(--text-main); border:none; border-radius:4px;"
+                        title="MHTEKM ni shu yerdan o'zgartirishingiz mumkin">
+                </div>
                 <button onclick="openQuiz()" class="btn"
                     style="background:#8b5cf6; color:white; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4);">
                     🧠 Bilimni Sinash
@@ -356,7 +364,9 @@
                                 <label>Soliq Imtiyozi (JShODS)</label>
                                 <select id="e-exemption">
                                     <option value="">Imtiyoz mavjud emas</option>
-                                    <option value="380">SK 380-modda (Nogironlik - 1.41 BRV)</option>
+                                    <option value="380">SK 380-modda (Urush qatnashchilari va nogironlar - 1.41 baravar
+                                        MHTEKM)
+                                    </option>
                                     <option value="378_edu">SK 378-modda (Kontrakt to'lovi)</option>
                                     <option value="378_loan">SK 378-modda (Ipoteka krediti)</option>
                                 </select>
@@ -566,7 +576,9 @@
                         <input type="number" id="s-rate" placeholder="Stavka (mas: 1.0)" step="0.1" min="0.1" max="1.0"
                             value="1.0" style="width:100px;">
                         <input type="number" id="s-salary" placeholder="Oylik Maosh" required>
-                        <button type="submit" class="btn btn-primary">Qo'shish</button>
+                        <button type="submit" id="s-submit-btn" class="btn btn-primary">Qo'shish</button>
+                        <button type="button" id="s-cancel-btn" class="btn btn-ghost" style="display:none;"
+                            onclick="cancelEditShtat()">Bekor qilish</button>
                     </form>
                 </div>
                 <div class="card">
@@ -598,6 +610,7 @@
             let currentUser = null;
 
             let editingId = null;
+            let editingShtatId = null;
 
             window.onload = function () {
                 checkLogin();
@@ -655,6 +668,7 @@
                 payrolls = JSON.parse(localStorage.getItem('k_payrolls_' + currentUser) || '{}');
 
                 document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+                loadMHTEKM();
                 const curMonth = new Date().toISOString().slice(0, 7);
                 document.getElementById('pay-month').value = curMonth;
                 document.getElementById('tabel-month').value = curMonth;
@@ -675,21 +689,29 @@
             // --- SHTAT ---
             document.getElementById('shtat-form').onsubmit = function (e) {
                 e.preventDefault();
-                shtat.push({
-                    id: Date.now(),
+                const newShtat = {
+                    id: editingShtatId || Date.now(),
                     dept: document.getElementById('s-dept').value,
                     pos: document.getElementById('s-pos').value,
                     rate: parseFloat(document.getElementById('s-rate').value) || 1.0,
                     salary: Math.round(parseFloat(document.getElementById('s-salary').value))
-                });
+                };
+
+                if (editingShtatId) {
+                    const idx = shtat.findIndex(x => x.id === editingShtatId);
+                    if (idx !== -1) shtat[idx] = newShtat;
+                } else {
+                    shtat.push(newShtat);
+                }
+
                 saveShtat();
-                this.reset();
+                cancelEditShtat();
                 renderShtat();
                 renderEmployees();
             };
             function renderShtat() {
                 const tbody = document.getElementById('shtat-tbody');
-                tbody.innerHTML = shtat.map(s => `<tr><td>${s.dept}</td><td>${s.pos}</td><td>${s.rate || 1}</td><td class="num">${s.salary.toLocaleString()}</td><td class="no-print"><button onclick="delShtat(${s.id})" class="btn-danger btn">x</button></td></tr>`).join('');
+                tbody.innerHTML = shtat.map(s => `<tr><td>${s.dept}</td><td>${s.pos}</td><td>${s.rate || 1}</td><td class="num">${s.salary.toLocaleString()}</td><td class="no-print"><button onclick="editShtat(${s.id})" class="btn-ghost btn">✏️</button> <button onclick="delShtat(${s.id})" class="btn-danger btn">🗑️</button></td></tr>`).join('');
                 const sel = document.getElementById('e-pos-select');
                 const currentVal = sel.value;
                 sel.innerHTML = '<option value="">-- Shtatdan tanlang --</option>' + shtat.map(s => `<option value="${s.id}">${s.pos} (${s.rate || 1} st) - ${s.salary}</option>`).join('');
@@ -702,6 +724,23 @@
             function saveShtat() {
                 if (!currentUser) return;
                 localStorage.setItem('k_shtat_' + currentUser, JSON.stringify(shtat));
+            }
+            function editShtat(id) {
+                const s = shtat.find(x => x.id === id);
+                if (!s) return;
+                editingShtatId = id;
+                document.getElementById('s-dept').value = s.dept;
+                document.getElementById('s-pos').value = s.pos;
+                document.getElementById('s-rate').value = s.rate || 1.0;
+                document.getElementById('s-salary').value = s.salary;
+                document.getElementById('s-submit-btn').innerText = "Saqlash";
+                document.getElementById('s-cancel-btn').style.display = 'inline-block';
+            }
+            function cancelEditShtat() {
+                editingShtatId = null;
+                document.getElementById('shtat-form').reset();
+                document.getElementById('s-submit-btn').innerText = "Qo'shish";
+                document.getElementById('s-cancel-btn').style.display = 'none';
             }
             function delShtat(id) { if (confirm('Ochirilsinmi?')) { shtat = shtat.filter(x => x.id !== id); saveShtat(); renderShtat(); } }
 
@@ -835,7 +874,19 @@
             }
 
             // --- PAYROLL CALCULATION (Updated) ---
-            const MHM = 375000;
+            // MHTEKM settings
+            let MHTEKM = 1050000;
+            function loadMHTEKM() {
+                const storedValue = localStorage.getItem('global_mhtekm');
+                if (storedValue) MHTEKM = parseInt(storedValue);
+                if (document.getElementById('global-mhtekm')) {
+                    document.getElementById('global-mhtekm').value = MHTEKM;
+                }
+            }
+            function saveMHTEKM() {
+                MHTEKM = parseInt(document.getElementById('global-mhtekm').value) || 1050000;
+                localStorage.setItem('global_mhtekm', MHTEKM);
+            }
 
             function calculatePayroll() {
                 const m = document.getElementById('pay-month').value;
@@ -896,7 +947,7 @@
                     let exemptAmount = 0;
                     let exemptDoc = "";
                     if (e.exemption === '380') {
-                        exemptAmount = Math.min(gross, 1.41 * MHM);
+                        exemptAmount = Math.min(gross, 1.41 * MHTEKM);
                         exemptDoc = "SK 380";
                     } else if (e.exemption === '378_edu') {
                         exemptAmount = Math.min(gross, 3000000);

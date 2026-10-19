@@ -13,9 +13,10 @@ const MODULLAR = [
     { id: 'na', nomi: 'Nomoddiy Aktivlar', prefixlar: ['na_assets_', 'na_logs_'] },
     { id: 'debitor', nomi: 'Debitorlar', prefixlar: ['debitor_clients_', 'debitor_invoices_', 'debitor_payments_'] },
     { id: 'kreditor', nomi: 'Kreditorlar', prefixlar: ['kred_vendors_', 'kred_txs_', 'kred_employees_', 'kred_proxies_'] },
-    { id: 'mfg', nomi: 'Ishlab Chiqarish', prefixlar: ['mfg_materials_', 'mfg_history_'] },
+    { id: 'mfg', nomi: 'Ishlab Chiqarish', prefixlar: ['mfg_materials_', 'mfg_history_', 'mfg_recipes_'] },
     { id: 'soliq', nomi: 'Soliq', prefixlar: ['soliq_reports_multi_'] },
     { id: 'bk', nomi: 'Bosh Kitob (Jurnal)', prefixlar: ['b_journal_'] },
+    { id: 'profil', nomi: 'Korxona Profili', prefixlar: ['company_profile_'] },
     { id: 'vazifa', nomi: 'Mavzu vazifalari (testlar)', prefixlar: ['vazifa_natija_'] },
 ];
 

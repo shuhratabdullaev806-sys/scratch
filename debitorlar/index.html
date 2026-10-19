@@ -534,11 +534,7 @@
             </div>
         </div>
 
-        <!-- USER DISPLAY -->
-        <div class="user-info no-print" id="user-display" style="cursor: default;">
-            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
-                onclick="logout()" title="Chiqish">❌</span>
-        </div>
+        <!-- USER DISPLAY MOVED TO HEADER -->
 
         <aside class="sidebar">
             <div class="brand">
@@ -573,7 +569,13 @@
                         style="background:#8b5cf6; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4);">
                         🧠 Bilimni Sinash
                     </button>
-                    <div class="avatar">A</div>
+                    <!-- USER DISPLAY -->
+                    <div class="user-info no-print" id="user-display"
+                        style="cursor: default; position:static; margin:0; display:none;">
+                        <span id="current-user-info">...</span> <span
+                            style="cursor:pointer; margin-left:10px; color:red;" onclick="logout()"
+                            title="Chiqish">❌</span>
+                    </div>
                 </div>
             </header>
             <div class="content-area" id="mainContainer"></div>
@@ -1091,11 +1093,11 @@
         <script>
             // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
             const quizQuestions = [
-                { q: "Mijozga mahsulot sotildi (10,000,000 so'm)", dt: "4010", kt: "9010", sum: 10000000 },
-                { q: "Sotilgan mahsulot uchun QQS (12%) hisoblandi (1,200,000 so'm)", dt: "9030", kt: "6410", sum: 1200000 },
+                { q: "Mijozga mahsulot sotildi (sof qiymat QQSsiz) (10,000,000 so'm)", dt: "4010", kt: "9010", sum: 10000000 },
+                { q: "Ushbu mahsulot uchun qo'shimcha QQS hisoblandi (1,200,000 so'm)", dt: "4010", kt: "6410", sum: 1200000 },
                 { q: "Mijozdan bank hisobiga pul kelib tushdi (8,000,000 so'm)", dt: "5110", kt: "4010", sum: 8000000 },
                 { q: "Mijozdan oldindan to'lov (Avans) olindi (5,000,000 so'm)", dt: "5110", kt: "6310", sum: 5000000 },
-                { q: "Oldin olingan avans daromadga o'tkazildi (Hisob-faktura berilgach) (5,000,000 so'm)", dt: "6310", kt: "4010", sum: 5000000 },
+                { q: "Mijozdan oldin olingan avans hisobga olindi (5,000,000 so'm)", dt: "6310", kt: "4010", sum: 5000000 },
                 { q: "Mijozga chegirma (skidka) berildi (500,000 so'm)", dt: "9050", kt: "4010", sum: 500000 },
                 { q: "Mijoz mahsulotni qaytarib berdi (Vozvrat) (2,000,000 so'm)", dt: "9040", kt: "4010", sum: 2000000 },
                 { q: "Mijozdan veksel olindi (Qarz evaziga) (1,000,000 so'm)", dt: "4020", kt: "4010", sum: 1000000 },

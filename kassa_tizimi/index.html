@@ -465,22 +465,25 @@
             </div>
         </div>
 
-        <!-- USER DISPLAY -->
-        <div class="user-info no-print" id="user-display" style="cursor: default;">
-            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
-                onclick="logout()" title="Chiqish">❌</span>
-        </div>
-
         <header class="no-print">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <h1 style="margin:0;">🏛️ Kassa Tizimi (5010) — "FAXR MADAD KONSALT"</h1>
                     <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Muallif: Suxrat Abdullaev</p>
                 </div>
-                <button onclick="openQuiz()" class="btn"
-                    style="background:#8b5cf6; color:white; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4); display:flex; align-items:center; gap:5px; font-size:1rem; padding: 10px 20px;">
-                    🧠 Bilimni Sinash
-                </button>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                    <button onclick="openQuiz()" class="btn"
+                        style="background:#8b5cf6; color:white; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4); display:flex; align-items:center; gap:5px; font-size:1rem; padding: 10px 20px;">
+                        🧠 Bilimni Sinash
+                    </button>
+                    <!-- USER DISPLAY -->
+                    <div class="user-info no-print" id="user-display"
+                        style="cursor: default; position:static; margin:0; display:none;">
+                        <span id="current-user-info">...</span> <span
+                            style="cursor:pointer; margin-left:10px; color:red;" onclick="logout()"
+                            title="Chiqish">❌</span>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -656,9 +659,10 @@
         <script>
             // Configuration
             const accounts = [
-                '4010', '4210', '4220', '4290', '4310', '4610',
+                '4010', '4210', '4220', '4230', '4290', '4310', '4410', '4520', '4610',
                 '4720', '4730', '5110', '5710', '5910', '6010',
-                '6710', '6310', '9010', '9020', '9030', '9390', '9380'
+                '6310', '6410', '6520', '6530', '6610', '6710', '6810', '6910', '6990',
+                '9010', '9020', '9030', '9380', '9390'
             ];
 
             // Initialize
