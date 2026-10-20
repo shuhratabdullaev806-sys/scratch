@@ -2,6 +2,7 @@
 <html lang="uz">
 
 <head>
+    <script>document.documentElement.style.visibility='hidden'</script><script src="../ustoz_kirish.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kirish kodi yaratish - FAXR MADAD KONSALT</title>
@@ -37,6 +38,21 @@
                 <li>Kodni o'quvchilarga Telegramda yuboring: <b id="kodK"></b></li>
             </ol>
         </div>
+        <div class="card">
+            <h2 style="margin-top:0;font-size:1.15rem">👨‍🏫 O'qituvchi parolini almashtirish</h2>
+            <label>Yangi parol (kamida 8 ta harf yoki raqam)</label>
+            <input id="uparol" type="text" autocomplete="off" placeholder="masalan: ustoz-yangi-2027">
+            <button id="ubtn">Iz yaratish</button>
+            <div id="unatija" style="display:none">
+                <p><b>Quyidagi qatorni nusxalang:</b></p>
+                <pre id="uqator"></pre>
+                <ol>
+                    <li>GitHub'da <code>ustoz_kirish.js</code> faylini oching, ✏️ (Edit) tugmasini bosing.</li>
+                    <li><code>h: '...'</code> qatorini shu qator bilan almashtiring → <b>Commit changes</b>.</li>
+                    <li>Sinf kompyuterlaridagi <code>ustoz_kirish.js</code> faylini ham yangilang.</li>
+                </ol>
+            </div>
+        </div>
         <p style="color:#64748b;font-size:.9rem">Bu sahifa kodni hech qayerga yubormaydi, hamma narsa brauzeringizda hisoblanadi.
             Saytda kodning o'zi emas, faqat uning "izi" saqlanadi.</p>
     </div>
@@ -56,6 +72,16 @@
             document.getElementById('qator').textContent = `        '${oy}': '${hex}',`;
             document.getElementById('kodK').textContent = kod;
             document.getElementById('natija').style.display = 'block';
+        };
+        document.getElementById('ubtn').onclick = async () => {
+            const p = document.getElementById('uparol').value;
+            if (norm(p).length < 8) return alert("Parol kamida 8 ta harf yoki raqamdan iborat bo'lsin.");
+            const enc = new TextEncoder(), U = window.USTOZ_KIRISH;
+            const key = await crypto.subtle.importKey('raw', enc.encode(norm(p)), 'PBKDF2', false, ['deriveBits']);
+            const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(U.tuz), iterations: U.iter, hash: 'SHA-256' }, key, 256);
+            const hex = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+            document.getElementById('uqator').textContent = `    h: '${hex}'`;
+            document.getElementById('unatija').style.display = 'block';
         };
     </script>
 </body>
