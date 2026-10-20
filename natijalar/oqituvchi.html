@@ -99,6 +99,11 @@
         .juft { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 14px; }
         .juft > div { background: #f8fafc; border-radius: 8px; padding: 8px 10px; white-space: pre-line; font-size: 0.88rem; }
         .juft > div.namuna { background: #f0fdf4; }
+        .tahlil { margin: 8px 0 16px; }
+        .tahlil summary { cursor: pointer; padding: 6px 0; }
+        .tahlil td { white-space: normal; vertical-align: top; }
+        .tahlil td:first-child { white-space: nowrap; }
+        .tahlil tr.xato td { background: #fef2f2; }
         @media (max-width: 700px) { .juft { grid-template-columns: 1fr; } }
         pre { background: #f8fafc; padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 0.8rem; }
     </style>
@@ -320,6 +325,32 @@
         const sum = x => Number(String(x).replace(/\D/g, '') || 0).toLocaleString('ru-RU');
         const provMatn = r => r.map(p => `Dt ${p.dt}  Kt ${p.kt} — ${sum(p.summa)}`).join('\n') || '—';
 
+        // Test va moslashtirish bo'yicha o'quvchi tanlovi, to'g'ri javob va tushuntirish.
+        // Harflar Word fayldagi tartibda saqlanadi (o'quvchi ekranida variantlar aralashtirilgan bo'ladi).
+        function testTahlili(m, k, r) {
+            const javob = r.javob || {};
+            const variant = (s, h) => (s.variantlar.find(v => v.harf === h) || {}).matn;
+            const qatorlar = [];
+            [['test1', 'T1'], ['test2', 'T2']].forEach(([t, kod]) => (m[t] || []).forEach(s => {
+                const h = javob[`${t}-${s.n}`], togri = (k[t] || {})[s.n];
+                qatorlar.push({
+                    bolim: t, kod: `${kod}-${s.n}`, savol: s.savol, ok: !!h && h === togri,
+                    tanlagan: h ? `${h}) ${variant(s, h) || ''}` : null,
+                    togri: togri ? `${togri}) ${variant(s, togri) || ''}` : '—',
+                    izoh: (k[t + '_izoh'] || {})[s.n] || '',
+                });
+            }));
+            if (m.moslik) m.moslik.atamalar.forEach((a, i) => {
+                const h = javob[`moslik-${i + 1}`], togri = (k.moslik || {})[i + 1];
+                const tarif = x => (m.moslik.tariflar.find(t => t.harf === x) || {}).matn || '';
+                qatorlar.push({
+                    bolim: 'moslik', kod: `MOS-${i + 1}`, savol: a, ok: !!h && h === togri,
+                    tanlagan: h ? `${h}) ${tarif(h)}` : null, togri: togri ? `${togri}) ${tarif(togri)}` : '—', izoh: '',
+                });
+            });
+            return qatorlar;
+        }
+
         function vazifaTafsiloti(r) {
             const m = BAZA.find(x => x.id === r.mavzu_id);
             const k = m ? kalitniOch(m) : null;
@@ -329,6 +360,17 @@
                 <p>${Object.entries(r.bolimlar).map(([b, v]) => `${nomlar[b] || b}: <b>${v.ball}/${v.maks}</b>`).join(' · ')}</p>
                 ${['test1', 'test2'].filter(t => r.xatolar?.[t]?.length).map(t => `<p class="bo">${nomlar[t]} xatolar: ${r.xatolar[t].join(', ')}-savollar</p>`).join('')}`;
             if (!m) return h + '<p class="warn">Bu mavzu bazada topilmadi — namunaviy javoblarni ko\'rsatib bo\'lmaydi.</p></div>';
+
+            const tt = testTahlili(m, k, r);
+            const xatoSoni = tt.filter(q => !q.ok).length;
+            if (tt.length) h += `<details class="tahlil" ${xatoSoni ? 'open' : ''}><summary><b>Test va moslashtirish tahlili</b>
+                <span class="${xatoSoni ? 'warn' : 'ok'}">— ${xatoSoni ? xatoSoni + ' ta xato' : 'hammasi to\'g\'ri'}</span></summary>
+                <p class="bo" style="font-size:.82rem">Harflar Word fayldagi tartibda. O'quvchi ekranida variantlar boshqa tartibda bo'lgan — matniga qarang.</p>
+                <div class="scroll"><table><thead><tr><th></th><th>Savol</th><th>O'quvchi javobi</th><th>To'g'ri javob</th><th>Tushuntirish</th></tr></thead><tbody>
+                ${tt.map(q => `<tr class="${q.ok ? '' : 'xato'}"><td>${q.ok ? '✅' : '❌'} ${q.kod}</td><td>${htmlXavfsiz(q.savol)}</td>
+                    <td>${q.tanlagan ? htmlXavfsiz(q.tanlagan) : '<span class="bo">javob bermagan</span>'}</td>
+                    <td>${htmlXavfsiz(q.togri)}</td><td class="bo">${htmlXavfsiz(q.izoh)}</td></tr>`).join('')}
+                </tbody></table></div></details>`;
 
             const juft = (sarlavha, oquvchi, namuna) => `<b>${htmlXavfsiz(sarlavha)}</b><div class="juft">
                 <div><span class="bo">O'quvchi:</span>\n${htmlXavfsiz(oquvchi || '— javob yo\'q —')}</div>
@@ -396,9 +438,19 @@
                     if (s.prov && s.provNamuna?.length) qism.push(`Namuna provodkalar:`, provMatn(s.provNamuna), ``);
                     qism.push(`Namuna javob: ${s.namuna || "(hujjatda namuna javob yo'q)"}`, ``);
                 }
+                const kalit = kalitniOch(m);
+                const kalitQatorlar = testTahlili(m, kalit, { javob: {} });
+                if (kalitQatorlar.length) {
+                    qism.push(`### Test va moslashtirish kaliti (avtomatik baholangan — qayta baholama, faqat tushuntirish uchun)`, ``);
+                    for (const q of kalitQatorlar)
+                        qism.push(`- **${q.kod}:** ${q.savol} → to'g'ri: ${q.togri}${q.izoh ? ` — ${q.izoh}` : ''}`);
+                    qism.push(``);
+                }
                 qism.push(`### O'quvchilar javoblari`, ``);
                 for (const { n, r } of royxat.sort((a, b) => a.n.ism.localeCompare(b.n.ism))) {
                     qism.push(`#### ${n.ism} (${n.guruh}) — avtomatik ball: ${r.foiz}% (${r.ball}/${r.maks}), ${r.urinish}-urinish`, ``);
+                    const xatolar = testTahlili(m, kalit, r).filter(q => !q.ok);
+                    qism.push(`- **Test va moslashtirish xatolari:** ${xatolar.length ? xatolar.map(q => `${q.kod} (${q.tanlagan ? 'tanlagan: ' + q.tanlagan : 'javob bermagan'})`).join('; ') : "yo'q"}`);
                     for (const s of savollar) {
                         const javob = (r.matn || {})[s.kalit];
                         const prov = s.prov ? ((r.provodka || {})[s.prov] || []) : [];
