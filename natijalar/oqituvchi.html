@@ -377,7 +377,8 @@
             const qism = [`# O'quvchilar javoblari — AI tekshiruvi uchun`, ``,
                 `Tayyorlangan: ${new Date().toLocaleString('uz-UZ')} · O'quvchilar: ${qatorlar.length} · Mavzular: ${mavzular.size}`, ``,
                 `Kodlar: MS — ko'rgazmali masala, M — muhokama, Q — qisqa mashq, A — amaliy topshiriq, K — keys.`,
-                `"Avtomatik ball" — testlar, moslashtirish va provodkalar bo'yicha sayt hisoblagan ball; uni qayta baholash shart emas.`, ``];
+                `"Avtomatik ball" — testlar, moslashtirish va provodkalar bo'yicha sayt hisoblagan ball; uni qayta baholash shart emas.`,
+                `Har mavzuning maksimal ochiq bali shu faylda ko'rsatilgan — ochiq javoblar foizini shu son bo'yicha hisobla.`, ``];
             const tartib = [...mavzular.keys()].sort((a, b) => (BAZA.find(m => m.id === a)?.raqam || 999) - (BAZA.find(m => m.id === b)?.raqam || 999));
             for (const id of tartib) {
                 const m = BAZA.find(x => x.id === id);
@@ -385,9 +386,13 @@
                 qism.push(`---`, ``, `## Mavzu: ${m ? (m.raqam ? m.raqam + '. ' : '') + m.nomi : royxat[0].r.mavzu}`, ``);
                 if (!m) { qism.push(`(Bu mavzu bazada topilmadi — savollar va namuna javoblar yo'q.)`, ``); continue; }
                 const savollar = ochiqSavollar(m, kalitniOch(m));
+                // Maksimal ballarni panel o'zi hisoblaydi — AI qo'shishda adashmasligi uchun.
+                const maks = kod => /^(MS|A|K)/.test(kod) ? 10 : 5;
+                const jamiMaks = savollar.reduce((t, s) => t + maks(s.kod), 0);
+                qism.push(`Ochiq javoblar uchun maksimal ball: **${jamiMaks}** (${savollar.map(s => `${s.kod} — ${maks(s.kod)}`).join(', ')}).`, ``);
                 qism.push(`### Savollar va namuna javoblar`, ``);
                 for (const s of savollar) {
-                    qism.push(`**${s.kod} — ${s.nom}**`, ``, `Savol: ${s.savol || '—'}`, ``);
+                    qism.push(`**${s.kod} — ${s.nom}** (maksimal ${maks(s.kod)} ball)`, ``, `Savol: ${s.savol || '—'}`, ``);
                     if (s.prov && s.provNamuna?.length) qism.push(`Namuna provodkalar:`, provMatn(s.provNamuna), ``);
                     qism.push(`Namuna javob: ${s.namuna || "(hujjatda namuna javob yo'q)"}`, ``);
                 }
