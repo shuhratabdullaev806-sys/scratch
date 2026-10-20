@@ -25,6 +25,7 @@ O'qituvchi `ai_tekshiruv_YYYY-MM-DD.md` faylini yuboradi. Unda har bir mavzu uch
 - "avtomatik ball" — testlar, moslashtirish va provodkalar uchun sayt hisoblagan ball. Uni qayta baholama, faqat jadvalga ko'chir.
 
 Savol kodlari: MS — ko'rgazmali masala, M — muhokama, Q — qisqa mashq, A — amaliy topshiriq, K — keys.
+Test kodlari (faqat tushuntirish uchun, ular avtomatik baholangan): T1 — 2-bo'lim testlari, T2 — 7-bo'lim testlari, MOS — moslashtirish.
 
 ### Ballash
 | Kod | Maksimal ball |
@@ -66,7 +67,14 @@ Har bir mavzu uchun:
    - namuna javobi yo'q savollar ro'yxati;
    - baholashda ishonching past bo'lgan javoblar (o'qituvchi o'zi qarashi kerak).
 
-4. **Excel uchun blok** — oxirida kod blokida, nuqtali vergul bilan ajratilgan:
+4. **O'quvchilarga xabarlar** — har bir o'quvchiga Telegram'da yuborish uchun tayyor, qisqa (4–8 qator) xabar, o'quvchiga "siz" deb murojaat qilib:
+   - umumiy natija (foiz va baho);
+   - test va moslashtirish xatolari: har biri uchun savolning qisqa mazmuni, tanlagan javobi, to'g'ri javob va bir jumlada nega (faylidagi "Test va moslashtirish kaliti" dan T1-, T2-, MOS- kodlari bo'yicha ol);
+   - ochiq javoblardagi eng muhim 1–2 xato va nimani takrorlash kerakligi;
+   - oxirida bitta rag'batlantiruvchi jumla.
+   Test kodlarini (T1-3) xabarda yozma — o'quvchi savolni mazmunidan tanisin. Harflarni ham yozma: o'quvchi ekranida variantlar boshqa tartibda bo'lgan, faqat javob matnini yoz.
+
+5. **Excel uchun blok** — oxirida kod blokida, nuqtali vergul bilan ajratilgan:
 ```
 O'quvchi;Guruh;Mavzu;Ochiq %;Avtomatik %;Umumiy %;Baho
 ```

@@ -236,6 +236,21 @@ def test_kaliti(elems):
     return kalit
 
 
+def test_izohlari(elems):
+    """'N-savol. To'g'ri javob: X) ...' qatoridan keyingi tushuntirish matnlari: {n: matn}."""
+    izoh, joriy = {}, None
+    for tur, t in elems:
+        if tur != 'p':
+            continue
+        m = re.match(rf"{BOSH}(\d+)\s*-\s*savol\W+to{A}g{A}ri javob", t, I)
+        if m:
+            joriy = int(m.group(1))
+            izoh.setdefault(joriy, [])
+        elif joriy is not None:
+            izoh[joriy].append(re.sub(r"^\s*Tushuntirish\s*:\s*", '', t, flags=I))
+    return {n: ' '.join(q).strip() for n, q in izoh.items() if q}
+
+
 def moslik_jadvali(elems):
     for tur, t in elems:
         if tur != 't' or len(t) < 3:
@@ -386,6 +401,8 @@ def docx_oqi(fayl):
     kalit = {
         'test1': test_kaliti(b2.get('test1', [])),
         'test2': test_kaliti(b2.get('test2', [])),
+        'test1_izoh': test_izohlari(b2.get('test1', [])),
+        'test2_izoh': test_izohlari(b2.get('test2', [])),
         'moslik': moslik_kaliti(matnga(mashq_y.get(1, b2.get('mashqlar', [])))) if v['moslik'] else {},
         'masala_provodkalar': provodkalar(b2.get('masala', [])),
         'mashqlar': {n: {'yechim': matnga(e), 'provodkalar': provodkalar(e)} for n, e in mashq_y.items()},
