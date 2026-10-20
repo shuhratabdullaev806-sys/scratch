@@ -54,7 +54,7 @@ Har bir mavzu uchun:
 | O'quvchi | Guruh | MS | M1 | … | A1 | … | K1 | … | Ochiq javoblar (ball/maks, %) | Avtomatik ball (%) | Umumiy (%) | Baho |
 
 - Ochiq javoblar foizi = to'plangan ball / maksimal ball × 100.
-- Umumiy foiz = (ochiq javoblar foizi + avtomatik ball foizi) / 2.
+- Umumiy foiz = ochiq javoblar foizi × 0,7 + avtomatik ball foizi × 0,3 (ochiq javoblar — 70%, testlar va moslashtirish — 30%). Bir xonagacha yaxlitla.
 - Baho (5 ballik): 86–100% → 5, 71–85% → 4, 56–70% → 3, 55% va undan past → 2.
 
 2. **Izohlar:** har bir o'quvchiga 1–2 jumla — asosiy xatosi nima va nimani takrorlashi kerak. Juda qisqa va aniq yoz.
