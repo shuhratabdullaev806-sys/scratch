@@ -122,6 +122,7 @@
                 <select id="guruhFiltr"><option value="">Barcha guruhlar</option></select>
                 <input type="search" id="qidiruv" placeholder="Ism bo'yicha qidirish">
                 <button class="btn" id="excel">📊 Excel'ga (CSV) yuklab olish</button>
+                <button class="btn ikkinchi" id="ai" title="Ochiq javoblarni Claude Project'da tekshirish uchun bitta matn fayl">🤖 AI tekshiruvi uchun</button>
                 <button class="btn xavf" id="tozalash">🗑 Ro'yxatni tozalash</button>
                 <span class="bo" id="holat"></span>
             </div>
@@ -208,7 +209,7 @@
         const drop = document.getElementById('drop');
         const input = document.getElementById('fayllar');
         drop.addEventListener('click', () => input.click());
-        input.addEventListener('change', () => { fayllarniOqi(input.files); input.value = ''; });
+        input.addEventListener('change', () => { fayllarniOqi([...input.files]); input.value = ''; });
         drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
         drop.addEventListener('dragleave', () => drop.classList.remove('over'));
         drop.addEventListener('drop', e => {
@@ -352,6 +353,73 @@
             m.keyslar.forEach(x => { h += juft(`${x.n}-Keys`, mt['keys-' + x.n], k.namuna.keyslar[x.n]); });
             return h + '</div>';
         }
+
+        // ---------- AI tekshiruvi uchun fayl ----------
+        // Ochiq javoblar (masala, muhokama, mashq, amaliy, keys) mavzular bo'yicha guruhlanadi:
+        // har mavzuda avval savollar va namuna javoblar bir marta, keyin har bir o'quvchining javoblari.
+        const blokMatn = b => (b || []).map(x => x.p || x.t.map(q => q.join(' | ')).join('\n')).join('\n').trim();
+
+        function ochiqSavollar(m, k) {
+            const s = [{ kod: 'MS', nom: "Ko'rgazmali masala (yechim va hisob-kitoblar)", savol: blokMatn(m.masala), namuna: k.namuna.masala, kalit: 'masala', prov: k.masala_provodkalar.length ? 'masala' : null, provNamuna: k.masala_provodkalar }];
+            m.muhokama.forEach(x => s.push({ kod: 'M' + x.n, nom: `Muhokama ${x.n}`, savol: x.savol, namuna: k.namuna.muhokama[x.n], kalit: 'muhokama-' + x.n }));
+            m.mashqlar.forEach(x => { const y = k.mashqlar[x.n] || {}; s.push({ kod: 'Q' + x.n, nom: `Mashq ${x.n}`, savol: blokMatn(x.bloklar), namuna: y.yechim, kalit: 'mashq-' + x.n, prov: x.provodka ? 'mashq-' + x.n : null, provNamuna: y.provodkalar }); });
+            m.amaliy.forEach(x => { const y = k.amaliy[x.n] || {}; s.push({ kod: 'A' + x.n, nom: `${x.n}-amaliy topshiriq`, savol: blokMatn(x.bloklar), namuna: y.yechim, kalit: 'amaliy-' + x.n, prov: x.provodka ? 'amaliy-' + x.n : null, provNamuna: y.provodkalar }); });
+            m.keyslar.forEach(x => s.push({ kod: 'K' + x.n, nom: `${x.n}-keys`, savol: blokMatn(x.bloklar), namuna: k.namuna.keyslar[x.n], kalit: 'keys-' + x.n }));
+            return s;
+        }
+
+        function aiFayl(qatorlar) {
+            const mavzular = new Map();
+            for (const n of qatorlar) for (const r of vazifaNatijalari(n)) {
+                if (!mavzular.has(r.mavzu_id)) mavzular.set(r.mavzu_id, []);
+                mavzular.get(r.mavzu_id).push({ n, r });
+            }
+            const qism = [`# O'quvchilar javoblari — AI tekshiruvi uchun`, ``,
+                `Tayyorlangan: ${new Date().toLocaleString('uz-UZ')} · O'quvchilar: ${qatorlar.length} · Mavzular: ${mavzular.size}`, ``,
+                `Kodlar: MS — ko'rgazmali masala, M — muhokama, Q — qisqa mashq, A — amaliy topshiriq, K — keys.`,
+                `"Avtomatik ball" — testlar, moslashtirish va provodkalar bo'yicha sayt hisoblagan ball; uni qayta baholash shart emas.`, ``];
+            const tartib = [...mavzular.keys()].sort((a, b) => (BAZA.find(m => m.id === a)?.raqam || 999) - (BAZA.find(m => m.id === b)?.raqam || 999));
+            for (const id of tartib) {
+                const m = BAZA.find(x => x.id === id);
+                const royxat = mavzular.get(id);
+                qism.push(`---`, ``, `## Mavzu: ${m ? (m.raqam ? m.raqam + '. ' : '') + m.nomi : royxat[0].r.mavzu}`, ``);
+                if (!m) { qism.push(`(Bu mavzu bazada topilmadi — savollar va namuna javoblar yo'q.)`, ``); continue; }
+                const savollar = ochiqSavollar(m, kalitniOch(m));
+                qism.push(`### Savollar va namuna javoblar`, ``);
+                for (const s of savollar) {
+                    qism.push(`**${s.kod} — ${s.nom}**`, ``, `Savol: ${s.savol || '—'}`, ``);
+                    if (s.prov && s.provNamuna?.length) qism.push(`Namuna provodkalar:`, provMatn(s.provNamuna), ``);
+                    qism.push(`Namuna javob: ${s.namuna || "(hujjatda namuna javob yo'q)"}`, ``);
+                }
+                qism.push(`### O'quvchilar javoblari`, ``);
+                for (const { n, r } of royxat.sort((a, b) => a.n.ism.localeCompare(b.n.ism))) {
+                    qism.push(`#### ${n.ism} (${n.guruh}) — avtomatik ball: ${r.foiz}% (${r.ball}/${r.maks}), ${r.urinish}-urinish`, ``);
+                    for (const s of savollar) {
+                        const javob = (r.matn || {})[s.kalit];
+                        const prov = s.prov ? ((r.provodka || {})[s.prov] || []) : [];
+                        const qator = [];
+                        if (s.prov) qator.push(`provodkalar: ${prov.length ? prov.map(p => `Dt ${p.dt} Kt ${p.kt} — ${sum(p.summa)}`).join('; ') : "yo'q"}`);
+                        qator.push(javob ? javob.replace(/\n+/g, ' ').trim() : "(javob yo'q)");
+                        qism.push(`- **${s.kod}:** ${qator.join(' | ')}`);
+                    }
+                    qism.push(``);
+                }
+            }
+            return qism.join('\n');
+        }
+
+        document.getElementById('ai').addEventListener('click', () => {
+            const q = korinadigan().filter(n => vazifaNatijalari(n).length);
+            if (!q.length) { alert("Mavzu vazifalarini topshirgan o'quvchi yo'q (ro'yxat yoki filtr bo'sh)."); return; }
+            if (!BAZA.length) { alert("Vazifalar bazasi (vazifalar/baza.js) yuklanmagan."); return; }
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([aiFayl(q)], { type: 'text/markdown;charset=utf-8' }));
+            a.download = `ai_tekshiruv_${new Date().toISOString().slice(0, 10)}.md`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            holat(`${q.length} ta o'quvchining javoblari AI tekshiruvi uchun faylga yig'ildi`);
+        });
 
         document.getElementById('excel').addEventListener('click', () => {
             const q = korinadigan();
