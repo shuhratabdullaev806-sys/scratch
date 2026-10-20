@@ -1,8 +1,9 @@
-// Internetdagi saytga kirish kodi (har oy yangilanadi).
-// Kompyuterdan fayl sifatida (file://) ochilganda — masalan, sinfdagi AMALIYOT yorlig'i — so'ralmaydi.
-// Bu yengil to'siq: tasodifan kirib qolgan begonalarni to'xtatadi, lekin dasturchini emas.
+// Portalga kirish kodi (har oy yangilanadi). Internetdagi saytda ham, kompyuterdan fayl
+// sifatida ochilganda ham so'raladi — saqlab olingan nusxa ham oy tugagach kodsiz ochilmaydi.
+// Har bir sahifa <head> ida sahifani yashiradigan qator bor; uni faqat shu fayl ochadi,
+// shuning uchun bu fayl bo'lmasa (masalan, "faqat HTML" saqlanganda) sahifa yopiq qoladi.
+// Bu yengil to'siq: oddiy foydalanuvchini to'xtatadi, lekin dasturchini emas.
 (function () {
-    if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
     var CFG = window.KIRISH_KODLARI;
     var KALIT = 'fmk_kirish';
     var d = new Date();
@@ -12,10 +13,12 @@
     function oqi() { try { return JSON.parse(localStorage.getItem(KALIT)); } catch (e) { return null; } }
     function yoz(v) { try { localStorage.setItem(KALIT, JSON.stringify(v)); } catch (e) { } }
 
-    var saqlangan = oqi();
-    if (kerak && saqlangan && saqlangan.oy === oy && saqlangan.h === kerak) return;
-
     var root = document.documentElement;
+    var saqlangan = oqi();
+    if (kerak && saqlangan && saqlangan.oy === oy && saqlangan.h === kerak) {
+        root.style.visibility = '';
+        return;
+    }
     root.style.visibility = 'hidden';
 
     var kul = document.createElement('div');
@@ -34,6 +37,7 @@
 
     var xato = function (m) { var e = document.getElementById('fmk-xato'); if (e) e.textContent = m; };
     if (!kerak) xato("Bu oy uchun kod belgilanmagan. O'qituvchiga murojaat qiling.");
+    else if (!window.crypto || !crypto.subtle) xato("Bu brauzer kodni tekshira olmaydi. Google Chrome yoki Microsoft Edge da oching.");
 
     function norm(s) { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
@@ -61,7 +65,7 @@
                 xato("Kod noto'g'ri. Qayta urinib ko'ring.");
             }
         } catch (err) {
-            xato("Brauzer kodni tekshira olmadi. Sahifani https:// orqali oching.");
+            xato("Brauzer kodni tekshira olmadi. Google Chrome yoki Microsoft Edge da oching.");
         }
         btn.disabled = false; btn.textContent = 'Kirish';
     });
