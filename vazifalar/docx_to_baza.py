@@ -40,7 +40,7 @@ OXIRI = r"\w*(?:\s+yechimi)?\s*[.:)]?\s*"
 ELEMENT_BOSHI = {
     'muhokama': BOSH + rf"(?:{ICHKI}|(\d+)\s*(?:-\s*(?:savol|javob)\w*(?:\s+javobi)?\s*[.:)]?|[.)]))\s*",
     'mashqlar': BOSH + rf"(?:{ICHKI}|(\d+)\s*-\s*(?:mashq|javob){OXIRI}|mashq\s+(\d+){OXIRI})",
-    'amaliy': BOSH + rf"(?:{ICHKI}|(\d+)\s*-\s*(?:amaliy|masala|topshiriq|mashq|javob){OXIRI}|masala\s+(\d+){OXIRI})",
+    'amaliy': BOSH + rf"(?:{ICHKI}|(\d+)\s*-\s*(?:amaliy|masala|topshiriq|mashq|javob)(?:\s+(?:mashq|topshiriq|masala)\b)?{OXIRI}|masala\s+(\d+){OXIRI})",
     'keyslar': BOSH + rf"(?:{ICHKI}|(\d+)\s*-\s*keys{OXIRI}|keys\s+(\d+){OXIRI})",
 }
 # Bir element tugab, boshqa turdagi element boshlanganini bildiradi (birlashgan bo'limlar uchun).

@@ -41,6 +41,8 @@ Qoidalar:
 6. Namuna javob yo'q bo'lsa, O'zbekiston qonunchiligi (21-son BHMS, Soliq kodeksi, Mehnat kodeksi) asosida o'zing baholaysan va jadval ostida "namuna yo'q" deb belgilab qo'yasan.
 7. Provodkali topshiriqda o'quvchi provodkalarini namuna provodkalar bilan solishtir: Dt/Kt va summa mos kelganlari to'g'ri hisoblanadi; izohdagi hisob-kitob ham hisobga olinadi.
 8. O'ylab topma: faylda yo'q narsani o'quvchi yozgan deb hisoblama.
+9. Javob namuna javob bilan so'zma-so'z yoki deyarli bir xil bo'lsa (bir xil jumlalar, bir xil tartib, bir xil belgilar), mazmuni bo'yicha ball ber, lekin "Ogohlantirishlar"da "javoblar kalitidan ko'chirilgan bo'lishi mumkin" deb, savol kodlari bilan belgila.
+10. Javob boshqa savolga tegishli bo'lsa (masalan, boshqa savolning yoki test tushuntirishining matni), u mavzuga aloqasiz hisoblanadi — 0 ball, izohda buni ayt.
 
 ### Natija shakli
 Har bir mavzu uchun:
@@ -57,6 +59,7 @@ Har bir mavzu uchun:
 
 3. **Ogohlantirishlar** (bo'lsa):
    - ikki yoki undan ortiq o'quvchining ochiq javoblari deyarli bir xil bo'lsa — ismlarini va savol kodini ko'rsat;
+   - javoblari namuna javob bilan so'zma-so'z bir xil bo'lgan o'quvchilar va savollar (javoblar kalitidan ko'chirilgan bo'lishi mumkin);
    - namuna javobi yo'q savollar ro'yxati;
    - baholashda ishonching past bo'lgan javoblar (o'qituvchi o'zi qarashi kerak).
 
