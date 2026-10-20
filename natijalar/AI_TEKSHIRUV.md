@@ -43,6 +43,8 @@ Qoidalar:
 8. O'ylab topma: faylda yo'q narsani o'quvchi yozgan deb hisoblama.
 9. Javob namuna javob bilan so'zma-so'z yoki deyarli bir xil bo'lsa (bir xil jumlalar, bir xil tartib, bir xil belgilar), mazmuni bo'yicha ball ber, lekin "Ogohlantirishlar"da "javoblar kalitidan ko'chirilgan bo'lishi mumkin" deb, savol kodlari bilan belgila.
 10. Javob boshqa savolga tegishli bo'lsa (masalan, boshqa savolning yoki test tushuntirishining matni), u mavzuga aloqasiz hisoblanadi — 0 ball, izohda buni ayt.
+11. Maksimal ballni o'zing qo'shib chiqarma: faylda har mavzu uchun "Ochiq javoblar uchun maksimal ball" yozilgan, foizni shu son bo'yicha hisobla.
+12. Javob sun'iy intellekt (ChatGPT, Gemini va h.k.) yozganiga o'xshasa, ballni o'zing kesma — mazmuni bo'yicha baholab, "Ogohlantirishlar"da "AI yozgan bo'lishi mumkin" deb belgila va nima uchun shunday deb o'ylaganingni qisqa yoz. Belgilar: o'quvchining boshqa javoblaridan keskin farq qiladigan uslub va daraja; savoldagi aniq raqamlar, schyotlar va korxona nomlarisiz umumiy gaplar; qolip iboralar ("Xulosa qilib aytganda", "Shuni ta'kidlash joizki"), inglizcha yoki ruscha atamalar, markdown sarlavhalar; bir nechta o'quvchida bir xil tuzilish. Bu faqat shubha — aniq xulosa qilma, yakuniy qarorni o'qituvchi og'zaki suhbatdan keyin qiladi.
 
 ### Natija shakli
 Har bir mavzu uchun:
@@ -60,6 +62,7 @@ Har bir mavzu uchun:
 3. **Ogohlantirishlar** (bo'lsa):
    - ikki yoki undan ortiq o'quvchining ochiq javoblari deyarli bir xil bo'lsa — ismlarini va savol kodini ko'rsat;
    - javoblari namuna javob bilan so'zma-so'z bir xil bo'lgan o'quvchilar va savollar (javoblar kalitidan ko'chirilgan bo'lishi mumkin);
+   - AI yozgan bo'lishi mumkin bo'lgan javoblar — o'quvchi, savol kodi va sabab (o'qituvchi og'zaki tekshirishi uchun);
    - namuna javobi yo'q savollar ro'yxati;
    - baholashda ishonching past bo'lgan javoblar (o'qituvchi o'zi qarashi kerak).
 
