@@ -441,6 +441,10 @@ def main():
         m = re.match(r"\s*(\d+)", f.stem)
         return (int(m.group(1)) if m else 10**6, f.stem)
     fayllar = sorted((p for p in (PAPKA / 'docx').glob('*.docx') if not p.name.startswith('~$')), key=tartib)
+    if not fayllar:
+        # docx lar GitHub'ga yuklanmaydi (javoblar bor), shuning uchun mavjud baza.js ga tegmaymiz.
+        print("vazifalar/docx ichida .docx topilmadi — baza.js o'zgartirilmadi")
+        return 1
     baza = []
     for f in fayllar:
         try:

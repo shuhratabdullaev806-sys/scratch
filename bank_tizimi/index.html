@@ -2,6 +2,7 @@
 <html lang="uz">
 
 <head>
+    <script>document.documentElement.style.visibility='hidden'</script><script src="../kirish_kodlari.js"></script><script src="../kirish.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank Tizimi (5110) - FAXR MADAD KONSALT</title>
@@ -661,9 +662,9 @@
                                 <label>Provodka Turi</label>
                                 <select id="p-type-code">
                                     <option value="6010">Mol yetkazib beruvchilarga to'lov (Dt 6010 - Kt 5110)</option>
-                                    <option value="6400">Byudjetga to'lovlar (Soliq) (Dt 6400 - Kt 5110)</option>
-                                    <option value="6700">Ish haqi to'lash (Dt 6700 - Kt 5110)</option>
-                                    <option value="6800">Boshqa to'lovlar (Dt 6800 - Kt 5110)</option>
+                                    <option value="6410">Byudjetga to'lovlar (Soliq) (Dt 6410 - Kt 5110)</option>
+                                    <option value="6710">Ish haqi to'lash (Dt 6710 - Kt 5110)</option>
+                                    <option value="6810">Boshqa to'lovlar (Dt 6810 - Kt 5110)</option>
                                 </select>
                             </div>
 
@@ -730,29 +731,52 @@
                         <form id="cp-form"
                             style="background:#f8fafc; padding:1.5rem; border-radius:0.5rem; margin-bottom:2rem;">
                             <div class="form-grid">
-                                <div class="form-group"><label>Nomi</label><input type="text" id="cp-name" required>
+                                <div class="form-group"><label>Nomi *</label><input type="text" id="cp-name" required>
                                 </div>
-                                <div class="form-group"><label>H/R</label><input type="text" id="cp-account" required>
+                                <div class="form-group"><label>H/R *</label><input type="text" id="cp-account" required>
                                 </div>
-                                <div class="form-group"><label>MFO</label><input type="text" id="cp-mfo" required></div>
-                                <div class="form-group"><label>STIR</label><input type="text" id="cp-inn" required>
+                                <div class="form-group"><label>MFO *</label><input type="text" id="cp-mfo" required>
+                                </div>
+                                <div class="form-group"><label>STIR *</label><input type="text" id="cp-inn" required>
+                                </div>
+                                <div class="form-group"><label>Telefon</label><input type="tel" id="cp-phone"
+                                        placeholder="+998 90 123 45 67">
+                                </div>
+                                <div class="form-group"><label>Email</label><input type="email" id="cp-email"
+                                        placeholder="info@company.uz">
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;"><label>Manzil</label><input
+                                        type="text" id="cp-address" placeholder="Toshkent shahar, ...">
+                                </div>
+                                <div class="form-group"><label>Shartnoma raqami</label><input type="text"
+                                        id="cp-contract-num" placeholder="№ 123">
+                                </div>
+                                <div class="form-group"><label>Shartnoma sanasi</label><input type="date"
+                                        id="cp-contract-date">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Qo'shish</button>
                         </form>
 
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Nomi</th>
-                                    <th>H/R</th>
-                                    <th>MFO</th>
-                                    <th>STIR</th>
-                                    <th>Amal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cp-body"></tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nomi</th>
+                                        <th>H/R</th>
+                                        <th>MFO</th>
+                                        <th>STIR</th>
+                                        <th>Telefon</th>
+                                        <th>Email</th>
+                                        <th>Manzil</th>
+                                        <th>Shartnoma №</th>
+                                        <th>Shartnoma sanasi</th>
+                                        <th>Amal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cp-body"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -1026,7 +1050,12 @@
                     name: document.getElementById('cp-name').value,
                     account: document.getElementById('cp-account').value,
                     mfo: document.getElementById('cp-mfo').value,
-                    inn: document.getElementById('cp-inn').value
+                    inn: document.getElementById('cp-inn').value,
+                    phone: document.getElementById('cp-phone').value || '',
+                    email: document.getElementById('cp-email').value || '',
+                    address: document.getElementById('cp-address').value || '',
+                    contractNum: document.getElementById('cp-contract-num').value || '',
+                    contractDate: document.getElementById('cp-contract-date').value || ''
                 };
                 counterparties.push(cp);
                 saveCP();
@@ -1050,11 +1079,115 @@
                         <td>${c.account}</td>
                         <td>${c.mfo}</td>
                         <td>${c.inn}</td>
-                        <td><button onclick="deleteCP(${c.id})" class="btn btn-danger" style="padding:5px 10px;">x</button></td>
+                        <td>${c.phone || '-'}</td>
+                        <td>${c.email || '-'}</td>
+                        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${c.address || ''}">${c.address || '-'}</td>
+                        <td>${c.contractNum || '-'}</td>
+                        <td>${c.contractDate || '-'}</td>
+                        <td style="display:flex; gap:5px;">
+                            <button onclick="editCP(${c.id})" class="btn" style="padding:5px 10px; background:#f59e0b; color:white;" title="Tahrirlash">✏️</button>
+                            <button onclick="deleteCP(${c.id})" class="btn btn-danger" style="padding:5px 10px;" title="O'chirish">x</button>
+                        </td>
                     </tr>
                 `;
                 });
             }
+
+            let editingCPId = null;
+
+            function editCP(id) {
+                const c = counterparties.find(x => x.id === id);
+                if (!c) return;
+
+                editingCPId = id;
+                document.getElementById('cp-name').value = c.name;
+                document.getElementById('cp-account').value = c.account;
+                document.getElementById('cp-mfo').value = c.mfo;
+                document.getElementById('cp-inn').value = c.inn;
+                document.getElementById('cp-phone').value = c.phone || '';
+                document.getElementById('cp-email').value = c.email || '';
+                document.getElementById('cp-address').value = c.address || '';
+                document.getElementById('cp-contract-num').value = c.contractNum || '';
+                document.getElementById('cp-contract-date').value = c.contractDate || '';
+
+                // Oyna sarlavhasi ustiga o'tish
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Form submit tugmasini yangilash
+                const formSubmitBtn = document.querySelector('#cp-form button[type="submit"]');
+                formSubmitBtn.innerText = "💾 Saqlash";
+                formSubmitBtn.classList.remove('btn-primary');
+                formSubmitBtn.classList.add('btn-success');
+
+                // Bekor qilish tugmasi qo'shish
+                if (!document.getElementById('cancel-cp-edit')) {
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.type = 'button';
+                    cancelBtn.id = 'cancel-cp-edit';
+                    cancelBtn.className = 'btn btn-secondary';
+                    cancelBtn.style.marginLeft = '10px';
+                    cancelBtn.style.marginTop = '1rem';
+                    cancelBtn.innerText = "Bekor qilish";
+                    cancelBtn.onclick = cancelCPEdit;
+                    document.getElementById('cp-form').appendChild(cancelBtn);
+                }
+            }
+
+            function cancelCPEdit() {
+                editingCPId = null;
+                document.getElementById('cp-form').reset();
+
+                const formSubmitBtn = document.querySelector('#cp-form button[type="submit"]');
+                formSubmitBtn.innerText = "Qo'shish";
+                formSubmitBtn.classList.add('btn-primary');
+                formSubmitBtn.classList.remove('btn-success');
+
+                const cancelBtn = document.getElementById('cancel-cp-edit');
+                if (cancelBtn) cancelBtn.remove();
+            }
+
+            // Update form submit behavior to handle edit
+            const oldSubmit = document.getElementById('cp-form').onsubmit;
+            document.getElementById('cp-form').onsubmit = function (e) {
+                e.preventDefault();
+
+                if (editingCPId) {
+                    const c = counterparties.find(x => x.id === editingCPId);
+                    if (c) {
+                        c.name = document.getElementById('cp-name').value;
+                        c.account = document.getElementById('cp-account').value;
+                        c.mfo = document.getElementById('cp-mfo').value;
+                        c.inn = document.getElementById('cp-inn').value;
+                        c.phone = document.getElementById('cp-phone').value || '';
+                        c.email = document.getElementById('cp-email').value || '';
+                        c.address = document.getElementById('cp-address').value || '';
+                        c.contractNum = document.getElementById('cp-contract-num').value || '';
+                        c.contractDate = document.getElementById('cp-contract-date').value || '';
+
+                        saveCP();
+                        cancelCPEdit();
+                        alert("Kontragent o'zgartirildi!");
+                    }
+                } else {
+                    // Create new
+                    const cp = {
+                        id: Date.now(),
+                        name: document.getElementById('cp-name').value,
+                        account: document.getElementById('cp-account').value,
+                        mfo: document.getElementById('cp-mfo').value,
+                        inn: document.getElementById('cp-inn').value,
+                        phone: document.getElementById('cp-phone').value || '',
+                        email: document.getElementById('cp-email').value || '',
+                        address: document.getElementById('cp-address').value || '',
+                        contractNum: document.getElementById('cp-contract-num').value || '',
+                        contractDate: document.getElementById('cp-contract-date').value || ''
+                    };
+                    counterparties.push(cp);
+                    saveCP();
+                    this.reset();
+                    alert("Kontragent qo'shildi!");
+                }
+            };
 
             function updateCPSelect() {
                 const sel = document.getElementById('p-payee-select');

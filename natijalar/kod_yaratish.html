@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish kodi yaratish - FAXR MADAD KONSALT</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f1f5f9; color: #1e293b; margin: 0; padding: 24px 16px; }
+        .wrap { max-width: 720px; margin: 0 auto; }
+        .card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 6px 20px rgba(0, 0, 0, .07); margin-bottom: 16px; }
+        input { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; width: 100%; box-sizing: border-box; margin: 4px 0 12px; }
+        button { background: #4361ee; color: #fff; border: none; padding: 11px 18px; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 10px; overflow-x: auto; user-select: all; }
+        code { background: #e2e8f0; padding: 1px 6px; border-radius: 5px; }
+        ol li { margin-bottom: 6px; }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <h1>🔑 Kirish kodi yaratish</h1>
+        <div class="card">
+            <label>Oy (masalan: 2026-11)</label>
+            <input id="oy" placeholder="YYYY-OO" maxlength="7">
+            <label>Yangi kod (so'z yoki so'zlar; harf va raqam)</label>
+            <input id="kod" placeholder="masalan: olma-quyosh-47" autocomplete="off">
+            <button id="btn">Yaratish</button>
+        </div>
+        <div class="card" id="natija" style="display:none">
+            <p><b>Quyidagi qatorni nusxalang:</b></p>
+            <pre id="qator"></pre>
+            <ol>
+                <li>GitHub'da <code>kirish_kodlari.js</code> faylini oching, ✏️ (Edit) tugmasini bosing.</li>
+                <li>Qatorni <code>oylar: {</code> dan keyin yangi qator qilib qo'ying (oxiridagi vergul bilan).</li>
+                <li><b>Commit changes</b> → <b>Commit changes</b> ni bosing. 1–2 daqiqada kod ishlaydi.</li>
+                <li>Kodni o'quvchilarga Telegramda yuboring: <b id="kodK"></b></li>
+            </ol>
+        </div>
+        <p style="color:#64748b;font-size:.9rem">Bu sahifa kodni hech qayerga yubormaydi, hamma narsa brauzeringizda hisoblanadi.
+            Saytda kodning o'zi emas, faqat uning "izi" saqlanadi.</p>
+    </div>
+    <script src="../kirish_kodlari.js"></script>
+    <script>
+        const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+        { const n = new Date(); n.setDate(1); n.setMonth(n.getMonth() + 1); document.getElementById('oy').value = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0'); }
+        document.getElementById('btn').onclick = async () => {
+            const oy = document.getElementById('oy').value.trim();
+            const kod = document.getElementById('kod').value;
+            if (!/^\d{4}-\d{2}$/.test(oy)) return alert("Oyni YYYY-OO ko'rinishida yozing (masalan 2026-11).");
+            if (norm(kod).length < 6) return alert("Kod kamida 6 ta harf yoki raqamdan iborat bo'lsin.");
+            const enc = new TextEncoder(), C = window.KIRISH_KODLARI;
+            const key = await crypto.subtle.importKey('raw', enc.encode(norm(kod) + '|' + oy), 'PBKDF2', false, ['deriveBits']);
+            const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: enc.encode(C.tuz), iterations: C.iter, hash: 'SHA-256' }, key, 256);
+            const hex = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+            document.getElementById('qator').textContent = `        '${oy}': '${hex}',`;
+            document.getElementById('kodK').textContent = kod;
+            document.getElementById('natija').style.display = 'block';
+        };
+    </script>
+</body>
+
+</html>

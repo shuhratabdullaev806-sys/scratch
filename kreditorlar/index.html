@@ -2,6 +2,7 @@
 <html lang="uz">
 
 <head>
+    <script>document.documentElement.style.visibility='hidden'</script><script src="../kirish_kodlari.js"></script><script src="../kirish.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kreditorlar (6010) - FAXR MADAD KONSALT</title>
@@ -442,11 +443,7 @@
             </div>
         </div>
 
-        <!-- USER DISPLAY -->
-        <div class="user-info no-print" id="user-display" style="cursor: default;">
-            <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
-                onclick="logout()" title="Chiqish">❌</span>
-        </div>
+        <!-- USER DISPLAY MOVED TO HEADER -->
 
         <aside class="sidebar">
             <div class="brand">
@@ -478,6 +475,13 @@
                         style="background:#8b5cf6; border:none; box-shadow:0 4px 15px rgba(139, 92, 246, 0.4);">
                         🧠 Bilimni Sinash
                     </button>
+                    <!-- USER DISPLAY -->
+                    <div class="user-info no-print" id="user-display"
+                        style="cursor: default; position:static; margin:0; display:none;">
+                        <span id="current-user-info">...</span> <span
+                            style="cursor:pointer; margin-left:10px; color:red;" onclick="logout()"
+                            title="Chiqish">❌</span>
+                    </div>
                     <div style="font-size:0.9rem; color:#666">FAXR MADAD KONSALT</div>
                 </div>
             </header>
@@ -799,6 +803,7 @@
                                     <td><span style="color:green; font-size:0.8rem">Faol (10 kun)</span></td>
                                     <td>
                                         <button class="btn-outline btn-sm" onclick="app.printProxy('${p.id}')"><i class="fa-print fa-solid"></i></button>
+                                        <button class="btn-outline btn-sm" onclick="app.editProxy('${p.id}')" title="Tahrirlash"><i class="fa-edit fa-solid"></i></button>
                                         <button class="btn-outline btn-sm" onclick="app.delProxy('${p.id}')" style="color:red"><i class="fa-trash fa-solid"></i></button>
                                     </td>
                                 </tr>`;
@@ -810,29 +815,31 @@
         `;
                 },
 
-                modalProxy() {
+                modalProxy(id = null) {
+                    const data = id ? store.get('proxies').find(x => x.id === id) : {};
                     const vendors = store.get('vendors');
                     const emps = store.get('employees');
                     if (emps.length === 0) return alert('Avval xodimlarni kiriting (Ta\'minotchilar bo\'limida)');
 
-                    document.getElementById('modalTitle').innerText = 'Yangi Ishonchnoma';
+                    document.getElementById('modalTitle').innerText = id ? 'Ishonchnomani Tahrirlash' : 'Yangi Ishonchnoma';
                     document.getElementById('modalBody').innerHTML = `
             <form onsubmit="app.saveProxy(event)">
+                <input type="hidden" name="id" value="${data.id || ''}">
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">Raqam</label><input name="number" class="form-control" required value="${store.get('proxies').length + 1}"></div>
-                    <div class="form-group"><label class="form-label">Sana</label><input type="date" name="date" class="form-control" value="${new Date().toISOString().split('T')[0]}" required></div>
+                    <div class="form-group"><label class="form-label">Raqam</label><input name="number" class="form-control" required value="${data.number || (store.get('proxies').length + 1)}"></div>
+                    <div class="form-group"><label class="form-label">Sana</label><input type="date" name="date" class="form-control" value="${data.date || new Date().toISOString().split('T')[0]}" required></div>
                 </div>
                 <div class="form-row">
                      <div class="form-group">
                         <label class="form-label">Xodim (Ishonchli vakil)</label>
                         <select name="employeeId" class="form-control" required>
-                            ${emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('')}
+                            ${emps.map(e => `<option value="${e.id}" ${e.id === data.employeeId ? 'selected' : ''}>${e.name}</option>`).join('')}
                         </select>
                     </div>
                      <div class="form-group">
                         <label class="form-label">Ta'minotchi</label>
                         <select name="vendorId" class="form-control" required>
-                            ${vendors.map(v => `<option value="${v.id}">${v.name}</option>`).join('')}
+                            ${vendors.map(v => `<option value="${v.id}" ${v.id === data.vendorId ? 'selected' : ''}>${v.name}</option>`).join('')}
                         </select>
                     </div>
                 </div>
@@ -841,18 +848,25 @@
                     <label class="form-label">Olinadigan tovarlar (Nomi, O'lchov, Soni)</label>
                     <textarea name="itemsRaw" class="form-control" rows="3" placeholder="Masalan: Sement, tonna, 50"></textarea>
                  </div>
-                <button type="submit" class="btn btn-primary" style="width:100%">Saqlash</button>
+                <button type="submit" class="btn btn-primary" style="width:100%">${id ? 'Saqlash' : 'Qo\'shish'}</button>
             </form>
         `;
                     document.getElementById('formModal').classList.add('active');
                 },
 
+                editProxy(id) { this.modalProxy(id); },
+
                 saveProxy(e) {
                     e.preventDefault();
                     const fd = new FormData(e.target);
                     const data = Object.fromEntries(fd.entries());
-                    data.id = utils.genId();
-                    store.add('proxies', data);
+                    const id = fd.get('id');
+                    if (id) {
+                        store.update('proxies', id, data);
+                    } else {
+                        data.id = utils.genId();
+                        store.add('proxies', data);
+                    }
                     this.closeModal();
                     this.render('proxy');
                 },
@@ -990,15 +1004,16 @@
             // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
             const quizQuestions = [
                 { q: "Material sotib olindi (Pul keyin to'lanadi) (10,000,000 so'm)", dt: "1010", kt: "6010", sum: 10000000 },
-                { q: "Asosiy vosita sotib olindi (Qarzga) (50,000,000 so'm)", dt: "0810", kt: "6010", sum: 50000000 },
+                { q: "Asosiy vosita sotib olindi (Qarzga) (50,000,000 so'm)", dt: "0820", kt: "6010", sum: 50000000 },
                 { q: "Yetkazib beruvchidan elektr energiyasi qabul qilindi (1,000,000 so'm)", dt: "2010", kt: "6010", sum: 1000000 },
                 { q: "Yetkazib beruvchiga pul o'tkazildi (To'lov) (5,000,000 so'm)", dt: "6010", kt: "5110", sum: 5000000 },
                 { q: "Kreditorga avans (bo'nak) berildi (2,000,000 so'm)", dt: "4310", kt: "5110", sum: 2000000 },
                 { q: "Berilgan avans hisobga olindi (Material kelib tushgach) (2,000,000 so'm)", dt: "6010", kt: "4310", sum: 2000000 },
                 { q: "Ta'sischidan qarz olindi (Vaqtinchalik moliyaviy yordam) (100,000,000 so'm)", dt: "5110", kt: "6820", sum: 100000000 },
-                { q: "Bankdan qisqa muddatli kredit olindi (To'lov uchun) (20,000,000 so'm)", dt: "6010", kt: "6810", sum: 20000000 },
+                { q: "Bankdan qisqa muddatli kredit olindi (Maxsus schotga) (20,000,000 so'm)", dt: "5530", kt: "6810", sum: 20000000 },
+                { q: "Kredit summasi maxsus schotdan asosiy hisob raqamga o'tkazildi (20,000,000 so'm)", dt: "5110", kt: "5530", sum: 20000000 },
                 { q: "Da'vo muddati o'tgan kreditor qarzi daromadga olindi (500,000 so'm)", dt: "6010", kt: "9360", sum: 500000 },
-                { q: "Kreditorga tovar qaytarib berildi (Vozvrat) (1,000,000 so'm)", dt: "6010", kt: "1010", sum: 1000000 }
+                { q: "Kreditorga tovar qaytarib berildi (Vozvrat) (1,000,000 so'm)", dt: "6010", kt: "2910", sum: 1000000 }
             ];
 
             let currentQIndex = 0;

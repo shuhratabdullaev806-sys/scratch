@@ -2,6 +2,7 @@
 <html lang="uz">
 
 <head>
+    <script>document.documentElement.style.visibility='hidden'</script><script src="../kirish_kodlari.js"></script><script src="../kirish.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xizmat Safari Tizimi - FAXR MADAD KONSALT</title>
@@ -558,7 +559,9 @@
                             <div class="form-group"><label>Pasport</label><input type="text" id="e-passport"
                                     placeholder="AA 1234567"></div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Qo'shish</button>
+                        <button type="submit" id="btn-emp-save" class="btn btn-primary">Qo'shish</button>
+                        <button type="button" id="btn-emp-cancel" class="btn btn-secondary" style="display:none;"
+                            onclick="cancelEditEmp()">Bekor qilish</button>
                     </form>
                     <table>
                         <thead>
@@ -594,6 +597,7 @@
             let expenses = [];
             let editingTripId = null;
             let editingExId = null;
+            let editingEmpId = null;
             let currentUser = null;
 
             // INIT
@@ -669,6 +673,7 @@
                 renderTrips();
                 renderEmployees();
                 updateEmpSelect();
+                try { renderExpenses(); } catch (err) { console.warn('renderExpenses xato:', err); }
             }
 
             // NAV
@@ -737,10 +742,10 @@
                     <td>${t.days} kun</td>
                     <td><span style="color:green; background:#dcfce7; padding:2px 6px; border-radius:4px;">Faol</span></td>
                     <td>
-                        <button class="btn btn-secondary" style="padding:5px;" onclick="printDoc('buyruq', ${t.id})" title="Buyruqni chop etish">📜</button>
-                        <button class="btn btn-secondary" style="padding:5px;" onclick="printDoc('guvohnoma', ${t.id})" title="Guvohnomani chop etish">✈️</button>
-                        <button class="btn btn-info" style="padding:5px;" onclick="editTrip(${t.id})">✏️</button>
-                        <button class="btn btn-danger" style="padding:5px;" onclick="deleteTrip(${t.id})">🗑️</button>
+                        <button class="btn btn-secondary" style="padding:5px 10px;" onclick="printDoc('buyruq', ${t.id})" title="Buyruqni chop etish">📜 Buyruq</button>
+                        <button class="btn btn-secondary" style="padding:5px 10px;" onclick="printDoc('guvohnoma', ${t.id})" title="Guvohnomani chop etish">🛂 Guvohnoma</button>
+                        <button class="btn btn-info" style="padding:5px 10px;" onclick="editTrip(${t.id})">✏️ Tahrirlash</button>
+                        <button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteTrip(${t.id})">🗑️ O'chirish</button>
                     </td>
                 `;
                     tbody.appendChild(tr);
@@ -787,14 +792,21 @@
             document.getElementById('emp-form').onsubmit = function (e) {
                 e.preventDefault();
                 const emp = {
-                    id: Date.now(),
+                    id: editingEmpId || Date.now(),
                     name: document.getElementById('e-name').value,
                     role: document.getElementById('e-role').value,
                     passport: document.getElementById('e-passport').value
                 };
-                employees.push(emp);
+
+                if (editingEmpId) {
+                    const idx = employees.findIndex(x => x.id === editingEmpId);
+                    if (idx !== -1) employees[idx] = emp;
+                } else {
+                    employees.push(emp);
+                }
+
                 saveEmp();
-                this.reset();
+                cancelEditEmp();
             };
 
             function saveEmp() {
@@ -808,8 +820,29 @@
                 const tbody = document.getElementById('emp-body');
                 tbody.innerHTML = '';
                 employees.forEach(e => {
-                    tbody.innerHTML += `<tr><td>${e.name}</td><td>${e.role}</td><td>${e.passport}</td><td><button onclick="deleteEmp(${e.id})" class="btn btn-danger" style="padding:5px;">x</button></td></tr>`;
+                    tbody.innerHTML += `<tr><td>${e.name}</td><td>${e.role}</td><td>${e.passport}</td><td>
+                        <button onclick="editEmp(${e.id})" class="btn btn-info" style="padding:5px;">✏️</button>
+                        <button onclick="deleteEmp(${e.id})" class="btn btn-danger" style="padding:5px;">🗑️</button>
+                    </td></tr>`;
                 });
+            }
+
+            function editEmp(id) {
+                const e = employees.find(x => x.id === id);
+                if (!e) return;
+                editingEmpId = id;
+                document.getElementById('e-name').value = e.name;
+                document.getElementById('e-role').value = e.role;
+                document.getElementById('e-passport').value = e.passport;
+                document.getElementById('btn-emp-save').innerText = "💾 O'zgartirish";
+                document.getElementById('btn-emp-cancel').style.display = 'inline-block';
+            }
+
+            function cancelEditEmp() {
+                editingEmpId = null;
+                document.getElementById('emp-form').reset();
+                document.getElementById('btn-emp-save').innerText = "Qo'shish";
+                document.getElementById('btn-emp-cancel').style.display = 'none';
             }
 
             function deleteEmp(id) {
@@ -882,16 +915,18 @@
                 const t = trips.find(x => x.id == tripId);
 
                 const ex = {
-                    id: Date.now(),
+                    id: editingExId || Date.now(),
                     tripId: tripId,
                     date: document.getElementById('ex-date').value,
                     empName: t.empName,
                     docNum: t.docNum,
+                    days: parseFloat(document.getElementById('ex-days').value) || 0,
+                    rate: parseFloat(document.getElementById('ex-rate').value) || 0,
                     daily: parseFloat(document.getElementById('ex-daily-total').value),
                     hotel: parseFloat(document.getElementById('ex-hotel').value),
                     transport: parseFloat(document.getElementById('ex-transport').value),
                     other: parseFloat(document.getElementById('ex-other').value),
-                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/,/g, ''))
+                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/[^\d.-]/g, ''))
                 };
 
                 if (editingExId) {
@@ -910,16 +945,17 @@
                 const tbody = document.getElementById('expenses-body');
                 tbody.innerHTML = '';
                 expenses.forEach(ex => {
+                    const safeTotal = (typeof ex.total === 'number' && !isNaN(ex.total)) ? ex.total : 0;
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                    <td>${ex.date}</td>
-                    <td>${ex.empName}</td>
-                    <td>${ex.docNum}</td>
-                    <td style="font-weight:bold;">${ex.total.toLocaleString()}</td>
+                    <td>${ex.date || '-'}</td>
+                    <td>${ex.empName || '-'}</td>
+                    <td>${ex.docNum || '-'}</td>
+                    <td style="font-weight:bold;">${safeTotal.toLocaleString()}</td>
                     <td>
-                        <button class="btn btn-secondary" style="padding:5px;" onclick="printDoc('ao1', ${ex.id})">🖨️</button>
-                        <button class="btn btn-info" style="padding:5px;" onclick="editEx(${ex.id})">✏️</button>
-                        <button class="btn btn-danger" style="padding:5px;" onclick="deleteEx(${ex.id})">🗑️</button>
+                        <button class="btn btn-secondary" style="padding:5px 10px;" onclick="printDoc('ao1', ${ex.id})">🖨️ Chop etish</button>
+                        <button class="btn btn-info" style="padding:5px 10px;" onclick="editEx(${ex.id})">✏️ Tahrirlash</button>
+                        <button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteEx(${ex.id})">🗑️ O'chirish</button>
                     </td>
                 `;
                     tbody.appendChild(tr);
@@ -935,17 +971,14 @@
 
                 document.getElementById('ex-trip').value = ex.tripId;
                 document.getElementById('ex-date').value = ex.date;
-                document.getElementById('ex-days').value = (ex.daily / (parseFloat(document.getElementById('ex-rate').value) || 185000)); // Approx reverse or store days? 
-                // Better to rely on manual calc or just let user re-enter?
-                // Let's actually store days in the object next time. For now, we can try to infer or just set the total daily amount.
+                // Restore days and rate from saved data
+                document.getElementById('ex-days').value = ex.days || 0;
+                document.getElementById('ex-rate').value = ex.rate || 185000;
                 document.getElementById('ex-daily-total').value = ex.daily;
                 document.getElementById('ex-hotel').value = ex.hotel;
                 document.getElementById('ex-transport').value = ex.transport;
                 document.getElementById('ex-other').value = ex.other;
                 document.getElementById('ex-grand-total').innerText = ex.total.toLocaleString();
-
-                // Re-trigger calc is safer if we want to support rate changes, 
-                // but if we just want to show stored values:
 
                 document.getElementById('btn-ex-save').innerText = "💾 O'zgartirish";
             }
@@ -960,7 +993,9 @@
             function deleteEx(id) {
                 if (!confirm("O'chirasizmi?")) return;
                 expenses = expenses.filter(e => e.id !== id);
-                localStorage.setItem('safari_expenses', JSON.stringify(expenses));
+                if (currentUser) {
+                    localStorage.setItem('safari_expenses_' + currentUser, JSON.stringify(expenses));
+                }
                 renderExpenses();
             }
 
@@ -1104,16 +1139,16 @@
         <script>
             // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
             const quizQuestions = [
-                { q: "Xizmat safari uchun kassadan avans berildi (2,000,000 so'm)", dt: "4211", kt: "5010", sum: 2000000 },
-                { q: "Xizmat safari uchun bankdan plastik kartaga pul o'tkazildi (3,000,000 so'm)", dt: "4211", kt: "5110", sum: 3000000 },
-                { q: "Avans hisoboti (AO-1) tasdiqlandi: Sutkalik xarajatlar (500,000 so'm)", dt: "9420", kt: "4211", sum: 500000 },
-                { q: "Mehmonxona xarajati (QQSsiz) hisobdan chiqarildi (1,000,000 so'm)", dt: "9420", kt: "4211", sum: 1000000 },
-                { q: "Mehmonxona xarajati uchun QQS hisobga olindi (120,000 so'm)", dt: "4410", kt: "4211", sum: 120000 },
+                { q: "Xizmat safari uchun kassadan avans berildi (2,000,000 so'm)", dt: "4220", kt: "5010", sum: 2000000 },
+                { q: "Xizmat safari uchun bankdan plastik kartaga pul o'tkazildi (3,000,000 so'm)", dt: "4220", kt: "5110", sum: 3000000 },
+                { q: "Avans hisoboti (AO-1) tasdiqlandi: Sutkalik xarajatlar (500,000 so'm)", dt: "9420", kt: "4220", sum: 500000 },
+                { q: "Mehmonxona xarajati (QQSsiz) hisobdan chiqarildi (1,000,000 so'm)", dt: "9420", kt: "4220", sum: 1000000 },
+                { q: "Mehmonxona xarajati uchun QQS hisobga olindi (120,000 so'm)", dt: "4410", kt: "4220", sum: 120000 },
                 { q: "Aviachipta sotib olindi (Pul o'tkazish yo'li bilan) (2,000,000 so'm)", dt: "4310", kt: "5110", sum: 2000000 },
                 { q: "Aviachipta 'Pul hujjatlari' sifatida kirim qilindi (2,000,000 so'm)", dt: "5610", kt: "4310", sum: 2000000 },
-                { q: "Xodimga aviachipta berildi (Hisobdorlikka) (2,000,000 so'm)", dt: "4211", kt: "5610", sum: 2000000 },
-                { q: "Foydalanilmagan avans summasi kassaga qaytarildi (100,000 so'm)", dt: "5010", kt: "4211", sum: 100000 },
-                { q: "Safar xarajatlari ishlab chiqarish tannarxiga qo'shildi (Sex boshlig'i) (1,500,000 so'm)", dt: "2510", kt: "4211", sum: 1500000 }
+                { q: "Xodimga aviachipta berildi (Hisobdorlikka) (2,000,000 so'm)", dt: "4220", kt: "5610", sum: 2000000 },
+                { q: "Foydalanilmagan avans summasi kassaga qaytarildi (100,000 so'm)", dt: "5010", kt: "4220", sum: 100000 },
+                { q: "Safar xarajatlari ishlab chiqarish tannarxiga qo'shildi (Sex boshlig'i) (1,500,000 so'm)", dt: "2010", kt: "4220", sum: 1500000 }
             ];
 
             let currentQIndex = 0;
@@ -1149,7 +1184,7 @@
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
                         <div>
                             <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet (Schyot)</label>
-                            <input type="text" id="q-dt" placeholder="Mas: 4211" class="form-control" style="width:100%">
+                            <input type="text" id="q-dt" placeholder="Mas: 4220" class="form-control" style="width:100%">
                         </div>
                         <div>
                             <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Kredit (Schyot)</label>
@@ -1189,7 +1224,7 @@
                         loadQuestion();
                     }, 1000);
                 } else {
-                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato! Qaytadan urinib ko'ring.</span>`;
                     feedback.style.display = 'block';
                 }
             }

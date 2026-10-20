@@ -2,6 +2,7 @@
 <html lang="uz">
 
 <head>
+    <script>document.documentElement.style.visibility='hidden'</script><script src="../kirish_kodlari.js"></script><script src="../kirish.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ishlab Chiqarish va Tannarx (2000) - FAXR MADAD KONSALT</title>
@@ -333,11 +334,7 @@
         </div>
     </div>
 
-    <!-- USER DISPLAY -->
-    <div class="user-info no-print" id="user-display" style="cursor: default;">
-        <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
-            onclick="logout()" title="Chiqish">❌</span>
-    </div>
+    <!-- USER DISPLAY MOVED TO HEADER -->
 
     <header class="no-print">
         <div style="display:flex; align-items:center; gap:10px;">
@@ -349,7 +346,7 @@
                 <div style="font-size:0.8rem; opacity:0.9;">"FAXR MADAD KONSALT"</div>
             </div>
         </div>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:10px; align-items:center;">
             <button onclick="openQuiz()" class="btn btn-sm"
                 style="background:#8b5cf6; color:white; border:none; box-shadow:0 4px 10px rgba(139, 92, 246, 0.4);">
                 🧠 Bilimni Sinash
@@ -357,6 +354,12 @@
             <button onclick="window.print()" class="btn btn-sm"
                 style="background:white; color:var(--primary-color);">🖨️
                 Chop etish</button>
+            <!-- USER DISPLAY -->
+            <div class="user-info no-print" id="user-display"
+                style="cursor: default; position:static; margin:0; display:none;">
+                <span id="current-user-info">...</span> <span style="cursor:pointer; margin-left:10px; color:red;"
+                    onclick="logout()" title="Chiqish">❌</span>
+            </div>
         </div>
     </header>
 
@@ -371,7 +374,7 @@
         <!-- TAB 1: MATERIALS -->
         <div id="tab-materials">
             <div class="card no-print">
-                <h3 class="section-title">Yangi Xomashyo Qo'shish (2010)</h3>
+                <h3 class="section-title">Yangi Xomashyo (Materiallar) Qo'shish (1010)</h3>
                 <form id="mat-form" class="form-row" style="align-items:end;">
                     <div>
                         <label>Xomashyo Nomi</label>
@@ -420,6 +423,21 @@
                     haqi, boshqa) qo'shing. Tizim tannarxni hisoblaydi.
                 </div>
 
+                <div
+                    style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:15px; margin-bottom:20px;">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <select id="recipe-select" class="form-control"
+                            style="max-width:300px; padding:8px; border:1px solid #cbd5e1; border-radius:4px;">
+                            <option value="">-- Saqlangan shablondan yuklash --</option>
+                        </select>
+                        <button type="button" onclick="loadRecipe()" class="btn btn-sm"
+                            style="background:#3b82f6; color:white;">Yuklash</button>
+                        <button type="button" onclick="saveAsRecipe()" class="btn btn-sm"
+                            style="margin-left:auto; background:#10b981; color:white;">🌟 Hozirgisini shablon qilib
+                            saqlash</button>
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div>
                         <label>Tayyor Mahsulot Nomi</label>
@@ -434,7 +452,7 @@
                 <hr style="border:0; border-top:1px dashed var(--border-color); margin:20px 0;">
 
                 <!-- Cost Components -->
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:20px;">
 
                     <!-- 1. Direct Materials -->
                     <div style="background:white; padding:15px; border:1px solid #e5e7eb; border-radius:8px;">
@@ -443,19 +461,19 @@
                             <select id="calc-mat-select" style="flex:1;">
                                 <option>Tanlang...</option>
                             </select>
-                            <input type="number" id="calc-mat-qty" placeholder="Miqdor" style="width:70px;">
+                            <input type="number" id="calc-mat-qty" placeholder="Miq." style="width:50px;">
                             <button onclick="addMaterialToCalc()" class="btn btn-sm btn-success">+</button>
                         </div>
-                        <ul id="calc-mat-list" style="padding-left:20px; font-size:0.9rem; color:#4b5563;"></ul>
-                        <div style="text-align:right; font-weight:bold; color:#059669;">Jami (Dt 2010): <span
-                                id="total-mat">0</span> so'm</div>
+                        <ul id="calc-mat-list" style="padding-left:20px; font-size:0.85rem; color:#4b5563;"></ul>
+                        <div style="text-align:right; font-size:0.9rem; font-weight:bold; color:#059669;">Jami (Dt
+                            2010): <span id="total-mat">0</span> so'm</div>
                     </div>
 
                     <!-- 2. Direct Labor -->
                     <div style="background:white; padding:15px; border:1px solid #e5e7eb; border-radius:8px;">
                         <h4 style="margin-top:0; color:#2563eb;">2. Ish Haqi (Kt 6700)</h4>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:0.8rem;">Ushbu partiya uchun umumiy ish haqi:</label>
+                            <label style="font-size:0.8rem;">Umumiy ish haqi:</label>
                             <input type="number" id="calc-labor" placeholder="0" oninput="updateTotals()">
                         </div>
                         <div style="margin-bottom:10px;">
@@ -463,19 +481,52 @@
                             <input type="number" id="calc-social" placeholder="Avto" readonly
                                 style="background:#f3f4f6;">
                         </div>
-                        <div style="text-align:right; font-weight:bold; color:#2563eb;">Jami (Dt 2010): <span
-                                id="total-labor">0</span> so'm</div>
+                        <div style="text-align:right; font-size:0.9rem; font-weight:bold; color:#2563eb;">Jami (Dt
+                            2010): <span id="total-labor">0</span> so'm</div>
                     </div>
 
-                    <!-- 3. Overhead -->
+                    <!-- 3. Depreciation -->
                     <div style="background:white; padding:15px; border:1px solid #e5e7eb; border-radius:8px;">
-                        <h4 style="margin-top:0; color:#d97706;">3. Bilvosita Xarajat (Kt 2510)</h4>
+                        <h4 style="margin-top:0; color:#9333ea;">3. Amortizatsiya (Kt 0230)</h4>
+                        <div style="margin-bottom:10px;">
+                            <label style="font-size:0.8rem;">Uskunalar eskirishi (Oy/Sikl):</label>
+                            <input type="number" id="calc-amort" placeholder="0" oninput="updateTotals()">
+                        </div>
+                        <div
+                            style="text-align:right; font-size:0.9rem; font-weight:bold; color:#9333ea; margin-top:20px;">
+                            Jami (Dt 2010): <span id="total-amort">0</span> so'm</div>
+                    </div>
+
+                    <!-- 4. Overhead -->
+                    <div style="background:white; padding:15px; border:1px solid #e5e7eb; border-radius:8px;">
+                        <h4 style="margin-top:0; color:#d97706;">4. Bilvosita Xarajat (Kt 2510)</h4>
                         <div style="margin-bottom:10px;">
                             <label style="font-size:0.8rem;">Elektr, Gaz, Ijara (Taqsimlangan):</label>
                             <input type="number" id="calc-overhead" placeholder="0" oninput="updateTotals()">
                         </div>
-                        <div style="text-align:right; font-weight:bold; color:#d97706;">Jami (Dt 2010): <span
-                                id="total-overhead">0</span> so'm</div>
+                        <div
+                            style="text-align:right; font-size:0.9rem; font-weight:bold; color:#d97706; margin-top:20px;">
+                            Jami (Dt 2010): <span id="total-overhead">0</span> so'm</div>
+                    </div>
+                </div>
+
+                <!-- Deductions -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+                    <!-- WIP Component -->
+                    <div style="background:#fefce8; border:1px solid #fef08a; padding:15px; border-radius:8px;">
+                        <h4 style="margin:0; color:#854d0e;">Chala Qoldiq (2010)</h4>
+                        <p style="margin:5px 0 10px 0; font-size:0.8rem; color:#a16207;">Tayyor bo'lmagan chala
+                            mahsulotlarning sarf-xarajati.</p>
+                        <input type="number" id="calc-wip" placeholder="0" oninput="updateTotals()"
+                            style="width:100%; border:2px solid #fde047;">
+                    </div>
+                    <!-- BRAK Component -->
+                    <div style="background:#fef2f2; border:1px solid #fecaca; padding:15px; border-radius:8px;">
+                        <h4 style="margin:0; color:#991b1b;">Yaroqsiz Mahsulot (Brak 2610)</h4>
+                        <p style="margin:5px 0 10px 0; font-size:0.8rem; color:#b91c1c;">Ishlab chiqarish vaqtidagi
+                            buzilgan/yaroqsiz mahsulotlar zarari.</p>
+                        <input type="number" id="calc-brak" placeholder="0" oninput="updateTotals()"
+                            style="width:100%; border:2px solid #fca5a5;">
                     </div>
                 </div>
 
@@ -486,11 +537,19 @@
                         <div class="cost-val" id="res-qty">0</div>
                     </div>
                     <div class="cost-item">
-                        <div class="cost-lbl">JAMI XARAJAT</div>
+                        <div class="cost-lbl">JAMI SARF</div>
+                        <div class="cost-val" id="res-gross">0 so'm</div>
+                    </div>
+                    <div class="cost-item" style="opacity:0.8;">
+                        <div class="cost-lbl">- CHEGIRMALAR</div>
+                        <div class="cost-val" id="res-deduct" style="color:#d97706;">0 so'm</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-lbl">= TAYYOR TANNARX</div>
                         <div class="cost-val" id="res-total">0 so'm</div>
                     </div>
                     <div class="cost-item">
-                        <div class="cost-lbl">1 DONA TANNARXI</div>
+                        <div class="cost-lbl">1 TANNARXI (2810)</div>
                         <div class="cost-val" style="color:#dc2626; font-size:1.5rem;" id="res-unit">0 so'm</div>
                     </div>
                 </div>
@@ -517,7 +576,8 @@
                             <th>Soni</th>
                             <th class="num-col">Jami Xarajat</th>
                             <th class="num-col">1 dona Tannarxi</th>
-                            <th class="no-print">Tafsilot</th>
+                            <th class="no-print">Taqsimot</th>
+                            <th class="no-print">Amal</th>
                         </tr>
                     </thead>
                     <tbody id="hist-tbody"></tbody>
@@ -529,9 +589,9 @@
 
     <script>
         // DATA STORE
-        // DATA STORE
         let materials = [];
         let history = [];
+        let recipes = [];
         let currentUser = null;
 
         // TEMP CALC STATE
@@ -589,8 +649,76 @@
             if (!currentUser) return;
             materials = JSON.parse(localStorage.getItem('mfg_materials_' + currentUser) || '[]');
             history = JSON.parse(localStorage.getItem('mfg_history_' + currentUser) || '[]');
+            recipes = JSON.parse(localStorage.getItem('mfg_recipes_' + currentUser) || '[]');
             renderMaterials();
             renderHistory();
+            renderRecipesCombo();
+        }
+
+        function renderRecipesCombo() {
+            const sel = document.getElementById('recipe-select');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">-- Saqlangan shablondan yuklash --</option>';
+            recipes.forEach((r, idx) => {
+                sel.innerHTML += `<option value="${idx}">${r.name} (${r.qty} ta)</option>`;
+            });
+        }
+
+        function saveAsRecipe() {
+            const name = document.getElementById('prod-name').value.trim();
+            const qty = parseFloat(document.getElementById('prod-qty').value);
+
+            if (!name || isNaN(qty) || qty <= 0) {
+                alert("Shablon saqlash kamida To'g'ri Nom va Miqdor kiritilishi shart.");
+                return;
+            }
+            if (currentMats.length === 0) {
+                alert("Shablonga kamida 1 xil xomashyo qo'shishingiz kerak.");
+                return;
+            }
+
+            const labor = document.getElementById('calc-labor').value;
+            const amort = document.getElementById('calc-amort').value;
+            const overhead = document.getElementById('calc-overhead').value;
+            const wip = document.getElementById('calc-wip').value;
+            const brak = document.getElementById('calc-brak').value;
+
+            recipes.push({
+                name: name,
+                qty: qty,
+                mats: JSON.parse(JSON.stringify(currentMats)), // deep copy of array map
+                labor: labor,
+                amort: amort,
+                overhead: overhead,
+                wip: wip,
+                brak: brak
+            });
+            localStorage.setItem('mfg_recipes_' + currentUser, JSON.stringify(recipes));
+            renderRecipesCombo();
+            alert(`"${name}" - Retsept/shablon muvaffaqiyatli saqlandi!`);
+        }
+
+        function loadRecipe() {
+            const idx = document.getElementById('recipe-select').value;
+            if (idx === "") return;
+
+            if (!confirm("Kiritilgan barcha maydonlar shablon asosida yangilanadi. Rozimisiz?")) return;
+
+            const r = recipes[idx];
+            document.getElementById('prod-name').value = r.name;
+            document.getElementById('prod-qty').value = r.qty;
+
+            // Reconstruct currentMats deep copy
+            currentMats = JSON.parse(JSON.stringify(r.mats));
+
+            document.getElementById('calc-labor').value = r.labor || '';
+            document.getElementById('calc-amort').value = r.amort || '';
+            document.getElementById('calc-overhead').value = r.overhead || '';
+            document.getElementById('calc-wip').value = r.wip || '';
+            document.getElementById('calc-brak').value = r.brak || '';
+
+            renderCalcMats();
+            updateTotals();
         }
 
         function setTab(tab) {
@@ -689,15 +817,25 @@
             document.getElementById('calc-social').value = social;
             document.getElementById('total-labor').innerText = (labor + social).toLocaleString();
 
+            const amort = parseFloat(document.getElementById('calc-amort').value) || 0;
+            document.getElementById('total-amort').innerText = amort.toLocaleString();
+
             const overhead = parseFloat(document.getElementById('calc-overhead').value) || 0;
             document.getElementById('total-overhead').innerText = overhead.toLocaleString();
 
-            const grandTotal = matTotal + labor + social + overhead;
+            const wip = parseFloat(document.getElementById('calc-wip').value) || 0;
+            const brak = parseFloat(document.getElementById('calc-brak').value) || 0;
+
+            const grandTotal = matTotal + labor + social + amort + overhead;
+            const deduct = wip + brak;
+            const finishedTotal = grandTotal - deduct;
             const qty = parseFloat(document.getElementById('prod-qty').value) || 1;
-            const unitCost = grandTotal / qty;
+            const unitCost = finishedTotal / qty;
 
             document.getElementById('res-qty').innerText = qty;
-            document.getElementById('res-total').innerText = grandTotal.toLocaleString() + " so'm";
+            document.getElementById('res-gross').innerText = grandTotal.toLocaleString() + " so'm";
+            document.getElementById('res-deduct').innerText = "- " + deduct.toLocaleString() + " so'm";
+            document.getElementById('res-total').innerText = finishedTotal.toLocaleString() + " so'm";
             document.getElementById('res-unit').innerText = unitCost.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " so'm";
         }
 
@@ -711,8 +849,12 @@
             const matTotal = currentMats.reduce((sum, i) => sum + i.total, 0);
             const labor = parseFloat(document.getElementById('calc-labor').value) || 0;
             const social = labor * 0.12;
+            const amort = parseFloat(document.getElementById('calc-amort').value) || 0;
             const overhead = parseFloat(document.getElementById('calc-overhead').value) || 0;
-            const total = matTotal + labor + social + overhead;
+            const wip = parseFloat(document.getElementById('calc-wip').value) || 0;
+            const brak = parseFloat(document.getElementById('calc-brak').value) || 0;
+            const grossTotal = matTotal + labor + social + amort + overhead;
+            const total = grossTotal - wip - brak;
 
             history.unshift({
                 id: Date.now(),
@@ -721,7 +863,10 @@
                 qty: qty,
                 cost_mat: matTotal,
                 cost_labor: labor + social,
+                cost_amort: amort,
                 cost_overhead: overhead,
+                cost_wip: wip,
+                cost_brak: brak,
                 total: total,
                 unit_cost: total / qty,
                 materials: [...currentMats]
@@ -734,7 +879,10 @@
             currentMats = [];
             document.getElementById('prod-name').value = '';
             document.getElementById('calc-labor').value = '';
+            document.getElementById('calc-amort').value = '';
             document.getElementById('calc-overhead').value = '';
+            document.getElementById('calc-wip').value = '';
+            document.getElementById('calc-brak').value = '';
             renderCalcMats();
             updateTotals();
             renderHistory();
@@ -753,13 +901,33 @@
                     <td class="num-col" style="font-weight:bold; color:#d97706;">${h.unit_cost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
                     <td class="no-print">
                         <small>
-                            Xom: ${h.cost_mat.toLocaleString()}<br>
-                            Ish: ${h.cost_labor.toLocaleString()}<br>
-                            Bil: ${h.cost_overhead.toLocaleString()}
+                            Xomashyo: ${h.cost_mat.toLocaleString()}<br>
+                            Ish Haqi: ${h.cost_labor.toLocaleString()}<br>
+                            Amortiz: ${(h.cost_amort || 0).toLocaleString()}<br>
+                            Bilvosita: ${h.cost_overhead.toLocaleString()}<br>
+                            ${h.cost_wip ? `<i>Chala: -${h.cost_wip.toLocaleString()}</i><br>` : ''}
+                            ${h.cost_brak ? `<i>Brak: -${h.cost_brak.toLocaleString()}</i>` : ''}
                         </small>
+                    </td>
+                    <td class="no-print" style="white-space:nowrap;">
+                        <button onclick="printKalk(${h.id})" class="btn-sm" style="background:#e0f2fe; color:#0284c7; border:none; padding:5px; border-radius:4px; cursor:pointer;" title="Chop etish">🖨️</button>
+                        <button onclick="deleteHistory(${h.id})" class="btn-sm" style="background:#fee2e2; color:#b91c1c; border:none; padding:5px; border-radius:4px; cursor:pointer;" title="O'chirish">🗑️</button>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function deleteHistory(id) {
+            if (confirm("Bu hujjatni o'chirishga ishonchingiz komilmi?")) {
+                history = history.filter(h => h.id !== id);
+                localStorage.setItem('mfg_history_' + currentUser, JSON.stringify(history));
+                renderHistory();
+            }
+        }
+
+        function printKalk(id) {
+            alert("Kalkulyatsiya nusxasi chop etishga yuborilmoqda...");
+            window.print();
         }
 
     </script>
@@ -775,7 +943,7 @@
             { q: "Umumishlab chiqarish xarajatlari taqsimlandi (Tannarxga qo'shildi) (3,000,000 so'm)", dt: "2010", kt: "2510", sum: 3000000 },
             { q: "Tayyor mahsulot omborga kirim qilindi (Tannarx bo'yicha) (20,000,000 so'm)", dt: "2810", kt: "2010", sum: 20000000 },
             { q: "Yaroqsiz mahsulot (Brak) aniqlandi (500,000 so'm)", dt: "2610", kt: "2010", sum: 500000 },
-            { q: "Tugallanmagan ishlab chiqarish qoldig'i keyingi oyga o'tkazildi (1,000,000 so'm)", dt: "2010", kt: "2010", sum: 1000000 },
+            { q: "Asosiy ishlab chiqarishdan yarim tayyor mahsulotlar omborga olindi (1,000,000 so'm)", dt: "2110", kt: "2010", sum: 1000000 },
             { q: "Mahsulot sotildi (Tannarx hisobdan chiqarildi) (18,000,000 so'm)", dt: "9110", kt: "2810", sum: 18000000 }
         ];
 
