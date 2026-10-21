@@ -981,6 +981,9 @@
                 // Set next doc number
                 const lastDoc = nextOutDocBase();
                 document.getElementById('p-num').value = lastDoc + 1;
+
+                // Bosh sahifadagi "16. Bank ko'chirmasi" havolasi to'g'ridan-to'g'ri ko'chirmani ochadi
+                if (location.hash === '#kochirma') showView('history');
             }
 
             // To'lov topshiriqnomasi raqami faqat chiqimlar bo'yicha (kirimda to'lovchining raqami yoziladi)
