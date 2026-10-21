@@ -799,16 +799,31 @@
                         <div class="section-title">
                             <h3>Bank Ko'chirmasi (Vipiska)</h3>
                             <div>
+                                <button onclick="printStatement()" class="btn btn-secondary" style="font-size:0.9rem;">🖨️
+                                    Chop etish</button>
                                 <button onclick="exportToExcel()" class="btn btn-success" style="font-size:0.9rem;">📊
                                     Excel</button>
                             </div>
                         </div>
 
-                        <div style="margin-bottom:1rem; display:flex; gap:10px;">
+                        <div style="margin-bottom:1rem; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                             <input type="text" id="search-tx" onkeyup="renderHistory()"
                                 placeholder="Qidirish (Nomi, summa...)" style="max-width:300px;">
-                            <input type="date" id="filter-date" onchange="renderHistory()" style="max-width:150px;">
+                            <label style="font-size:0.9rem;">Davr:</label>
+                            <input type="date" id="filter-from" onchange="renderHistory()" style="max-width:160px;" title="dan">
+                            <span>dan</span>
+                            <input type="date" id="filter-to" onchange="renderHistory()" style="max-width:160px;" title="gacha">
+                            <span>gacha</span>
                         </div>
+
+                        <!-- Ko'chirma qoldiqlari (hisob raqam 5110) -->
+                        <div id="stmt-summary" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:1rem;">
+                            <div style="background:#f8fafc; padding:10px; border-radius:6px;"><small>Boshlang'ich qoldiq</small><div id="stmt-open" style="font-weight:bold;">0</div></div>
+                            <div style="background:#ecfdf5; padding:10px; border-radius:6px;"><small>Kirim (Dt 5110) aylanmasi</small><div id="stmt-in" class="text-green" style="font-weight:bold;">0</div></div>
+                            <div style="background:#fef2f2; padding:10px; border-radius:6px;"><small>Chiqim (Kt 5110) aylanmasi</small><div id="stmt-out" class="text-red" style="font-weight:bold;">0</div></div>
+                            <div style="background:#eff6ff; padding:10px; border-radius:6px;"><small>Oxirgi qoldiq</small><div id="stmt-close" style="font-weight:bold;">0</div></div>
+                        </div>
+                        <div id="stmt-note" style="font-size:0.8rem; color:#64748b; margin-bottom:0.5rem;"></div>
 
                         <div class="table-responsive">
                             <table class="table" id="history-table">
@@ -817,16 +832,18 @@
                                         <th>Sana</th>
                                         <th>№</th>
                                         <th>Operatsiya Turi</th>
-                                        <th>Kontragent</th>
-                                        <th>Debet</th>
-                                        <th>Kredit</th>
-                                        <th class="amount-col">Summa</th>
+                                        <th>Kontragent / Maqsad</th>
+                                        <th>Korr. hisob</th>
+                                        <th class="amount-col">Kirim (Debet)</th>
+                                        <th class="amount-col">Chiqim (Kredit)</th>
+                                        <th class="amount-col">Qoldiq</th>
                                         <th>Amal</th>
                                     </tr>
                                 </thead>
                                 <tbody id="history-body">
                                     <!-- JS -->
                                 </tbody>
+                                <tfoot id="history-foot"></tfoot>
                             </table>
                         </div>
                     </div>
@@ -1415,6 +1432,33 @@
             }
 
             // --- HISTORY RENDER ---
+            // Ko'chirma (vipiska) hisob-kitobi:
+            // boshlang'ich qoldiq (barcha operatsiyalardan oldin) = saqlangan qoldiq - Σkirim + Σchiqim;
+            // davr boshidagi qoldiq = boshlang'ich + Σkirim(sana < dan) - Σchiqim(sana < dan).
+            function fmtSum(n) { return (Math.round(n * 100) / 100).toLocaleString(); }
+            function fmtD(d) { return d ? d.split('-').reverse().join('.') : ''; }
+            function txSigned(t) { return t.type === 'Kirim' ? t.amount : -t.amount; }
+
+            function getStatement() {
+                const from = document.getElementById('filter-from').value;
+                const to = document.getElementById('filter-to').value;
+                const initial = transactions.reduce((b, t) => b - txSigned(t), balance);
+                // Xronologik tartib: sana, so'ng kiritilgan vaqt (id)
+                const sorted = transactions.slice().sort((x, y) => x.date < y.date ? -1 : x.date > y.date ? 1 : x.id - y.id);
+                let opening = initial;
+                sorted.forEach(t => { if (from && t.date < from) opening += txSigned(t); });
+                const rows = [];
+                let run = opening, kirim = 0, chiqim = 0;
+                sorted.forEach(t => {
+                    if ((from && t.date < from) || (to && t.date > to)) return;
+                    run += txSigned(t);
+                    if (t.type === 'Kirim') kirim += t.amount; else chiqim += t.amount;
+                    rows.push({ t, run });
+                });
+                const period = (from || to) ? `${from ? fmtD(from) + ' dan' : ''} ${to ? fmtD(to) + ' gacha' : ''}`.trim() : 'Barcha davr';
+                return { from, to, period, opening, kirim, chiqim, closing: opening + kirim - chiqim, rows };
+            }
+
             function renderHistory() {
                 const tbody = document.getElementById('history-body');
                 const dashBody = document.getElementById('dash-trans-body');
@@ -1422,38 +1466,46 @@
                 dashBody.innerHTML = '';
 
                 const term = document.getElementById('search-tx').value.toLowerCase();
-                const dateFilter = document.getElementById('filter-date').value;
+                const st = getStatement();
 
-                const filtered = transactions.filter(t => {
-                    const matchTerm = t.payee.toLowerCase().includes(term) || t.amount.toString().includes(term) || t.purpose.toLowerCase().includes(term);
-                    const matchDate = dateFilter ? t.date === dateFilter : true;
-                    return matchTerm && matchDate;
-                });
+                // Qidiruv faqat qatorlarni filtrlaydi; qoldiq va aylanmalar butun davr bo'yicha hisoblanadi
+                const filtered = st.rows.filter(({ t }) =>
+                    t.payee.toLowerCase().includes(term) || t.amount.toString().includes(term) || t.purpose.toLowerCase().includes(term));
 
-                filtered.forEach(t => {
+                document.getElementById('stmt-open').innerText = fmtSum(st.opening);
+                document.getElementById('stmt-in').innerText = fmtSum(st.kirim);
+                document.getElementById('stmt-out').innerText = fmtSum(st.chiqim);
+                document.getElementById('stmt-close').innerText = fmtSum(st.closing);
+                document.getElementById('stmt-note').innerText = 'Hisob raqam 5110 · Davr: ' + st.period +
+                    (term ? ' · Qidiruv faqat qatorlarni filtrlaydi, qoldiqlar butun davr bo\'yicha.' : '');
+
+                let html = `<tr style="background:#f8fafc;"><td colspan="7"><b>Davr boshidagi qoldiq</b></td><td class="amount-col"><b>${fmtSum(st.opening)}</b></td><td></td></tr>`;
+                filtered.forEach(({ t, run }) => {
                     const isOut = t.type === 'Chiqim';
-                    const row = `
+                    html += `
                     <tr>
                         <td>${t.date}</td>
                         <td>${t.docNum || '-'}</td>
                         <td><span class="badge" style="background:${isOut ? '#fee2e2' : '#d1fae5'}; color:${isOut ? 'red' : 'green'}; padding:2px 6px; border-radius:4px; font-size:0.8rem">${t.type}</span></td>
                         <td>${t.payee} <div style="font-size:0.8rem; color:#888">${t.purpose.substring(0, 30)}...</div></td>
-                        <td>${t.dt}</td>
-                        <td>${t.kt}</td>
-                        <td class="amount-col ${isOut ? 'text-red' : 'text-green'}">
-                            ${isOut ? '-' : '+'}${t.amount.toLocaleString()}
-                        </td>
+                        <td>${isOut ? t.dt : t.kt}</td>
+                        <td class="amount-col text-green">${isOut ? '' : fmtSum(t.amount)}</td>
+                        <td class="amount-col text-red">${isOut ? fmtSum(t.amount) : ''}</td>
+                        <td class="amount-col">${fmtSum(run)}</td>
                         <td style="display:flex; gap:5px;">
                             <button onclick="printPaymentOrderById(${t.id})" class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem;" title="Chop etish">🖨️</button>
                             <button onclick="editTransaction(${t.id})" class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem; background-color:#f59e0b; border:none;" title="Tahrirlash">✏️</button>
                         </td>
                     </tr>
                 `;
-                    tbody.innerHTML += row;
                 });
+                tbody.innerHTML = html;
+                document.getElementById('history-foot').innerHTML = `
+                    <tr style="background:#f1f5f9; font-weight:bold;"><td colspan="5">Davr aylanmasi</td><td class="amount-col text-green">${fmtSum(st.kirim)}</td><td class="amount-col text-red">${fmtSum(st.chiqim)}</td><td></td><td></td></tr>
+                    <tr style="background:#eff6ff; font-weight:bold;"><td colspan="7">Davr oxiridagi qoldiq</td><td class="amount-col">${fmtSum(st.closing)}</td><td></td></tr>`;
 
-                // Dashboard items (top 5)
-                filtered.slice(0, 5).forEach(t => {
+                // Dashboard items (top 5, eng oxirgi kiritilganlar)
+                transactions.slice(0, 5).forEach(t => {
                     const isOut = t.type === 'Chiqim';
                     dashBody.innerHTML += `
                     <tr>
@@ -1465,6 +1517,36 @@
                     </tr>
                  `;
                 });
+            }
+
+            function printStatement() {
+                const st = getStatement();
+                const rowsHtml = st.rows.map(({ t, run }) => {
+                    const isOut = t.type === 'Chiqim';
+                    return `<tr><td>${fmtD(t.date)}</td><td>${t.docNum || '-'}</td><td>${t.payee}<br><small>${t.purpose}</small></td><td>${isOut ? t.dt : t.kt}</td>
+                        <td style="text-align:right">${isOut ? '' : fmtSum(t.amount)}</td><td style="text-align:right">${isOut ? fmtSum(t.amount) : ''}</td><td style="text-align:right">${fmtSum(run)}</td></tr>`;
+                }).join('');
+                document.getElementById('print-area').innerHTML = `
+                <div class="po-container">
+                    <h2 style="text-align:center; margin-bottom:5px;">BANK KO'CHIRMASI (VIPISKA)</h2>
+                    <p style="text-align:center; margin:0;">Mijoz: <b>FAXR MADAD KONSALT</b> · STIR 123456789</p>
+                    <p style="text-align:center; margin:0;">Hisob raqam: 2020 8000 9000 0012 3456 (5110 — Hisob-kitob schyoti) · AT "XALQ BANKI" OPERU, MFO 00450</p>
+                    <p style="text-align:center; margin-top:0;">Davr: <b>${st.period}</b></p>
+                    <table class="po-table">
+                        <tr><td>Boshlang'ich qoldiq</td><td style="text-align:right"><b>${fmtSum(st.opening)}</b></td></tr>
+                    </table>
+                    <table class="po-table">
+                        <tr><th>Sana</th><th>№</th><th>Kontragent / Maqsad</th><th>Korr. hisob</th><th>Kirim (Debet)</th><th>Chiqim (Kredit)</th><th>Qoldiq</th></tr>
+                        ${rowsHtml || '<tr><td colspan="7" style="text-align:center">Davrda operatsiyalar yo\'q</td></tr>'}
+                        <tr><td colspan="4"><b>Davr aylanmasi</b></td><td style="text-align:right"><b>${fmtSum(st.kirim)}</b></td><td style="text-align:right"><b>${fmtSum(st.chiqim)}</b></td><td></td></tr>
+                        <tr><td colspan="6"><b>Oxirgi qoldiq</b></td><td style="text-align:right"><b>${fmtSum(st.closing)}</b></td></tr>
+                    </table>
+                    <div style="display:flex; justify-content:space-between; margin-top:30px;">
+                        <div>___________________<br>(Bank mas'ul xodimi)</div>
+                        <div>Bosilgan sana: ${new Date().toLocaleDateString('uz-UZ')}</div>
+                    </div>
+                </div>`;
+                document.getElementById('print-overlay').style.display = 'flex';
             }
 
             // --- PRINTING ---
@@ -1542,12 +1624,23 @@
             }
 
             function exportToExcel() {
+                const st = getStatement();
+                const q = v => '"' + String(v).replace(/"/g, '""') + '"';
                 let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-                csvContent += "Sana,Hujjat Raqami,Kontragent,DT,KT,Summa,Maqsad\n";
-                transactions.forEach(t => {
-                    csvContent += `${t.date},${t.docNum},"${t.payee}",${t.dt},${t.kt},${t.amount},"${t.purpose}"\n`;
+                csvContent += `"Bank ko'chirmasi - hisob raqam 5110 (FAXR MADAD KONSALT)"\n`;
+                csvContent += `Davr,${q(st.period)}\n`;
+                csvContent += `Boshlang'ich qoldiq,${st.opening}\n`;
+                csvContent += `Kirim (Dt 5110) aylanmasi,${st.kirim}\n`;
+                csvContent += `Chiqim (Kt 5110) aylanmasi,${st.chiqim}\n`;
+                csvContent += `Oxirgi qoldiq,${st.closing}\n\n`;
+                csvContent += "Sana,Hujjat Raqami,Turi,Kontragent,DT,KT,Kirim,Chiqim,Qoldiq,Maqsad\n";
+                st.rows.forEach(({ t, run }) => {
+                    const isOut = t.type === 'Chiqim';
+                    csvContent += `${t.date},${q(t.docNum || '')},${t.type},${q(t.payee)},${t.dt},${t.kt},${isOut ? '' : t.amount},${isOut ? t.amount : ''},${run},${q(t.purpose)}\n`;
                 });
-                const encodedUri = encodeURI(csvContent);
+                // '#' va boshqa belgilar CSVni kesib qo'ymasligi uchun to'liq kodlanadi
+                const pre = "data:text/csv;charset=utf-8,";
+                const encodedUri = pre + encodeURIComponent(csvContent.slice(pre.length));
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
                 link.setAttribute("download", "bank_kochat_" + new Date().toLocaleDateString() + ".csv");
