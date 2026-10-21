@@ -445,8 +445,8 @@
                         <tr>
                             <th style="width:20%">Faoliyat Turi</th>
                             <th style="width:15%">Stavka</th>
-                            <th>Tushum (Jami)</th>
-                            <th>Imtiyoz (Summa)</th>
+                            <th>Tushum (Yil boshidan)</th>
+                            <th>Imtiyoz (Yil boshidan)</th>
                             <th style="width:20%">Imtiyoz Hujjati</th>
                             <th>Soliq</th>
                             <th style="width:40px"></th>
@@ -457,7 +457,10 @@
                     </tbody>
                 </table>
                 <div style="padding:10px; text-align:right; color:#6b7280; font-size:0.85rem;">
-                    * Har bir satr alohida hisoblanadi va pastdagi asosiy hisobotga jamlanadi.
+                    * Har bir satr alohida hisoblanadi va pastdagi asosiy hisobotga jamlanadi.<br>
+                    * Tushum va imtiyoz summalari <b>yil boshidan o'sib boruvchi (jamlangan) tartibda</b> kiritiladi
+                    (masalan, Fevral uchun: Yanvar + Fevral tushumi). 060-satr = shu oygacha hisoblangan soliq − oldingi
+                    topshirilgan oy bo'yicha hisoblangan soliq.
                 </div>
             </div>
         </div>
@@ -509,8 +512,8 @@
                             </tr>
                             <tr style="background:#ecfdf5;">
                                 <td>5</td>
-                                <td style="color:#047857;"><strong>Byudjetga To'lanadi</strong> (Jami - Oldingi
-                                    Oylar)
+                                <td style="color:#047857;"><strong>Byudjetga To'lanadi</strong> (Yil boshidan jami
+                                    050 - Oldingi oylarda hisoblangan)
                                 </td>
                                 <td class="code-col">060</td>
                                 <td class="input-col"><input type="text" id="row-060" class="report-input readonly"
@@ -620,7 +623,8 @@
             const existing = reports[monthName];
 
             if (existing) {
-                activities = existing.activities || [];
+                // Nusxa olinadi: saqlanmagan o'zgarishlar topshirilgan hisobotni buzmasligi uchun
+                activities = JSON.parse(JSON.stringify(existing.activities || []));
                 document.getElementById('month-status-msg').innerHTML = `✅ <b>${monthName}</b> hisoboti topshirilgan.`;
                 document.getElementById('submit-btn').innerText = "Qayta Yuborish";
             } else {
@@ -664,8 +668,8 @@
                             <option value="0" ${act.rate == 0 ? 'selected' : ''}>0% - Ijtimoiy</option>
                         </select>
                     </td>
-                    <td class="input-col"><input type="number" class="editable" value="${act.revenue}" oninput="updateAct(${idx}, 'revenue', this.value)"></td>
-                    <td class="input-col"><input type="number" class="editable" value="${act.exempt}" oninput="updateAct(${idx}, 'exempt', this.value)"></td>
+                    <td class="input-col"><input type="number" class="editable" min="0" value="${act.revenue}" oninput="updateAct(${idx}, 'revenue', this.value)"></td>
+                    <td class="input-col"><input type="number" class="editable" min="0" value="${act.exempt}" oninput="updateAct(${idx}, 'exempt', this.value)"></td>
                     <td class="input-col">
                         <select class="editable doc-select" id="doc-${idx}" onchange="updateAct(${idx}, 'doc', this.value)" ${act.exempt > 0 ? '' : 'disabled'}>
                             ${docs.map(d => `<option value="${d.code}" ${act.doc === d.code ? 'selected' : ''}>${d.name}</option>`).join('')}
@@ -748,6 +752,14 @@
 
             // Basic Val
             for (let a of activities) {
+                if (a.revenue < 0 || a.exempt < 0) {
+                    alert("Xato! Tushum va imtiyoz summalari manfiy bo'lishi mumkin emas.");
+                    return;
+                }
+                if (a.exempt > a.revenue) {
+                    alert("Xato! Imtiyoz summasi tushum summasidan oshib ketmasligi kerak.");
+                    return;
+                }
                 if (a.exempt > 0 && !a.doc) {
                     alert("Diqqat! Imtiyoz (Soliq solinmaydigan daromad) kiritilgan, lekin Hujjat tanlanmagan.");
                     return;
@@ -756,7 +768,7 @@
 
             reports[monthName] = {
                 timestamp: new Date().toISOString(),
-                activities: activities
+                activities: JSON.parse(JSON.stringify(activities))
             };
 
             localStorage.setItem('soliq_reports_multi_' + currentUser, JSON.stringify(reports));

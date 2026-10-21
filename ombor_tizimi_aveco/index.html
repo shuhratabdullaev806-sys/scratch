@@ -350,6 +350,13 @@
             z-index: 2000;
         }
 
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
         .login-modal-box {
             background: white;
             padding: 2rem;
@@ -405,8 +412,6 @@
 </head>
 
 <body>
-
-    <body>
 
         <!-- LOGIN MODAL -->
         <div class="modal-overlay" id="login-modal">
@@ -633,6 +638,8 @@
                             </div>
                             <button type="submit" class="submit-btn" style="background-color:#0d9488;">Taqqoslash va
                                 Saqlash</button>
+                            <button type="button" id="btn-inv-cancel" class="submit-btn" onclick="cancelEdit()"
+                                style="background-color:#6b7280; display:none; margin-top:10px;">Bekor qilish</button>
                         </form>
                         <div id="inv-result" style="margin-top:15px;"></div>
                     </div>
@@ -828,6 +835,7 @@
                 };
 
                 history.unshift(record);
+                finishEdit();
                 saveData();
 
                 this.reset();
@@ -884,6 +892,7 @@
                 };
 
                 history.unshift(record);
+                finishEdit();
                 saveData();
 
                 this.reset();
@@ -1000,7 +1009,15 @@
             }
 
             // --- EDIT LOGIC (AVECO) ---
+            let editSnapshot = null; // Tahrirlashdan oldingi holat (bekor qilinsa qaytariladi)
+
+            function finishEdit() {
+                editingId = null;
+                editSnapshot = null;
+            }
+
             function editTransaction(id) {
+                if (editingId) cancelEdit(); // Oldingi tugallanmagan tahrirni qaytarish
                 const index = history.findIndex(h => h.id === id);
                 if (index === -1) return;
                 const tx = history[index];
@@ -1010,8 +1027,23 @@
                 // REVERT STOCK (Simple + / - )
                 const m = materials[tx.name];
                 if (!m) { alert("Material topilmadi"); return; }
+                const snapshot = { m: JSON.stringify(materials), h: JSON.stringify(history) };
 
-                if (tx.type.includes('Kirim')) {
+                if (tx.type.includes('Xatlov')) {
+                    // Xatlov: ortiqchalik qaytarilganda qoldiq kamayadi, kamomad qaytarilganda ko'payadi
+                    const sign = tx.type.includes('Ortiqchalik') ? -1 : 1;
+                    m.qty += sign * tx.qty;
+                    m.totalPrice += sign * tx.price;
+                    if (m.qty < 0.0001) { m.qty = 0; m.totalPrice = 0; }
+
+                    switchTab('xatlov');
+                    document.getElementById('inv-name').value = tx.name;
+                    updateInvInfo();
+                    document.getElementById('inv-fact-qty').value = Math.max(0, m.qty - sign * tx.qty);
+                    document.getElementById('inv-date').value = tx.date;
+                    document.getElementById('inv-result').innerHTML = '';
+                    document.getElementById('btn-inv-cancel').style.display = 'block';
+                } else if (tx.type.includes('Kirim')) {
                     // Revert Kirim: Deduct qty and price
                     m.qty -= tx.qty;
                     m.totalPrice -= tx.price;
@@ -1044,17 +1076,26 @@
                     document.getElementById('btn-chiqim-cancel').style.display = 'inline-block';
                 }
 
-                // Remove from history
+                // Remove from history (faqat xotirada; saqlash yangi hujjat yuborilganda bo'ladi)
                 editingId = tx.id;
+                editSnapshot = snapshot;
                 history.splice(index, 1);
-                saveData();
+                renderAll();
             }
 
             function cancelEdit() {
                 if (editingId) {
-                    alert("Tahrirlash bekor qilindi. ESLATMA: Eski hujjat tizimdan o'chirildi (REVERT qilindi). Qaytadan kiritishingiz kerak.");
-                    editingId = null;
+                    // Tahrirlash bekor qilindi: eski hujjat va ombor holatini tiklaymiz
+                    if (editSnapshot) {
+                        materials = JSON.parse(editSnapshot.m);
+                        history = JSON.parse(editSnapshot.h);
+                    }
+                    finishEdit();
+                    renderAll();
+                    alert("Tahrirlash bekor qilindi. Eski hujjat o'zgarishsiz qoldi.");
                 }
+                const invCancel = document.getElementById('btn-inv-cancel');
+                if (invCancel) invCancel.style.display = 'none';
 
                 document.getElementById('kirim-form').reset();
                 document.getElementById('chiqim-form').reset();
@@ -1063,6 +1104,10 @@
                 document.getElementById('btn-kirim-cancel').style.display = 'none';
                 document.getElementById('btn-chiqim-submit').innerText = "Ishlab Chiqarishga Berish";
                 document.getElementById('btn-chiqim-cancel').style.display = 'none';
+
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('k-date').value = today;
+                document.getElementById('ch-date').value = today;
             }
 
             function deleteKirim(id) {
@@ -1074,6 +1119,7 @@
                 const tx = history[index];
 
                 const m = materials[tx.name];
+                if (!m) return alert("Material topilmadi");
                 if (m.qty < tx.qty) {
                     alert("O'chirish mumkin emas: Omborda qoldiq yetarli emas (allaqachon ishlatilgan bo'lishi mumkin).");
                     return;
@@ -1126,13 +1172,13 @@
                     currentQty = Math.max(0, currentQty);
 
                     rows += `
-                        < tr >
+                        <tr>
                             <td>${h.date}</td>
                             <td>${h.type} ${h.party ? '<br><small>(' + h.party + ')</small>' : ''}</td>
                             <td class="num-col" style="color:var(--primary-dark)">${kirimQty > 0 ? kirimQty.toLocaleString() : '-'}</td>
                             <td class="num-col" style="color:#d97706">${chiqimQty > 0 ? chiqimQty.toLocaleString() : '-'}</td>
                             <td class="num-col" style="font-weight:bold">${currentQty.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                        </tr >
+                        </tr>
                         `;
                 });
 
@@ -1147,7 +1193,7 @@
                 const printArea = document.getElementById('print-area');
 
                 printArea.innerHTML = `
-                        < div class="m-form" >
+                        <div class="m-form">
                         <div class="m-title">MATERIAL HISOBI KARTOCHKASI (M-17 Shakli)<br><small>Material: ${name}</small></div>
                         <table class="m-data-table">
                             <thead>
@@ -1167,7 +1213,7 @@
                             <div>Moddiy javobgar shaxs: __________________</div>
                             <div>Tekshirdi: __________________</div>
                         </div>
-                    </div >
+                    </div>
                         `;
                 document.getElementById('print-overlay').style.display = 'flex';
             }
@@ -1200,6 +1246,7 @@
                 const resultBox = document.getElementById('inv-result');
 
                 if (Math.abs(diff) < 0.0001) {
+                    if (editingId) { finishEdit(); saveData(); cancelEdit(); updateInvInfo(); } // Tahrirda farq qolmasa eski xatlov hujjati bekor bo'ladi
                     resultBox.innerHTML = `<div style="padding:10px; background:#ccfbf1; color:#0f766e; border:1px solid #99f6e4; border-radius:5px;">✅ <b>Farq yo'q.</b> Dastur va fakt bir xil!</div>`;
                     return;
                 }
@@ -1239,7 +1286,7 @@
                 if (m.qty < 0.0001) { m.qty = 0; m.totalPrice = 0; }
 
                 const record = {
-                    id: Date.now(),
+                    id: editingId || Date.now(),
                     type: type,
                     date: date,
                     name: name,
@@ -1251,8 +1298,11 @@
                     kredit: kredit
                 };
 
+                const wasEditing = !!editingId;
                 history.unshift(record);
+                finishEdit();
                 saveData();
+                if (wasEditing) cancelEdit();
 
                 resultBox.innerHTML = `<div style="padding:10px; background:${color}; border-radius:5px;">
                     ${msg}<br>Tizimda to'g'irlandi. Farq qiymati: ${diffValue.toLocaleString()} so'm
@@ -1275,7 +1325,7 @@
                         <table class="m-header-table">
                             <tr>
                                 <td><strong>Tashkilot:</strong> "FAXR MADAD KONSALT"</td>
-                                <td style="text-align:right"><strong>Sana:</strong> ${item.date}</td>
+                                <td style="text-align:right"><strong>Tuzilgan sana:</strong> ${item.date}</td>
                             </tr>
                             <tr>
                                 <td><strong>Yetkazib beruvchi:</strong> ${item.party}</td>
@@ -1288,9 +1338,8 @@
                             <tr>
                                 <th>Material Nomi</th>
                                 <th>O'lchov bir.</th>
-                                <th>So'raldi</th>
-                                <th>Berildi</th>
-                                <th>Narxi (AVECO)</th>
+                                <th>Soni</th>
+                                <th>Narxi</th>
                                 <th>Summasi</th>
                                 <th>Schyot (Dt)</th>
                                 <th>Schyot (Kt)</th>
@@ -1300,7 +1349,6 @@
                             <tr>
                                 <td>${item.name}</td>
                                 <td>${item.unit}</td>
-                                <td>${item.qty.toLocaleString()}</td>
                                 <td>${item.qty.toLocaleString()}</td>
                                 <td>${(item.price / item.qty).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
                                 <td>${item.price.toLocaleString()}</td>
@@ -1312,20 +1360,18 @@
 
                     <div class="m-footer">
                         <div>
-                            Ruxsat berdi: __________________
+                            Qabul qildi (Omborchi): __________________
                         </div>
                         <div>
-                            Omborchi: __________________
+                            Topshirdi: __________________
                         </div>
-                        <div>
-                            Oldi: __________________
-                        </div>
+                    </div>
                     </div>
                 `;
                 } else {
                     // M-11 FORM
                     printArea.innerHTML = `
-                            < div class="m-form" >
+                            <div class="m-form">
                         <div class="m-title">TALABNOMA-YUKXATI № ${item.id.toString().slice(-6)} <br> (M-11 Shakli)</div>
                         <table class="m-header-table">
                             <tr>
@@ -1334,6 +1380,8 @@
                             </tr>
                             <tr>
                                 <td><strong>Yuboruvchi:</strong> Asosiy Ombor</td>
+                                <td></td>
+                            </tr>
                             <tr>
                                 <td><strong>Oluvchi:</strong> ${item.party}</td>
                                 <td style="text-align:right"><strong>Maqsad:</strong> Ishlab chiqarish ehtiyoji uchun</td>
@@ -1372,7 +1420,7 @@
                             <div>Omborchi: __________________</div>
                             <div>Oldi: __________________</div>
                         </div>
-                    </div >
+                    </div>
                 `;
                 }
                 document.getElementById('print-overlay').style.display = 'flex';
@@ -1383,7 +1431,56 @@
             }
 
             function printInventoryReport() {
-                window.print();
+                const printArea = document.getElementById('print-area');
+                let rows = '';
+                let totalValue = 0;
+
+                Object.keys(materials).sort().forEach(name => {
+                    const m = materials[name];
+                    if (m.qty <= 0 && m.totalPrice <= 0) return;
+
+                    const avg = m.qty > 0 ? m.totalPrice / m.qty : 0;
+                    totalValue += m.totalPrice;
+
+                    rows += `
+                    <tr>
+                        <td>${name}</td>
+                        <td style="text-align:center">${m.unit}</td>
+                        <td style="text-align:right">${m.qty.toLocaleString()}</td>
+                        <td style="text-align:right">${avg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td style="text-align:right">${m.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
+                });
+
+                printArea.innerHTML = `
+                <div class="m-form">
+                    <div class="m-title">MATERIAL QOLDIQLARI HISOBOTI (1010)<br><small>${new Date().toLocaleDateString()}</small></div>
+                    <table class="m-data-table">
+                        <thead>
+                            <tr>
+                                <th>Material Nomi</th>
+                                <th>Birlik</th>
+                                <th>Miqdor</th>
+                                <th>O'rtacha Narx (AVECO)</th>
+                                <th>Jami Qiymat (so'm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                            <tr style="font-weight:bold; background:#eee;">
+                                <td colspan="4" style="text-align:right">JAMI:</td>
+                                <td style="text-align:right">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="m-footer">
+                        <div>Omborchi: __________________</div>
+                        <div>Bosh hisobchi: __________________</div>
+                    </div>
+                </div>
+            `;
+                document.getElementById('print-overlay').style.display = 'flex';
             }
 
             function exportToExcel() {
@@ -1442,12 +1539,12 @@
             function loadQuestion() {
                 if (currentQIndex >= quizQuestionsActual.length) {
                     document.getElementById('quiz-content').innerHTML = `
-                        < div style = "text-align:center; padding:20px;" >
+                        <div style="text-align:center; padding:20px;">
                         <h2 style="color:#0d9488;">🎉 Tabriklaymiz!</h2>
                         <p>Siz barcha savollarni muvaffaqiyatli yakunladingiz.</p>
                         <button onclick="closeQuiz()" class="submit-btn" style="width:100%">Yopish</button>
                         <button onclick="openQuiz()" class="submit-btn" style="background-color:#f59e0b; width:100%; margin-top:10px;">Qayta ishlash</button>
-                    </div >
+                    </div>
                         `;
                     return;
                 }
@@ -1456,7 +1553,7 @@
                 // Reset content if it was overwritten
                 if (!document.getElementById('q-text')) {
                     document.getElementById('quiz-content').innerHTML = `
-                        < div style = "background:#f0fdf4; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#134e4a;" id = "q-text" ></div >
+                        <div style="background:#f0fdf4; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#134e4a;" id="q-text"></div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
                         <div>
                             <label style="font-size:0.8rem; font-weight:bold; display:block; margin-bottom:5px;">Debet (Schyot)</label>
@@ -1476,7 +1573,7 @@
                     `;
                 }
 
-                document.getElementById('q-text').innerText = `${currentQIndex + 1} -Savol: ${q.q} `;
+                document.getElementById('q-text').innerText = `${currentQIndex + 1}-Savol: ${q.q}`;
                 document.getElementById('q-dt').value = '';
                 document.getElementById('q-kt').value = '';
                 document.getElementById('q-sum').value = '';
@@ -1500,7 +1597,7 @@
                         loadQuestion();
                     }, 1000);
                 } else {
-                    feedback.innerHTML = `< span style = "color:var(--danger-color); font-weight:bold;" >❌ Xato!</span > <br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
                     feedback.style.display = 'block';
                 }
             }
