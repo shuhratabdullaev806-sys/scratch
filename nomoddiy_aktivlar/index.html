@@ -409,6 +409,7 @@
                                     <option value="0430">0430 - Dasturiy ta'minot</option>
                                     <option value="0440">0440 - Yer va tabiat resurslaridan foydalanish huquqlari
                                     </option>
+                                    <option value="0450">0450 - Tashkiliy xarajatlar</option>
                                     <option value="0460">0460 - Franchayz</option>
                                     <option value="0470">0470 - Mualliflik huquqlari</option>
                                     <option value="0480">0480 - Gudvill</option>
@@ -747,7 +748,7 @@
 
                 const method = document.getElementById('na-method').value;
                 const paramValue = parseFloat(document.getElementById('na-rate').value);
-                const salvage = parseFloat(document.getElementById('na-salvage').value) || 0;
+                const salvage = method === 'straight_rate' ? 0 : (parseFloat(document.getElementById('na-salvage').value) || 0); // straight_rate uchun maydon yashirin
 
                 const asset = {
                     id: editingId || Date.now(),
@@ -767,6 +768,7 @@
                 if (editingId) {
                     const old = assets.find(a => a.id === editingId);
                     if (old) asset.accumulatedDepr = old.accumulatedDepr;
+                    if (old && old.deprMonths) asset.deprMonths = old.deprMonths;
 
                     const idx = assets.findIndex(a => a.id === editingId);
                     assets[idx] = asset;
@@ -807,8 +809,8 @@
                     <td>${a.date}</td>
                     <td><span class="badge">${a.account}</span></td>
                     <td class="num-col">${a.cost.toLocaleString()}</td>
-                    <td class="num-col" style="color:var(--danger-color)">${a.accumulatedDepr.toLocaleString()}</td>
-                    <td class="num-col" style="color:var(--success-color)">${bookValue.toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--danger-color)">${Math.round(a.accumulatedDepr).toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--success-color)">${Math.round(bookValue).toLocaleString()}</td>
                     <td class="no-print">
                         <button onclick="editAsset(${a.id})" class="btn btn-sm btn-secondary">✏️</button>
                         <button onclick="deleteAsset(${a.id})" class="btn btn-sm" style="background:#fee2e2; color:red;">🗑️</button>
@@ -819,8 +821,8 @@
 
                 // Update Summary
                 document.getElementById('sum-initial').innerText = totalInitial.toLocaleString() + " so'm";
-                document.getElementById('sum-deprey').innerText = totalDepr.toLocaleString() + " so'm";
-                document.getElementById('sum-book').innerText = (totalInitial - totalDepr).toLocaleString() + " so'm";
+                document.getElementById('sum-deprey').innerText = Math.round(totalDepr).toLocaleString() + " so'm";
+                document.getElementById('sum-book').innerText = Math.round(totalInitial - totalDepr).toLocaleString() + " so'm";
             }
 
             // Search listener
@@ -857,6 +859,7 @@
             function cancelEdit() {
                 editingId = null;
                 document.getElementById('na-kirim-form').reset();
+                document.getElementById('na-method').onchange(); // label va qoldiq maydonini qayta tiklash
                 document.getElementById('btn-save').innerText = "💾 Saqlash";
                 document.getElementById('btn-cancel').style.display = 'none';
                 document.getElementById('na-date').value = new Date().toISOString().split('T')[0];
@@ -880,10 +883,20 @@
 
                 let monthTotal = 0;
                 let count = 0;
+                let skippedDone = 0;
+                let skippedNew = 0;
 
                 assets.forEach(a => {
                     const method = a.method || 'straight_rate';
                     const salvage = a.salvage || 0;
+                    const doneMonths = a.deprMonths || [];
+
+                    if (a.status === 'Active') {
+                        // Shu oy uchun allaqachon hisoblangan bo'lsa - qayta hisoblanmaydi
+                        if (doneMonths.includes(month)) { skippedDone++; return; }
+                        // Amortizatsiya kirim qilingan oydan keyingi oydan boshlanadi
+                        if ((a.date || '').slice(0, 7) >= month) { skippedNew++; return; }
+                    }
 
                     if (a.status === 'Active' && a.accumulatedDepr < a.cost - salvage) {
                         let actualCharge = 0;
@@ -925,6 +938,7 @@
 
                         if (actualCharge > 0) {
                             a.accumulatedDepr += actualCharge;
+                            a.deprMonths = doneMonths.concat(month);
                             monthTotal += actualCharge;
                             count++;
                         }
@@ -936,7 +950,10 @@
 
                 addLog(`Amortizatsiya (05): ${month} - ${count} ta NA, Jami: ${monthTotal.toLocaleString()} so'm`);
                 saveData();
-                alert(`Muvaffaqiyatli! Jami hisoblangan amortizatsiya: ${monthTotal.toLocaleString()} so'm`);
+                let note = '';
+                if (skippedDone) note += `\n${skippedDone} ta NA uchun ${month} oyi bo'yicha amortizatsiya avval hisoblangan - qayta hisoblanmadi.`;
+                if (skippedNew) note += `\n${skippedNew} ta NA ${month} oyida yoki undan keyin kirim qilingan - amortizatsiya keyingi oydan boshlanadi.`;
+                alert(`Muvaffaqiyatli! Jami hisoblangan amortizatsiya: ${monthTotal.toLocaleString()} so'm` + note);
             };
 
             // LOGGING

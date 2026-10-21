@@ -684,7 +684,8 @@
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 if (view === 'list') document.querySelectorAll('.nav-btn')[0].classList.add('active');
                 if (view === 'create') document.querySelectorAll('.nav-btn')[1].classList.add('active');
-                if (view === 'employees') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+                if (view === 'expenses') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+                if (view === 'employees') document.querySelectorAll('.nav-btn')[3].classList.add('active');
 
                 if (view !== 'create') cancelEdit();
             }
@@ -702,7 +703,12 @@
             document.getElementById('trip-form').onsubmit = function (e) {
                 e.preventDefault();
                 const empId = document.getElementById('t-employee').value;
-                const emp = employees.find(x => x.id == empId);
+                let emp = employees.find(x => x.id == empId);
+                if (!emp && editingTripId) {
+                    const old = trips.find(x => x.id === editingTripId);
+                    if (old && old.empId == empId) emp = { id: old.empId, name: old.empName, role: old.empRole };
+                }
+                if (!emp) { alert("Iltimos, xodimni tanlang!"); return; }
 
                 const trip = {
                     id: editingTripId || Date.now(),
@@ -758,7 +764,15 @@
                 showView('create');
                 editingTripId = id;
 
-                document.getElementById('t-employee').value = t.empId;
+                const empSel = document.getElementById('t-employee');
+                if (!employees.some(x => x.id == t.empId)) {
+                    // Xodim bazadan o'chirilgan bo'lsa, eski ma'lumotni saqlab qolish uchun vaqtinchalik variant
+                    const opt = document.createElement('option');
+                    opt.value = t.empId;
+                    opt.text = `${t.empName} (o'chirilgan)`;
+                    empSel.appendChild(opt);
+                }
+                empSel.value = t.empId;
                 document.getElementById('t-doc-num').value = t.docNum;
                 document.getElementById('t-city').value = t.city;
                 document.getElementById('t-org').value = t.org;
@@ -772,6 +786,7 @@
 
             function cancelEdit() {
                 editingTripId = null;
+                updateEmpSelect();
                 document.getElementById('trip-form').reset();
                 document.getElementById('btn-save').innerText = "💾 Saqlash";
             }
@@ -922,11 +937,11 @@
                     docNum: t.docNum,
                     days: parseFloat(document.getElementById('ex-days').value) || 0,
                     rate: parseFloat(document.getElementById('ex-rate').value) || 0,
-                    daily: parseFloat(document.getElementById('ex-daily-total').value),
-                    hotel: parseFloat(document.getElementById('ex-hotel').value),
-                    transport: parseFloat(document.getElementById('ex-transport').value),
-                    other: parseFloat(document.getElementById('ex-other').value),
-                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/[^\d.-]/g, ''))
+                    daily: parseFloat(document.getElementById('ex-daily-total').value) || 0,
+                    hotel: parseFloat(document.getElementById('ex-hotel').value) || 0,
+                    transport: parseFloat(document.getElementById('ex-transport').value) || 0,
+                    other: parseFloat(document.getElementById('ex-other').value) || 0,
+                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/[^\d.-]/g, '')) || 0
                 };
 
                 if (editingExId) {
@@ -978,7 +993,7 @@
                 document.getElementById('ex-hotel').value = ex.hotel;
                 document.getElementById('ex-transport').value = ex.transport;
                 document.getElementById('ex-other').value = ex.other;
-                document.getElementById('ex-grand-total').innerText = ex.total.toLocaleString();
+                document.getElementById('ex-grand-total').innerText = (ex.total || 0).toLocaleString();
 
                 document.getElementById('btn-ex-save').innerText = "💾 O'zgartirish";
             }
@@ -1001,8 +1016,9 @@
 
             // --- PRINTING LOGIC ---
             function printDoc(type, id) {
-                const t = trips.find(x => x.id === id);
-                if (!t) return;
+                // AO-1 uchun id - bu xarajat (hisobot) id si, safar id si emas
+                const t = type === 'ao1' ? null : trips.find(x => x.id === id);
+                if (type !== 'ao1' && !t) return;
                 const area = document.getElementById('print-area');
 
                 if (type === 'buyruq') {
@@ -1092,23 +1108,23 @@
                                 <tbody>
                                     <tr>
                                         <td style="border:1px solid black;">Sutkalik xarajatlar (Komandirovochniy)</td>
-                                        <td style="border:1px solid black; text-align:right;">${ex.daily.toLocaleString()}</td>
+                                        <td style="border:1px solid black; text-align:right;">${(ex.daily || 0).toLocaleString()}</td>
                                     </tr>
                                     <tr>
                                         <td style="border:1px solid black;">Mehmonxona (Yashash joyi)</td>
-                                        <td style="border:1px solid black; text-align:right;">${ex.hotel.toLocaleString()}</td>
+                                        <td style="border:1px solid black; text-align:right;">${(ex.hotel || 0).toLocaleString()}</td>
                                     </tr>
                                     <tr>
                                         <td style="border:1px solid black;">Yo'l kira (Transport)</td>
-                                        <td style="border:1px solid black; text-align:right;">${ex.transport.toLocaleString()}</td>
+                                        <td style="border:1px solid black; text-align:right;">${(ex.transport || 0).toLocaleString()}</td>
                                     </tr>
                                     <tr>
                                         <td style="border:1px solid black;">Boshqa xarajatlar</td>
-                                        <td style="border:1px solid black; text-align:right;">${ex.other.toLocaleString()}</td>
+                                        <td style="border:1px solid black; text-align:right;">${(ex.other || 0).toLocaleString()}</td>
                                     </tr>
                                     <tr style="font-weight:bold;">
                                         <td style="border:1px solid black;">JAMI</td>
-                                        <td style="border:1px solid black; text-align:right;">${ex.total.toLocaleString()}</td>
+                                        <td style="border:1px solid black; text-align:right;">${(ex.total || 0).toLocaleString()}</td>
                                     </tr>
                                 </tbody>
                             </table>
