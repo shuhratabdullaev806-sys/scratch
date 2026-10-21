@@ -505,8 +505,8 @@
                                 </tr>
                                 <tr style="background:#ecfeff; font-size:0.8rem;">
                                     <th class="num">Imtiyoz</th>
-                                    <th class="num">Soliq (12%)</th>
-                                    <th class="num">INPS (0.1%)</th>
+                                    <th class="num">JShDS (12%)</th>
+                                    <th class="num" title="INPS JShDS ichidan ajratiladi">sh.j. INPS (0.1%)</th>
                                     <th class="num" style="color:#d946ef">Komunal</th>
                                 </tr>
                             </thead>
@@ -525,6 +525,7 @@
                                 </tr>
                             </tfoot>
                         </table>
+                        <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">INPS (0.1%) alohida ushlanmaydi: u JShDS (12%) ichidan shaxsiy jamg'arib boriladigan pensiya hisobiga ajratiladi. Budjetga JShDS 11.9% o'tkaziladi (Dt 6710 - Kt 6410), INPS 0.1% (Dt 6710 - Kt 6530).</p>
                     </div>
                 </div>
             </div>
@@ -553,7 +554,8 @@
                                 <th colspan="2" style="text-align:center">Soliq Solinmaydigan (020)</th>
                                 <th rowspan="2">Soliq Bazasi<br>(030)</th>
                                 <th rowspan="2">Soliq Summasi<br>(040)</th>
-                                <th rowspan="2">INPS (0.1%)<br>(Ma'l. uchun)</th>
+                                <th rowspan="2">Shu jumladan<br>INPS (0.1%)</th>
+                                <th rowspan="2">Budjetga<br>JShDS (11.9%)</th>
                             </tr>
                             <tr>
                                 <th>Summa</th>
@@ -965,7 +967,7 @@
 
                     const taxable = Math.max(0, gross - Math.round(exemptAmount));
                     const tax = Math.round(taxable * 0.12);
-                    const inps = Math.round(taxable * 0.001);
+                    const inps = Math.round(taxable * 0.001); // INPS JShDS (12%) ichidan ajratiladi, qo'shimcha ushlanmaydi
 
                     const net = gross - tax;
 
@@ -1080,6 +1082,7 @@
                     <td class="num bg-blue-50">${base.toLocaleString()}</td>
                     <td class="num font-bold text-blue-800">${r.tax.toLocaleString()}</td>
                     <td class="num text-gray-500">${r.inps.toLocaleString()}</td>
+                    <td class="num">${(r.tax - r.inps).toLocaleString()}</td>
                 </tr>`;
                 }).join('');
 
@@ -1091,6 +1094,7 @@
                 <td class="num">${totals.b.toLocaleString()}</td>
                 <td class="num">${totals.t.toLocaleString()}</td>
                 <td class="num">${totals.i.toLocaleString()}</td>
+                <td class="num">${(totals.t - totals.i).toLocaleString()}</td>
             `;
             }
 
@@ -1098,8 +1102,8 @@
             const quizQuestions = [
                 { q: "Ma'muriy xodimlar uchun ish haqi hisoblandi (10,000,000 so'm)", dt: "9420", kt: "6710", sum: 10000000 },
                 { q: "Ishlab chiqarish xodimlari uchun ish haqi hisoblandi (50,000,000 so'm)", dt: "2010", kt: "6710", sum: 50000000 },
-                { q: "Xodimlardan Daromad solig'i (12%) ushlab qolindi (1,200,000 so'm)", dt: "6710", kt: "6410", sum: 1200000 },
-                { q: "INPS (0.1%) ajratmasi ushlab qolindi (10,000 so'm)", dt: "6710", kt: "6530", sum: 10000 },
+                { q: "Ish haqi 10,000,000 so'm. JShDS (12%) ushlab qolindi: budjetga o'tadigan qismi (11.9%) (1,190,000 so'm)", dt: "6710", kt: "6410", sum: 1190000 },
+                { q: "JShDS ichidan INPS (0.1%) ajratildi - shaxsiy jamg'arib boriladigan pensiya hisobiga (10,000 so'm)", dt: "6710", kt: "6530", sum: 10000 },
                 { q: "Korxona hisobidan Ijtimoiy soliq (12%) hisoblandi (1,200,000 so'm)", dt: "9420", kt: "6520", sum: 1200000 },
                 { q: "Xodimlarga ish haqi plastik karta orqali to'lab berildi (8,000,000 so'm)", dt: "6710", kt: "5110", sum: 8000000 },
                 { q: "Kassadan naqd pulda ish haqi tarqatildi (2,000,000 so'm)", dt: "6710", kt: "5010", sum: 2000000 },
