@@ -417,6 +417,17 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label>Kirim asosi (manba)</label>
+                                <select id="na-source">
+                                    <option value="6010">Mol yetkazib beruvchidan sotib olindi (Kt 6010)</option>
+                                    <option value="4610">Ta'sischi ustav kapitaliga hissa sifatida kiritdi (Kt 4610)</option>
+                                    <option value="5110">Bank hisobidan to'lab sotib olindi (Kt 5110)</option>
+                                    <option value="5010">Kassadan naqd to'lab sotib olindi (Kt 5010)</option>
+                                    <option value="8530">Tekin (bepul) olindi (Kt 8530)</option>
+                                </select>
+                            </div>
+                            <div id="na-prov" style="background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85rem;"></div>
+                            <div class="form-group">
                                 <label>Sotib Olish Sanasi</label>
                                 <input type="date" id="na-date" required>
                             </div>
@@ -743,6 +754,31 @@
             }
 
             // --- ASSET MANAGEMENT ---
+            // NMA kirimi ikki bosqichda: avval 0830 (kapital qo'yilma), so'ng foydalanishga topshirilganda NMA schyotiga
+            function kirimProvodkalari(a) {
+                const src = a.source || '6010';
+                return [
+                    { dt: '0830', kt: src, sum: a.cost, izoh: "Kapital qo'yilma sifatida qabul qilindi" },
+                    { dt: a.account, kt: '0830', sum: a.cost, izoh: 'Foydalanishga topshirildi' }
+                ];
+            }
+            function provodkaNamunasi() {
+                const box = document.getElementById('na-prov');
+                if (!box) return;
+                const a = {
+                    account: document.getElementById('na-group').value,
+                    source: document.getElementById('na-source').value,
+                    cost: parseFloat(document.getElementById('na-cost').value) || 0
+                };
+                box.innerHTML = '<b>Provodkalar:</b><br>' + kirimProvodkalari(a).map((p, k) =>
+                    `${k + 1}) Dt ${p.dt} - Kt ${p.kt} — ${p.sum.toLocaleString()} so'm <span style="color:#64748b">(${p.izoh})</span>`).join('<br>');
+            }
+            setTimeout(provodkaNamunasi, 0);
+            ['na-group', 'na-source', 'na-cost'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', provodkaNamunasi); el.addEventListener('input', provodkaNamunasi); }
+            });
+
             document.getElementById('na-kirim-form').onsubmit = function (e) {
                 e.preventDefault();
 
@@ -755,6 +791,7 @@
                     inv: document.getElementById('na-inv').value,
                     name: document.getElementById('na-name').value,
                     account: document.getElementById('na-group').value,
+                    source: document.getElementById('na-source').value,
                     date: document.getElementById('na-date').value,
                     cost: parseFloat(document.getElementById('na-cost').value),
                     method: method,
@@ -775,7 +812,7 @@
                     addLog(`Tahrirlandi: ${asset.name} (${asset.inv})`);
                 } else {
                     assets.push(asset);
-                    addLog(`Kirim qilindi (04): ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm`);
+                    addLog(`Kirim qilindi (04): ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm. Provodkalar: ` + kirimProvodkalari(asset).map(p => `Dt ${p.dt} Kt ${p.kt}`).join('; '));
                 }
 
                 saveData();
@@ -839,6 +876,7 @@
                 document.getElementById('na-inv').value = a.inv;
                 document.getElementById('na-name').value = a.name;
                 document.getElementById('na-group').value = a.account;
+                document.getElementById('na-source').value = a.source || '6010';
                 document.getElementById('na-date').value = a.date;
                 document.getElementById('na-cost').value = a.cost;
 
@@ -853,6 +891,7 @@
                 document.getElementById('na-rate').value = (a.method && a.method !== 'straight_rate') ? a.life : (a.rate || 15);
 
                 document.getElementById('btn-save').innerText = "💾 O'zgartirish";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'block';
             }
 
@@ -861,6 +900,7 @@
                 document.getElementById('na-kirim-form').reset();
                 document.getElementById('na-method').onchange(); // label va qoldiq maydonini qayta tiklash
                 document.getElementById('btn-save').innerText = "💾 Saqlash";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'none';
                 document.getElementById('na-date').value = new Date().toISOString().split('T')[0];
             }
@@ -1002,10 +1042,12 @@
                 { q: "Yangi ixtiro uchun ishchilar maoshi hisoblandi (Kapitalizatsiya) (5,000,000 so'm)", dt: "0830", kt: "6710", sum: 5000000 },
 
                 // === GUDVILL (0480) ===
-                { q: "Ustav kapitaliga hissa sifatida 'Gudvill' (0480) qabul qilindi (50,000,000 so'm)", dt: "0480", kt: "4610", sum: 50000000 },
+                { q: "Ta'sischi ustav kapitaliga hissa sifatida dasturiy ta'minot kiritdi (kapital qo'yilma) (50,000,000 so'm)", dt: "0830", kt: "4610", sum: 50000000 },
+                { q: "Ta'sischi kiritgan dasturiy ta'minot (0430) foydalanishga topshirildi (50,000,000 so'm)", dt: "0430", kt: "0830", sum: 50000000 },
 
                 // === TEKIN OLINGAN PATENT ===
-                { q: "Tekin olingan patent daromadga olindi (2,000,000 so'm)", dt: "0410", kt: "9390", sum: 2000000 },
+                { q: "Tekin (bepul) olingan patent kapital qo'yilma sifatida hisobga olindi (2,000,000 so'm)", dt: "0830", kt: "8530", sum: 2000000 },
+                { q: "Tekin olingan patent (0410) foydalanishga topshirildi (2,000,000 so'm)", dt: "0410", kt: "0830", sum: 2000000 },
 
                 // === SOTISH — DASTUR (0430) ===
                 { q: "Nomoddiy aktiv (Dastur, 0430) sotildi - Tushum (Debitorlik) (15,000,000 so'm)", dt: "4010", kt: "9220", sum: 15000000 },
@@ -1018,7 +1060,8 @@
                 { q: "Franchayz (0460) uchun amortizatsiya hisoblandi (Ma'muriyat) (500,000 so'm)", dt: "9420", kt: "0560", sum: 500000 },
 
                 // === MUALLIFLIK HUQUQLARI (0470) ===
-                { q: "Mualliflik huquqi (0470) sotib olindi va balansga olindi (3,000,000 so'm)", dt: "0470", kt: "5110", sum: 3000000 },
+                { q: "Mualliflik huquqi ta'minotchidan sotib olindi (kapital qo'yilma) (3,000,000 so'm)", dt: "0830", kt: "6010", sum: 3000000 },
+                { q: "Sotib olingan mualliflik huquqi (0470) foydalanishga topshirildi (3,000,000 so'm)", dt: "0470", kt: "0830", sum: 3000000 },
                 { q: "Mualliflik huquqlari (0470) uchun amortizatsiya hisoblandi (150,000 so'm)", dt: "9420", kt: "0570", sum: 150000 }
             ];
 

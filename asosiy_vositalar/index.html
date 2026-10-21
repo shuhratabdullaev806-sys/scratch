@@ -413,6 +413,17 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label>Kirim asosi (manba)</label>
+                                <select id="av-source">
+                                    <option value="6010">Mol yetkazib beruvchidan sotib olindi (Kt 6010)</option>
+                                    <option value="4610">Ta'sischi ustav kapitaliga hissa sifatida kiritdi (Kt 4610)</option>
+                                    <option value="5110">Bank hisobidan to'lab sotib olindi (Kt 5110)</option>
+                                    <option value="5010">Kassadan naqd to'lab sotib olindi (Kt 5010)</option>
+                                    <option value="8530">Tekin (bepul) olindi (Kt 8530)</option>
+                                </select>
+                            </div>
+                            <div id="av-prov" style="background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85rem;"></div>
+                            <div class="form-group">
                                 <label>Sotib Olish Sanasi</label>
                                 <input type="date" id="av-date" required>
                             </div>
@@ -738,6 +749,31 @@
             }
 
             // --- ASSET MANAGEMENT ---
+            // AV kirimi ikki bosqichda: avval 0820 (kapital qo'yilma), so'ng foydalanishga topshirilganda AV schyotiga
+            function kirimProvodkalari(a) {
+                const src = a.source || '6010';
+                return [
+                    { dt: '0820', kt: src, sum: a.cost, izoh: "Kapital qo'yilma sifatida qabul qilindi" },
+                    { dt: a.account, kt: '0820', sum: a.cost, izoh: 'Foydalanishga topshirildi' }
+                ];
+            }
+            function provodkaNamunasi() {
+                const box = document.getElementById('av-prov');
+                if (!box) return;
+                const a = {
+                    account: document.getElementById('av-group').value,
+                    source: document.getElementById('av-source').value,
+                    cost: parseFloat(document.getElementById('av-cost').value) || 0
+                };
+                box.innerHTML = '<b>Provodkalar:</b><br>' + kirimProvodkalari(a).map((p, k) =>
+                    `${k + 1}) Dt ${p.dt} - Kt ${p.kt} — ${p.sum.toLocaleString()} so'm <span style="color:#64748b">(${p.izoh})</span>`).join('<br>');
+            }
+            setTimeout(provodkaNamunasi, 0);
+            ['av-group', 'av-source', 'av-cost'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', provodkaNamunasi); el.addEventListener('input', provodkaNamunasi); }
+            });
+
             document.getElementById('av-kirim-form').onsubmit = function (e) {
                 e.preventDefault();
 
@@ -750,6 +786,7 @@
                     inv: document.getElementById('av-inv').value,
                     name: document.getElementById('av-name').value,
                     account: document.getElementById('av-group').value,
+                    source: document.getElementById('av-source').value,
                     date: document.getElementById('av-date').value,
                     cost: parseFloat(document.getElementById('av-cost').value),
                     method: method,
@@ -773,7 +810,7 @@
                     addLog(`Tahrirlandi: ${asset.name} (${asset.inv})`);
                 } else {
                     assets.push(asset);
-                    addLog(`Kirim qilindi: ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm`);
+                    addLog(`Kirim qilindi: ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm. Provodkalar: ` + kirimProvodkalari(asset).map(p => `Dt ${p.dt} Kt ${p.kt}`).join('; '));
                 }
 
                 saveData();
@@ -837,6 +874,7 @@
                 document.getElementById('av-inv').value = a.inv;
                 document.getElementById('av-name').value = a.name;
                 document.getElementById('av-group').value = a.account;
+                document.getElementById('av-source').value = a.source || '6010';
                 document.getElementById('av-date').value = a.date;
                 document.getElementById('av-cost').value = a.cost;
 
@@ -851,6 +889,7 @@
                 document.getElementById('av-rate').value = (a.method && a.method !== 'straight_rate') ? a.life : (a.rate || 15);
 
                 document.getElementById('btn-save').innerText = "💾 O'zgartirish";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'block';
             }
 
@@ -859,6 +898,7 @@
                 document.getElementById('av-kirim-form').reset();
                 document.getElementById('av-method').onchange(); // label va qoldiq maydonini qayta tiklash
                 document.getElementById('btn-save').innerText = "💾 Saqlash";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'none';
                 document.getElementById('av-date').value = new Date().toISOString().split('T')[0];
             }
@@ -1013,7 +1053,8 @@
                 { q: "Hisobdan chiqarilgan noutbuk kompyuterning (0150) eskirishi (3,500,000 so'm) hisobdan o'chirildi", dt: "0250", kt: "9210", sum: 3500000 },
 
                 // === TA'SISCHI HISSASI — BINO (0120) ===
-                { q: "Ta'sischidan ustav kapitaliga ma'muriy bino (0120) qabul qilindi (500,000,000 so'm)", dt: "0120", kt: "4610", sum: 500000000 },
+                { q: "Ta'sischidan ustav kapitaliga ma'muriy bino qabul qilindi (kapital qo'yilma sifatida) (500,000,000 so'm)", dt: "0820", kt: "4610", sum: 500000000 },
+                { q: "Ta'sischidan qabul qilingan ma'muriy bino (0120) foydalanishga topshirildi (500,000,000 so'm)", dt: "0120", kt: "0820", sum: 500000000 },
 
                 // === SOTISH — TRANSPORT (0160) ===
                 { q: "Korxona avtomobili (Transport vositasi, 0160) sotildi (100,000,000 so'm)", dt: "9210", kt: "0160", sum: 100000000 },
