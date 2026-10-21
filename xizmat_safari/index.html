@@ -397,6 +397,46 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- AVANS BERISH -->
+                <div class="card" id="avans-view" style="display:none;">
+                    <h2 class="section-title">
+                        <span>💵 Avans berish: <span id="av-trip-label"></span></span>
+                        <button class="btn btn-secondary" onclick="hideAvansForm()">Yopish</button>
+                    </h2>
+                    <form id="avans-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Sana</label>
+                                <input type="date" id="av-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Summa (so'm)</label>
+                                <input type="number" id="av-sum" min="1" placeholder="2000000" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Manba</label>
+                                <select id="av-source">
+                                    <option value="5010">5010 - Kassa (naqd)</option>
+                                    <option value="5110">5110 - Bank (plastik karta)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">💵 Avans berish</button>
+                    </form>
+                    <table style="margin-top:15px;">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th>Summa</th>
+                                <th>Manba</th>
+                                <th>Provodka</th>
+                                <th>Amal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="avans-body"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 2. CREATE TRIP FORM -->
@@ -477,6 +517,7 @@
                                     <th>Xodim</th>
                                     <th>Buyruq №</th>
                                     <th>Jami Xarajat</th>
+                                    <th>Hisob-kitob (Avans)</th>
                                     <th>Amal</th>
                                 </tr>
                             </thead>
@@ -500,6 +541,14 @@
                                 <div class="form-group">
                                     <label>Hisobot Sanasi</label>
                                     <input type="date" id="ex-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Xarajat schyoti (Dt)</label>
+                                    <select id="ex-account" onchange="calcExTotal()">
+                                        <option value="9420">9420 - Ma'muriy xarajatlar</option>
+                                        <option value="9410">9410 - Sotish xarajatlari</option>
+                                        <option value="2510">2510 - Umumishlab chiqarish xarajatlari</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -534,6 +583,8 @@
                                     Jami: <span id="ex-grand-total">0</span> so'm
                                 </div>
                             </div>
+
+                            <div id="ex-settle" style="background:#fefce8; padding:15px; border-radius:8px; margin-bottom:15px;"></div>
 
                             <div style="margin-top:20px;">
                                 <button type="submit" id="btn-ex-save" class="btn btn-primary">Saqlash</button>
@@ -721,8 +772,15 @@
                     start: document.getElementById('t-start-date').value,
                     end: document.getElementById('t-end-date').value,
                     days: document.getElementById('t-days').value,
-                    purpose: document.getElementById('t-purpose').value
+                    purpose: document.getElementById('t-purpose').value,
+                    avanslar: [],
+                    provodkalar: [] // Buyruqning o'zi provodka bermaydi; avans provodkalari avanslar[] ichida
                 };
+
+                if (editingTripId) {
+                    const old = trips.find(t => t.id === editingTripId);
+                    if (old && Array.isArray(old.avanslar)) trip.avanslar = old.avanslar;
+                }
 
                 if (editingTripId) {
                     const idx = trips.findIndex(t => t.id === editingTripId);
@@ -746,8 +804,9 @@
                     <td>${t.empName}<br><small style="color:#64748b">${t.empRole}</small></td>
                     <td>${t.city}<br><small>${t.org}</small></td>
                     <td>${t.days} kun</td>
-                    <td><span style="color:green; background:#dcfce7; padding:2px 6px; border-radius:4px;">Faol</span></td>
+                    <td><span style="color:green; background:#dcfce7; padding:2px 6px; border-radius:4px;">Faol</span>${tripAvans(t) > 0 ? `<br><small>Avans: <b>${tripAvans(t).toLocaleString()}</b></small>` : ''}</td>
                     <td>
+                        <button class="btn btn-primary" style="padding:5px 10px;" onclick="showAvansForm(${t.id})" title="Avans berish (Dt 4220)">💵 Avans</button>
                         <button class="btn btn-secondary" style="padding:5px 10px;" onclick="printDoc('buyruq', ${t.id})" title="Buyruqni chop etish">📜 Buyruq</button>
                         <button class="btn btn-secondary" style="padding:5px 10px;" onclick="printDoc('guvohnoma', ${t.id})" title="Guvohnomani chop etish">🛂 Guvohnoma</button>
                         <button class="btn btn-info" style="padding:5px 10px;" onclick="editTrip(${t.id})">✏️ Tahrirlash</button>
@@ -794,6 +853,7 @@
             function deleteTrip(id) {
                 if (!confirm("O'chirasizmi?")) return;
                 trips = trips.filter(t => t.id !== id);
+                if (avansTripId === id) hideAvansForm();
                 saveTrips();
             }
 
@@ -801,6 +861,122 @@
                 if (!currentUser) return;
                 localStorage.setItem('safari_trips_' + currentUser, JSON.stringify(trips));
                 renderTrips();
+            }
+
+            // --- AVANS BERISH (Dt 4220 - Kt 5010/5110) ---
+            let avansTripId = null;
+            const AV_SOURCES = { '5010': 'Kassa (naqd)', '5110': 'Bank (plastik karta)' };
+
+            function tripAvans(t) {
+                if (!t || !Array.isArray(t.avanslar)) return 0;
+                return t.avanslar.reduce((s, a) => s + (Number(a.sum) || 0), 0);
+            }
+
+            function provHtml(list) {
+                if (!list || list.length === 0) return '<small style="color:#64748b">Provodka yo\'q</small>';
+                return `<table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                    <thead><tr style="background:#eee;"><th style="border:1px solid #999;">Dt</th><th style="border:1px solid #999;">Kt</th><th style="border:1px solid #999; text-align:right;">Summa</th><th style="border:1px solid #999;">Izoh</th></tr></thead>
+                    <tbody>${list.map(p => `<tr><td style="border:1px solid #999;"><b>${p.dt}</b></td><td style="border:1px solid #999;"><b>${p.kt}</b></td><td style="border:1px solid #999; text-align:right;">${(p.sum || 0).toLocaleString()}</td><td style="border:1px solid #999;">${p.izoh}</td></tr>`).join('')}</tbody>
+                </table>`;
+            }
+
+            function showAvansForm(id) {
+                const t = trips.find(x => x.id === id);
+                if (!t) return;
+                avansTripId = id;
+                document.getElementById('avans-form').reset();
+                document.getElementById('av-date').value = t.start || new Date().toISOString().slice(0, 10);
+                document.getElementById('av-trip-label').innerText = `${t.docNum} - ${t.empName} (${t.city})`;
+                document.getElementById('avans-view').style.display = 'block';
+                renderAvans();
+                document.getElementById('avans-view').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function hideAvansForm() {
+                avansTripId = null;
+                document.getElementById('avans-view').style.display = 'none';
+            }
+
+            function renderAvans() {
+                const t = trips.find(x => x.id === avansTripId);
+                const tbody = document.getElementById('avans-body');
+                const list = (t && Array.isArray(t.avanslar)) ? t.avanslar : [];
+                tbody.innerHTML = list.length ? list.map(a => `<tr>
+                    <td>${a.date}</td>
+                    <td style="font-weight:bold;">${(a.sum || 0).toLocaleString()}</td>
+                    <td>${a.source} - ${AV_SOURCES[a.source] || ''}</td>
+                    <td>${(a.provodkalar || []).map(p => `Dt ${p.dt} - Kt ${p.kt}: ${p.sum.toLocaleString()}`).join('<br>')}</td>
+                    <td><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteAvans(${a.id})">🗑️</button></td>
+                </tr>`).join('') + `<tr style="font-weight:bold;"><td>JAMI</td><td>${tripAvans(t).toLocaleString()}</td><td colspan="3"></td></tr>`
+                    : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Avans berilmagan</td></tr>';
+            }
+
+            document.getElementById('avans-form').onsubmit = function (e) {
+                e.preventDefault();
+                const t = trips.find(x => x.id === avansTripId);
+                if (!t) return;
+                const sum = Math.round(parseFloat(document.getElementById('av-sum').value) || 0);
+                if (sum <= 0) { alert("Summani kiriting!"); return; }
+                const source = document.getElementById('av-source').value;
+                if (!Array.isArray(t.avanslar)) t.avanslar = [];
+                t.avanslar.push({
+                    id: Date.now(),
+                    date: document.getElementById('av-date').value,
+                    sum: sum,
+                    source: source,
+                    provodkalar: [{ dt: '4220', kt: source, sum: sum, izoh: `Xizmat safari uchun avans berildi (${AV_SOURCES[source]}) - ${t.empName}, buyruq ${t.docNum}` }]
+                });
+                saveTrips();
+                document.getElementById('av-sum').value = '';
+                renderAvans();
+            };
+
+            function deleteAvans(aid) {
+                const t = trips.find(x => x.id === avansTripId);
+                if (!t || !confirm("O'chirasizmi?")) return;
+                t.avanslar = (t.avanslar || []).filter(a => a.id !== aid);
+                saveTrips();
+                renderAvans();
+            }
+
+            // AO-1 hisob-kitobi: avans va sarflangan summa bo'yicha provodkalar
+            function calcSettlement(total, avans, account, empName) {
+                total = Math.round(total || 0); avans = Math.round(avans || 0);
+                const qoldiq = Math.max(0, avans - total);
+                const ortiqcha = Math.max(0, total - avans);
+                const prov = [];
+                if (total > 0) prov.push({ dt: account || '9420', kt: '4220', sum: total, izoh: `Avans hisoboti (AO-1) tasdiqlandi - xizmat safari xarajatlari${empName ? ' (' + empName + ')' : ''}` });
+                if (qoldiq > 0) prov.push({ dt: '5010', kt: '4220', sum: qoldiq, izoh: "Qoldiq kassaga qaytarildi" });
+                if (ortiqcha > 0) prov.push({ dt: '4220', kt: '5010', sum: ortiqcha, izoh: "Ortiqcha xarajat xodimga to'landi" });
+                return { avans, spent: total, qoldiq, ortiqcha, provodkalar: prov };
+            }
+
+            // Saqlangan yoki eski (provodkasiz) hisobot uchun hisob-kitob
+            function exSettlement(ex) {
+                if (Array.isArray(ex.provodkalar) && typeof ex.avans === 'number') {
+                    const total = Math.round(ex.total || 0);
+                    return { avans: ex.avans, spent: total, qoldiq: Math.max(0, ex.avans - total), ortiqcha: Math.max(0, total - ex.avans), provodkalar: ex.provodkalar };
+                }
+                const t = trips.find(x => x.id == ex.tripId);
+                return calcSettlement(ex.total, tripAvans(t), ex.account || '9420', ex.empName);
+            }
+
+            function settleHtml(st) {
+                return `<table style="width:100%; border-collapse:collapse; margin-bottom:10px;">
+                    <tr><td style="border:1px solid #999;">Avans olindi</td><td style="border:1px solid #999; text-align:right;">${st.avans.toLocaleString()}</td></tr>
+                    <tr><td style="border:1px solid #999;">Sarflandi</td><td style="border:1px solid #999; text-align:right;">${st.spent.toLocaleString()}</td></tr>
+                    <tr><td style="border:1px solid #999;">Qoldiq (qaytariladi)</td><td style="border:1px solid #999; text-align:right; font-weight:bold;">${st.qoldiq.toLocaleString()}</td></tr>
+                    <tr><td style="border:1px solid #999;">Ortiqcha (to'lanadi)</td><td style="border:1px solid #999; text-align:right; font-weight:bold;">${st.ortiqcha.toLocaleString()}</td></tr>
+                </table>`;
+            }
+
+            function renderExSettle() {
+                const el = document.getElementById('ex-settle');
+                if (!el) return;
+                const t = trips.find(x => x.id == document.getElementById('ex-trip').value);
+                const total = parseFloat(document.getElementById('ex-grand-total').innerText.replace(/[^\d.-]/g, '')) || 0;
+                const st = calcSettlement(total, tripAvans(t), document.getElementById('ex-account').value, t ? t.empName : '');
+                el.innerHTML = `<b>Hisob-kitob</b>${settleHtml(st)}<b>Provodkalar</b>${provHtml(st.provodkalar)}`;
             }
 
             // --- EMPLOYEES LOGIC ---
@@ -922,6 +1098,7 @@
 
                 const total = dailyTotal + hotel + transport + other;
                 document.getElementById('ex-grand-total').innerText = total.toLocaleString();
+                renderExSettle();
             }
 
             document.getElementById('expense-form').onsubmit = function (e) {
@@ -941,8 +1118,12 @@
                     hotel: parseFloat(document.getElementById('ex-hotel').value) || 0,
                     transport: parseFloat(document.getElementById('ex-transport').value) || 0,
                     other: parseFloat(document.getElementById('ex-other').value) || 0,
-                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/[^\d.-]/g, '')) || 0
+                    total: parseFloat(document.getElementById('ex-grand-total').innerText.replace(/[^\d.-]/g, '')) || 0,
+                    account: document.getElementById('ex-account').value
                 };
+                const st = calcSettlement(ex.total, tripAvans(t), ex.account, t.empName);
+                ex.avans = st.avans;
+                ex.provodkalar = st.provodkalar;
 
                 if (editingExId) {
                     const idx = expenses.findIndex(x => x.id === editingExId);
@@ -961,12 +1142,14 @@
                 tbody.innerHTML = '';
                 expenses.forEach(ex => {
                     const safeTotal = (typeof ex.total === 'number' && !isNaN(ex.total)) ? ex.total : 0;
+                    const st = exSettlement({ ...ex, total: safeTotal });
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                     <td>${ex.date || '-'}</td>
                     <td>${ex.empName || '-'}</td>
                     <td>${ex.docNum || '-'}</td>
                     <td style="font-weight:bold;">${safeTotal.toLocaleString()}</td>
+                    <td><small>Avans: ${st.avans.toLocaleString()}<br>${st.qoldiq > 0 ? `Qoldiq (qaytariladi): <b>${st.qoldiq.toLocaleString()}</b>` : (st.ortiqcha > 0 ? `Ortiqcha (to'lanadi): <b>${st.ortiqcha.toLocaleString()}</b>` : 'Hisob-kitob yopildi')}<br>${st.provodkalar.map(p => `Dt ${p.dt} - Kt ${p.kt}: ${p.sum.toLocaleString()}`).join('<br>')}</small></td>
                     <td>
                         <button class="btn btn-secondary" style="padding:5px 10px;" onclick="printDoc('ao1', ${ex.id})">🖨️ Chop etish</button>
                         <button class="btn btn-info" style="padding:5px 10px;" onclick="editEx(${ex.id})">✏️ Tahrirlash</button>
@@ -994,6 +1177,8 @@
                 document.getElementById('ex-transport').value = ex.transport;
                 document.getElementById('ex-other').value = ex.other;
                 document.getElementById('ex-grand-total').innerText = (ex.total || 0).toLocaleString();
+                document.getElementById('ex-account').value = ex.account || '9420';
+                renderExSettle();
 
                 document.getElementById('btn-ex-save').innerText = "💾 O'zgartirish";
             }
@@ -1003,6 +1188,7 @@
                 document.getElementById('expense-form').reset();
                 document.getElementById('btn-ex-save').innerText = "Saqlash";
                 document.getElementById('ex-grand-total').innerText = "0";
+                document.getElementById('ex-settle').innerHTML = '';
             }
 
             function deleteEx(id) {
@@ -1087,6 +1273,7 @@
                 } else if (type === 'ao1') {
                     const ex = expenses.find(x => x.id === id);
                     if (!ex) return;
+                    const st = exSettlement(ex);
                     area.innerHTML = `
                     <div class="doc-paper">
                         <div style="text-align:right; font-size:0.8rem;">AO-1 Shakli</div>
@@ -1128,6 +1315,11 @@
                                     </tr>
                                 </tbody>
                             </table>
+
+                            <div style="margin-top:20px;"><b>Hisob-kitob:</b></div>
+                            ${settleHtml(st)}
+                            <div style="margin-top:10px;"><b>Buxgalteriya provodkalari:</b></div>
+                            ${provHtml(st.provodkalar)}
 
                             <div style="margin-top:40px; display:flex; justify-content:space-between;">
                                 <div>
