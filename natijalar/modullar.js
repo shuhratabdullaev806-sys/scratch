@@ -5,6 +5,8 @@ const MODULLAR = [
     { id: 'simulyator', nomi: 'Buxgalteriya Simulyatori', prefixlar: ['sim_data_'] },
     { id: 'kassa', nomi: 'Kassa Tizimi', prefixlar: ['kassa_history_'] },
     { id: 'bank', nomi: 'Bank Tizimi', prefixlar: ['bank_transactions_', 'bank_counterparties_', 'bank_balance_'] },
+    // FIFO: ombor_tizimi/ (portaldagi asosiy havola) 'ombor_materials_'/'ombor_history_' yozadi,
+    // FIFO/ papkasi (eski nusxa) esa '..._fifo_' yozadi — ikkalasi ham bitta modul sifatida hisoblanadi.
     { id: 'fifo', nomi: 'Ombor (FIFO)', prefixlar: ['ombor_materials_fifo_', 'ombor_history_fifo_', 'ombor_materials_', 'ombor_history_'] },
     { id: 'aveco', nomi: 'Ombor (AVECO)', prefixlar: ['ombor_materials_aveco_', 'ombor_history_aveco_'] },
     { id: 'kadrlar', nomi: 'Kadrlar', prefixlar: ['k_employees_', 'k_shtat_', 'k_tabel_', 'k_payrolls_'] },

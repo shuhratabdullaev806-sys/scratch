@@ -409,12 +409,24 @@
                                     <option value="0430">0430 - Dasturiy ta'minot</option>
                                     <option value="0440">0440 - Yer va tabiat resurslaridan foydalanish huquqlari
                                     </option>
+                                    <option value="0450">0450 - Tashkiliy xarajatlar</option>
                                     <option value="0460">0460 - Franchayz</option>
                                     <option value="0470">0470 - Mualliflik huquqlari</option>
                                     <option value="0480">0480 - Gudvill</option>
                                     <option value="0490">0490 - Boshqa nomoddiy aktivlar</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>Kirim asosi (manba)</label>
+                                <select id="na-source">
+                                    <option value="6010">Mol yetkazib beruvchidan sotib olindi (Kt 6010)</option>
+                                    <option value="4610">Ta'sischi ustav kapitaliga hissa sifatida kiritdi (Kt 4610)</option>
+                                    <option value="5110">Bank hisobidan to'lab sotib olindi (Kt 5110)</option>
+                                    <option value="5010">Kassadan naqd to'lab sotib olindi (Kt 5010)</option>
+                                    <option value="8530">Tekin (bepul) olindi (Kt 8530)</option>
+                                </select>
+                            </div>
+                            <div id="na-prov" style="background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85rem;"></div>
                             <div class="form-group">
                                 <label>Sotib Olish Sanasi</label>
                                 <input type="date" id="na-date" required>
@@ -742,18 +754,44 @@
             }
 
             // --- ASSET MANAGEMENT ---
+            // NMA kirimi ikki bosqichda: avval 0830 (kapital qo'yilma), so'ng foydalanishga topshirilganda NMA schyotiga
+            function kirimProvodkalari(a) {
+                const src = a.source || '6010';
+                return [
+                    { dt: '0830', kt: src, sum: a.cost, izoh: "Kapital qo'yilma sifatida qabul qilindi" },
+                    { dt: a.account, kt: '0830', sum: a.cost, izoh: 'Foydalanishga topshirildi' }
+                ];
+            }
+            function provodkaNamunasi() {
+                const box = document.getElementById('na-prov');
+                if (!box) return;
+                const a = {
+                    account: document.getElementById('na-group').value,
+                    source: document.getElementById('na-source').value,
+                    cost: parseFloat(document.getElementById('na-cost').value) || 0
+                };
+                box.innerHTML = '<b>Provodkalar:</b><br>' + kirimProvodkalari(a).map((p, k) =>
+                    `${k + 1}) Dt ${p.dt} - Kt ${p.kt} — ${p.sum.toLocaleString()} so'm <span style="color:#64748b">(${p.izoh})</span>`).join('<br>');
+            }
+            setTimeout(provodkaNamunasi, 0);
+            ['na-group', 'na-source', 'na-cost'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', provodkaNamunasi); el.addEventListener('input', provodkaNamunasi); }
+            });
+
             document.getElementById('na-kirim-form').onsubmit = function (e) {
                 e.preventDefault();
 
                 const method = document.getElementById('na-method').value;
                 const paramValue = parseFloat(document.getElementById('na-rate').value);
-                const salvage = parseFloat(document.getElementById('na-salvage').value) || 0;
+                const salvage = method === 'straight_rate' ? 0 : (parseFloat(document.getElementById('na-salvage').value) || 0); // straight_rate uchun maydon yashirin
 
                 const asset = {
                     id: editingId || Date.now(),
                     inv: document.getElementById('na-inv').value,
                     name: document.getElementById('na-name').value,
                     account: document.getElementById('na-group').value,
+                    source: document.getElementById('na-source').value,
                     date: document.getElementById('na-date').value,
                     cost: parseFloat(document.getElementById('na-cost').value),
                     method: method,
@@ -767,13 +805,14 @@
                 if (editingId) {
                     const old = assets.find(a => a.id === editingId);
                     if (old) asset.accumulatedDepr = old.accumulatedDepr;
+                    if (old && old.deprMonths) asset.deprMonths = old.deprMonths;
 
                     const idx = assets.findIndex(a => a.id === editingId);
                     assets[idx] = asset;
                     addLog(`Tahrirlandi: ${asset.name} (${asset.inv})`);
                 } else {
                     assets.push(asset);
-                    addLog(`Kirim qilindi (04): ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm`);
+                    addLog(`Kirim qilindi (04): ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm. Provodkalar: ` + kirimProvodkalari(asset).map(p => `Dt ${p.dt} Kt ${p.kt}`).join('; '));
                 }
 
                 saveData();
@@ -807,8 +846,8 @@
                     <td>${a.date}</td>
                     <td><span class="badge">${a.account}</span></td>
                     <td class="num-col">${a.cost.toLocaleString()}</td>
-                    <td class="num-col" style="color:var(--danger-color)">${a.accumulatedDepr.toLocaleString()}</td>
-                    <td class="num-col" style="color:var(--success-color)">${bookValue.toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--danger-color)">${Math.round(a.accumulatedDepr).toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--success-color)">${Math.round(bookValue).toLocaleString()}</td>
                     <td class="no-print">
                         <button onclick="editAsset(${a.id})" class="btn btn-sm btn-secondary">✏️</button>
                         <button onclick="deleteAsset(${a.id})" class="btn btn-sm" style="background:#fee2e2; color:red;">🗑️</button>
@@ -819,8 +858,8 @@
 
                 // Update Summary
                 document.getElementById('sum-initial').innerText = totalInitial.toLocaleString() + " so'm";
-                document.getElementById('sum-deprey').innerText = totalDepr.toLocaleString() + " so'm";
-                document.getElementById('sum-book').innerText = (totalInitial - totalDepr).toLocaleString() + " so'm";
+                document.getElementById('sum-deprey').innerText = Math.round(totalDepr).toLocaleString() + " so'm";
+                document.getElementById('sum-book').innerText = Math.round(totalInitial - totalDepr).toLocaleString() + " so'm";
             }
 
             // Search listener
@@ -837,6 +876,7 @@
                 document.getElementById('na-inv').value = a.inv;
                 document.getElementById('na-name').value = a.name;
                 document.getElementById('na-group').value = a.account;
+                document.getElementById('na-source').value = a.source || '6010';
                 document.getElementById('na-date').value = a.date;
                 document.getElementById('na-cost').value = a.cost;
 
@@ -851,13 +891,16 @@
                 document.getElementById('na-rate').value = (a.method && a.method !== 'straight_rate') ? a.life : (a.rate || 15);
 
                 document.getElementById('btn-save').innerText = "💾 O'zgartirish";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'block';
             }
 
             function cancelEdit() {
                 editingId = null;
                 document.getElementById('na-kirim-form').reset();
+                document.getElementById('na-method').onchange(); // label va qoldiq maydonini qayta tiklash
                 document.getElementById('btn-save').innerText = "💾 Saqlash";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'none';
                 document.getElementById('na-date').value = new Date().toISOString().split('T')[0];
             }
@@ -880,10 +923,20 @@
 
                 let monthTotal = 0;
                 let count = 0;
+                let skippedDone = 0;
+                let skippedNew = 0;
 
                 assets.forEach(a => {
                     const method = a.method || 'straight_rate';
                     const salvage = a.salvage || 0;
+                    const doneMonths = a.deprMonths || [];
+
+                    if (a.status === 'Active') {
+                        // Shu oy uchun allaqachon hisoblangan bo'lsa - qayta hisoblanmaydi
+                        if (doneMonths.includes(month)) { skippedDone++; return; }
+                        // Amortizatsiya kirim qilingan oydan keyingi oydan boshlanadi
+                        if ((a.date || '').slice(0, 7) >= month) { skippedNew++; return; }
+                    }
 
                     if (a.status === 'Active' && a.accumulatedDepr < a.cost - salvage) {
                         let actualCharge = 0;
@@ -925,6 +978,7 @@
 
                         if (actualCharge > 0) {
                             a.accumulatedDepr += actualCharge;
+                            a.deprMonths = doneMonths.concat(month);
                             monthTotal += actualCharge;
                             count++;
                         }
@@ -936,7 +990,10 @@
 
                 addLog(`Amortizatsiya (05): ${month} - ${count} ta NA, Jami: ${monthTotal.toLocaleString()} so'm`);
                 saveData();
-                alert(`Muvaffaqiyatli! Jami hisoblangan amortizatsiya: ${monthTotal.toLocaleString()} so'm`);
+                let note = '';
+                if (skippedDone) note += `\n${skippedDone} ta NA uchun ${month} oyi bo'yicha amortizatsiya avval hisoblangan - qayta hisoblanmadi.`;
+                if (skippedNew) note += `\n${skippedNew} ta NA ${month} oyida yoki undan keyin kirim qilingan - amortizatsiya keyingi oydan boshlanadi.`;
+                alert(`Muvaffaqiyatli! Jami hisoblangan amortizatsiya: ${monthTotal.toLocaleString()} so'm` + note);
             };
 
             // LOGGING
@@ -985,10 +1042,12 @@
                 { q: "Yangi ixtiro uchun ishchilar maoshi hisoblandi (Kapitalizatsiya) (5,000,000 so'm)", dt: "0830", kt: "6710", sum: 5000000 },
 
                 // === GUDVILL (0480) ===
-                { q: "Ustav kapitaliga hissa sifatida 'Gudvill' (0480) qabul qilindi (50,000,000 so'm)", dt: "0480", kt: "4610", sum: 50000000 },
+                { q: "Ta'sischi ustav kapitaliga hissa sifatida dasturiy ta'minot kiritdi (kapital qo'yilma) (50,000,000 so'm)", dt: "0830", kt: "4610", sum: 50000000 },
+                { q: "Ta'sischi kiritgan dasturiy ta'minot (0430) foydalanishga topshirildi (50,000,000 so'm)", dt: "0430", kt: "0830", sum: 50000000 },
 
                 // === TEKIN OLINGAN PATENT ===
-                { q: "Tekin olingan patent daromadga olindi (2,000,000 so'm)", dt: "0410", kt: "9390", sum: 2000000 },
+                { q: "Tekin (bepul) olingan patent kapital qo'yilma sifatida hisobga olindi (2,000,000 so'm)", dt: "0830", kt: "8530", sum: 2000000 },
+                { q: "Tekin olingan patent (0410) foydalanishga topshirildi (2,000,000 so'm)", dt: "0410", kt: "0830", sum: 2000000 },
 
                 // === SOTISH — DASTUR (0430) ===
                 { q: "Nomoddiy aktiv (Dastur, 0430) sotildi - Tushum (Debitorlik) (15,000,000 so'm)", dt: "4010", kt: "9220", sum: 15000000 },
@@ -1001,7 +1060,8 @@
                 { q: "Franchayz (0460) uchun amortizatsiya hisoblandi (Ma'muriyat) (500,000 so'm)", dt: "9420", kt: "0560", sum: 500000 },
 
                 // === MUALLIFLIK HUQUQLARI (0470) ===
-                { q: "Mualliflik huquqi (0470) sotib olindi va balansga olindi (3,000,000 so'm)", dt: "0470", kt: "5110", sum: 3000000 },
+                { q: "Mualliflik huquqi ta'minotchidan sotib olindi (kapital qo'yilma) (3,000,000 so'm)", dt: "0830", kt: "6010", sum: 3000000 },
+                { q: "Sotib olingan mualliflik huquqi (0470) foydalanishga topshirildi (3,000,000 so'm)", dt: "0470", kt: "0830", sum: 3000000 },
                 { q: "Mualliflik huquqlari (0470) uchun amortizatsiya hisoblandi (150,000 so'm)", dt: "9420", kt: "0570", sum: 150000 }
             ];
 

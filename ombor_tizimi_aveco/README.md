@@ -8,7 +8,7 @@ Buxgalteriya o'quvchilari uchun **Materiallar Hisobi (7-mavzu)** bo'yicha amaliy
 - 🖨️ **Professional Hisobot**: 1010-schyot aylanma qaydnomasini (Oborotka) A4 formatda chop etish.
 - 📝 **M-4 Shakli (Kirim)**: Mol yetkazib beruvchilardan (6010) material kirim qilish.
 - 📤 **M-11 Shakli (Chiqim)**: Ishlab chiqarishga (2010) material berish.
-- 🧮 **FIFO (First-In, First-Out)**: Material narxi "FIFO" (Birinchi kirgan - birinchi chiqadi) usulida hisoblanadi. Batch (partiya) bo'yicha hisob yuritiladi.
+- 🧮 **AVECO (O'rtacha tortilgan narx)**: Material chiqim narxi omborda mavjud materiallarning o'rtacha narxi (Jami qiymat / Miqdor) bo'yicha hisoblanadi.
 
 ## Qanday ishlatiladi?
 1. `index.html` faylini oching.

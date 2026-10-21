@@ -476,7 +476,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="display:flex; gap:10px; align-items:center;">
                             <label>Hisobot Oyi:</label>
-                            <input type="month" id="pay-month">
+                            <input type="month" id="pay-month" onchange="renderPayrollTable(payrolls[this.value])">
                             <small style="color:#666">Hisoblash Tabel ma'lumotlariga asoslanadi</small>
                             <button onclick="calculatePayroll()" class="btn btn-success">⚙️ Hisoblash
                                 (Tabeldan)</button>
@@ -505,8 +505,8 @@
                                 </tr>
                                 <tr style="background:#ecfeff; font-size:0.8rem;">
                                     <th class="num">Imtiyoz</th>
-                                    <th class="num">Soliq (12%)</th>
-                                    <th class="num">INPS (0.1%)</th>
+                                    <th class="num">JShDS (12%)</th>
+                                    <th class="num" title="INPS JShDS ichidan ajratiladi">sh.j. INPS (0.1%)</th>
                                     <th class="num" style="color:#d946ef">Komunal</th>
                                 </tr>
                             </thead>
@@ -525,6 +525,7 @@
                                 </tr>
                             </tfoot>
                         </table>
+                        <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">INPS (0.1%) alohida ushlanmaydi: u JShDS (12%) ichidan shaxsiy jamg'arib boriladigan pensiya hisobiga ajratiladi. Budjetga JShDS 11.9% o'tkaziladi (Dt 6710 - Kt 6410), INPS 0.1% (Dt 6710 - Kt 6530).</p>
                     </div>
                 </div>
             </div>
@@ -553,7 +554,8 @@
                                 <th colspan="2" style="text-align:center">Soliq Solinmaydigan (020)</th>
                                 <th rowspan="2">Soliq Bazasi<br>(030)</th>
                                 <th rowspan="2">Soliq Summasi<br>(040)</th>
-                                <th rowspan="2">INPS (0.1%)<br>(Ma'l. uchun)</th>
+                                <th rowspan="2">Shu jumladan<br>INPS (0.1%)</th>
+                                <th rowspan="2">Budjetga<br>JShDS (11.9%)</th>
                             </tr>
                             <tr>
                                 <th>Summa</th>
@@ -677,6 +679,7 @@
                 renderShtat();
                 renderEmployees();
                 loadTabel();
+                renderPayrollTable(payrolls[curMonth]);
             }
 
             function setTab(tab) {
@@ -810,6 +813,7 @@
                 document.getElementById('e-aliment').value = e.aliment || 0;
                 toggleEmpInputs();
                 if (e.type !== 'Shtat') document.getElementById('e-pos-text').value = e.position;
+                else { const s = shtat.find(x => x.pos === e.position); document.getElementById('e-pos-select').value = s ? s.id : ''; }
                 document.getElementById('e-salary').value = e.salary;
                 document.getElementById('e-date').value = e.date;
             }
@@ -820,6 +824,8 @@
             function loadTabel() {
                 const m = document.getElementById('tabel-month').value;
                 const records = tabelData[m] || [];
+                const norma = (records[0] && records[0].plan) || 168;
+                document.getElementById('tabel-norma').value = norma;
 
                 // Merge with current employees. If emp exists but no tabel record, create default.
                 const tbody = document.getElementById('tabel-tbody');
@@ -830,7 +836,7 @@
                     <td>${i + 1}</td>
                     <td><b>${e.name}</b><br><small>${e.position}</small></td>
                     <td style="text-align:center;">
-                        <span id="plan-${e.id}">168</span>
+                        <span id="plan-${e.id}">${rec.plan || norma}</span>
                     </td>
                     <td>
                         <input type="number" class="inp-table" id="fact-${e.id}" value="${rec.fact}" style="width:70px" title="Ishlagan soati">
@@ -869,6 +875,7 @@
                 });
 
                 tabelData[m] = newRecords;
+                employees.forEach(e => { const el = document.getElementById(`plan-${e.id}`); if (el) el.innerText = plan; });
                 if (!currentUser) return;
                 localStorage.setItem('k_tabel_' + currentUser, JSON.stringify(tabelData));
                 alert("Tabel saqlandi! Endi 'Ish Haqi' bo'limida hisoblashni bajaring.");
@@ -960,7 +967,7 @@
 
                     const taxable = Math.max(0, gross - Math.round(exemptAmount));
                     const tax = Math.round(taxable * 0.12);
-                    const inps = Math.round(taxable * 0.001);
+                    const inps = Math.round(taxable * 0.001); // INPS JShDS (12%) ichidan ajratiladi, qo'shimcha ushlanmaydi
 
                     const net = gross - tax;
 
@@ -1004,16 +1011,18 @@
 
                 if (!data || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Ma\'lumot yo\'q. Hisoblashni bosing.</td></tr>';
+                    ['t-gross', 't-exempt', 't-tax', 't-inps', 't-util', 't-net', 't-alim', 't-pay'].forEach(id => document.getElementById(id).innerHTML = '0');
                     return;
                 }
 
-                let totals = { g: 0, e: 0, t: 0, i: 0, n: 0, a: 0, p: 0 };
+                let totals = { g: 0, e: 0, t: 0, i: 0, u: 0, n: 0, a: 0, p: 0 };
 
                 tbody.innerHTML = data.map((r, i) => {
                     totals.g += r.gross;
                     totals.e += r.exempt;
                     totals.t += r.tax;
                     totals.i += r.inps;
+                    totals.u += (r.utility || 0);
                     totals.n += r.net;
                     totals.a += r.aliment;
                     totals.p += r.toPay;
@@ -1026,6 +1035,7 @@
                     <td class="num" style="color:#666">${r.exempt > 0 ? r.exempt.toLocaleString() : '-'}</td>
                     <td class="num">${r.tax.toLocaleString()}</td>
                     <td class="num">${r.inps.toLocaleString()}</td>
+                    <td class="num" style="color:#d946ef">${(r.utility || 0).toLocaleString()}</td>
                     <td class="num" style="font-weight:bold;">${r.net.toLocaleString()}</td>
                     <td class="num" style="color:#7c3aed">${r.aliment.toLocaleString()}</td>
                     <td class="num" style="background:#f0fdf4; font-weight:bold; color:#15803d">${r.toPay.toLocaleString()}</td>
@@ -1036,6 +1046,7 @@
                 document.getElementById('t-exempt').innerHTML = totals.e.toLocaleString();
                 document.getElementById('t-tax').innerHTML = totals.t.toLocaleString();
                 document.getElementById('t-inps').innerHTML = totals.i.toLocaleString();
+                document.getElementById('t-util').innerHTML = totals.u.toLocaleString();
                 document.getElementById('t-net').innerHTML = totals.n.toLocaleString();
                 document.getElementById('t-alim').innerHTML = totals.a.toLocaleString();
                 document.getElementById('t-pay').innerHTML = totals.p.toLocaleString();
@@ -1071,6 +1082,7 @@
                     <td class="num bg-blue-50">${base.toLocaleString()}</td>
                     <td class="num font-bold text-blue-800">${r.tax.toLocaleString()}</td>
                     <td class="num text-gray-500">${r.inps.toLocaleString()}</td>
+                    <td class="num">${(r.tax - r.inps).toLocaleString()}</td>
                 </tr>`;
                 }).join('');
 
@@ -1082,6 +1094,7 @@
                 <td class="num">${totals.b.toLocaleString()}</td>
                 <td class="num">${totals.t.toLocaleString()}</td>
                 <td class="num">${totals.i.toLocaleString()}</td>
+                <td class="num">${(totals.t - totals.i).toLocaleString()}</td>
             `;
             }
 
@@ -1089,8 +1102,8 @@
             const quizQuestions = [
                 { q: "Ma'muriy xodimlar uchun ish haqi hisoblandi (10,000,000 so'm)", dt: "9420", kt: "6710", sum: 10000000 },
                 { q: "Ishlab chiqarish xodimlari uchun ish haqi hisoblandi (50,000,000 so'm)", dt: "2010", kt: "6710", sum: 50000000 },
-                { q: "Xodimlardan Daromad solig'i (12%) ushlab qolindi (1,200,000 so'm)", dt: "6710", kt: "6410", sum: 1200000 },
-                { q: "INPS (0.1%) ajratmasi ushlab qolindi (10,000 so'm)", dt: "6710", kt: "6530", sum: 10000 },
+                { q: "Ish haqi 10,000,000 so'm. JShDS (12%) ushlab qolindi: budjetga o'tadigan qismi (11.9%) (1,190,000 so'm)", dt: "6710", kt: "6410", sum: 1190000 },
+                { q: "JShDS ichidan INPS (0.1%) ajratildi - shaxsiy jamg'arib boriladigan pensiya hisobiga (10,000 so'm)", dt: "6710", kt: "6530", sum: 10000 },
                 { q: "Korxona hisobidan Ijtimoiy soliq (12%) hisoblandi (1,200,000 so'm)", dt: "9420", kt: "6520", sum: 1200000 },
                 { q: "Xodimlarga ish haqi plastik karta orqali to'lab berildi (8,000,000 so'm)", dt: "6710", kt: "5110", sum: 8000000 },
                 { q: "Kassadan naqd pulda ish haqi tarqatildi (2,000,000 so'm)", dt: "6710", kt: "5010", sum: 2000000 },
@@ -1101,8 +1114,11 @@
 
             let currentQIndex = 0;
 
+            let quizTemplate = null;
             function openQuiz() {
                 currentQIndex = 0;
+                const qc = document.getElementById('quiz-content');
+                if (quizTemplate === null) quizTemplate = qc.innerHTML; else if (!document.getElementById('q-text')) qc.innerHTML = quizTemplate;
                 document.getElementById('quiz-modal').style.display = 'flex';
                 loadQuestion();
             }

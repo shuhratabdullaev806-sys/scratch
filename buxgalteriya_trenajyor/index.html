@@ -606,7 +606,7 @@
                     { q: "Reklama xizmati uchun to'landi.", dt: '6010', kt: '5110', expl: "Agar avval qarz bo'lsa 6010, oldindan bo'lsa 4310. Keling qarzni yopdik deb olaylik." },
                     { q: "Reklama xizmati ko'rsatildi (Act oldik).", dt: '9410', kt: '6010', expl: "Sotish xarajati oshdi, Qarz oshdi." },
                     { q: "Bino (0120) sotib olindi (kapital qo'yilma hisobiga olindi).", dt: '0820', kt: '6010', expl: "Kapital qo'yilma (0820) oshdi, Qarz oshdi (6010). Bino hali foydalanishga topshirilmagan." },
-                    { q: "Buzilgan tovar hisobdan chiqarildi (Zararga).", dt: '9420', kt: '2910', expl: "Zarar bo'ldi, Tovar kamaydi." },
+                    { q: "Buzilgan tovar hisobdan chiqarildi (Zararga).", dt: '5910', kt: '2910', expl: "Buzilishdan yo'qotish (5910) oshdi, Tovar kamaydi (2910). Aybdor topilmasa keyin Dt 9430 - Kt 5910 bilan xarajatga olinadi." },
                     { q: "Yil oxirida foyda solig'i hisoblandi (Budjetga).", dt: '9810', kt: '6410', expl: "Foyda solig'i xarajati (Dt 9810), Soliq qarzi oshdi (Kt 6410)." },
                     { q: "Xodim yetkazgan moddiy zarar aniqlandi (Aybdor topildi).", dt: '4730', kt: '9390', expl: "Xodim qarzdor bo'ldi (A+), Boshqa operatsion daromad (Qoplash) hisoblandi." },
                     { q: "Xodim moddiy zararni to'ladi (Kassaga).", dt: '5010', kt: '4730', expl: "Kassa oshdi, Xodim qarzi yopildi." }
@@ -625,9 +625,10 @@
                     { q: "Internet uchun oldindan to'lov o'tkazildi (1 yillik).", dt: '3120', kt: '5110', expl: "Oldindan to'langan xizmat haqi (3120) oshdi, Bank puli ketdi." },
                     { q: "Internet uchun to'langan avans joriy oy xarajatiga olib borildi (Oy yopildi).", dt: '9420', kt: '3120', expl: "Joriy Ma'muriy xarajati (9420) ko'paydi, 3120 kamaydi." },
                     { q: "O'rnatiladigan asbob-uskuna (mahalliy, 0710) sotib olindi.", dt: '0710', kt: '6010', expl: "Uskuna (montaj qilinmagan) kirim (0710), Qarz oshdi." },
-                    { q: "O'rnatiladigan uskuna (0710) montaj qilindi va ishga tushirildi (0130 ga o'tdi).", dt: '0130', kt: '0710', expl: "Mashina va uskunalar bo'ldi (A+ 0130), 0710 yopildi (A-)." },
-                    { q: "Arzon baholi buyumlar (Boshqa AV) hisobdan chiqarildi.", dt: '9420', kt: '0190', expl: "Xarajatga olib borildi, Boshqa asosiy vositalar kamaydi (0190)." },
-                    { q: "Yo'ldagi pullar (Inkomissiya) bankka kelib tushdi.", dt: '5110', kt: '5710', expl: "Bank oshdi, Yo'ldagi pul nol bo'ldi." },
+                    { q: "O'rnatiladigan uskuna (0710) montajga berildi (kapital qo'yilmaga o'tdi).", dt: '0820', kt: '0710', expl: "Montaj xarajatlari bilan birga kapital qo'yilmada (0820) jamlanadi, 0710 kamaydi." },
+                    { q: "Montaj tugadi, uskuna foydalanishga topshirildi (0130).", dt: '0130', kt: '0820', expl: "Asosiy vosita barcha xarajatlar bilan 0820 dan 0130 ga o'tkaziladi." },
+                    { q: "Arzon baholi buyumlar (Boshqa AV) hisobdan chiqarildi.", dt: '9210', kt: '0190', expl: "Asosiy vosita chiqib ketishi 9210 orqali: boshlang'ich qiymati Kt 0190. Jamg'arilgan eskirish Dt 0290 - Kt 9210 bilan yopiladi." },
+                    { q: "Yo'ldagi pullar (Inkassatsiya) bankka kelib tushdi.", dt: '5110', kt: '5710', expl: "Bank oshdi, Yo'ldagi pul nol bo'ldi." },
                     { q: "Kassadagi pulni inkassator olib ketdi (hali bankka yetmadi).", dt: '5710', kt: '5010', expl: "Yo'ldagi pul oshdi, Kassa kamaydi." },
                     { q: "Xaridor tovarni qaytarib berdi (vozvrat).", dt: '9040', kt: '4010', expl: "Tovarlar qaytarilganda 9040 (Vozvrat) debetlanadi, Xaridor qarzi (4010) kamayadi." },
                     { q: "Qaytarilgan tovar omborga kirim qilindi.", dt: '2910', kt: '9110', expl: "Tovar tiklandi (Dt), Tannarx xarajati kamaydi (Kt)." },
@@ -657,7 +658,7 @@
                 selDt.innerHTML = opts;
                 selKt.innerHTML = opts;
 
-                setLevel('easy');
+                setLevel(questionsDB[currentLevel] ? currentLevel : 'easy');
             }
 
             function setLevel(lvl) {
@@ -741,6 +742,7 @@
                     document.getElementById('user-display').style.display = 'block';
                     updateDisplay(name, group);
                     loadProgress();
+                    setLevel(questionsDB[currentLevel] ? currentLevel : 'easy');
                 } else {
                     alert("Iltimos, F.I.Sh va Guruhni kiriting!");
                 }
@@ -771,6 +773,10 @@
             function loadProgress() {
                 if (!currentUser) return;
                 const saved = localStorage.getItem('trenajyor_data_' + currentUser);
+                // Login oldidan ko'rsatilgan savol hisobga olinmaydi (keyin setLevel yangi savol beradi)
+                score = 0;
+                qCount = 0;
+                document.getElementById('score').innerText = score;
                 if (saved) {
                     const data = JSON.parse(saved);
                     score = data.score || 0;

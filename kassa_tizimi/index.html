@@ -453,7 +453,6 @@
 
 <body>
 
-    <body>
 
         <!-- LOGIN MODAL -->
         <div class="modal-overlay" id="login-modal">
@@ -826,11 +825,10 @@
                 const order = history.find(h => h.id === id);
                 if (!order) return;
 
-                editingId = id;
-
                 if (order.type === 'KO-1') {
-                    // Switch to Kirim tab
+                    // Switch to Kirim tab (switchFormTab calls cancelEdit, so set editingId after it)
                     switchFormTab('kirim');
+                    editingId = id;
 
                     // Fill form
                     document.getElementById('k-date').value = order.date;
@@ -844,8 +842,9 @@
                     document.getElementById('btn-kirim-cancel').style.display = 'block';
 
                 } else {
-                    // Switch to Chiqim tab
+                    // Switch to Chiqim tab (switchFormTab calls cancelEdit, so set editingId after it)
                     switchFormTab('chiqim');
+                    editingId = id;
 
                     // Fill form
                     document.getElementById('ch-date').value = order.date;
@@ -1024,7 +1023,7 @@
             }
 
             function openPrint(id) {
-                const history = JSON.parse(localStorage.getItem('kassa_history') || '[]');
+                const history = JSON.parse(localStorage.getItem('kassa_history_' + currentUser) || '[]');
                 const item = history.find(i => i.id === id);
                 if (!item) return;
 
@@ -1130,7 +1129,7 @@
             }
 
             function printLedger() {
-                const history = JSON.parse(localStorage.getItem('kassa_history') || '[]');
+                const history = JSON.parse(localStorage.getItem('kassa_history_' + currentUser) || '[]');
                 history.sort((a, b) => {
                     if (a.date !== b.date) return new Date(a.date) - new Date(b.date);
                     return a.id - b.id;
@@ -1207,7 +1206,6 @@
             }
         </script>
 
-    </body>
 
     <script>
         // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
@@ -1225,9 +1223,13 @@
         ];
 
         let currentQIndex = 0;
+        let quizTemplate = null;
 
         function openQuiz() {
             currentQIndex = 0;
+            const qc = document.getElementById('quiz-content');
+            if (quizTemplate === null) quizTemplate = qc.innerHTML;
+            else if (!document.getElementById('q-text')) qc.innerHTML = quizTemplate;
             document.getElementById('quiz-modal').style.display = 'flex';
             loadQuestion();
         }

@@ -594,6 +594,7 @@
             const app = {
                 init() {
                     if (!currentUser) return;
+                    migrateLegacy();
                     this.render('dashboard');
                 },
 
@@ -843,10 +844,10 @@
                         </select>
                     </div>
                 </div>
-                 <div class="form-group"><label class="form-label">Shartnoma / Buyurtma</label><input name="contract" class="form-control" placeholder="12-sonli shartnoma"></div>
+                 <div class="form-group"><label class="form-label">Shartnoma / Buyurtma</label><input name="contract" class="form-control" placeholder="12-sonli shartnoma" value="${data.contract || ''}"></div>
                  <div class="form-group">
                     <label class="form-label">Olinadigan tovarlar (Nomi, O'lchov, Soni)</label>
-                    <textarea name="itemsRaw" class="form-control" rows="3" placeholder="Masalan: Sement, tonna, 50"></textarea>
+                    <textarea name="itemsRaw" class="form-control" rows="3" placeholder="Masalan: Sement, tonna, 50">${data.itemsRaw || ''}</textarea>
                  </div>
                 <button type="submit" class="btn btn-primary" style="width:100%">${id ? 'Saqlash' : 'Qo\'shish'}</button>
             </form>
@@ -924,7 +925,7 @@
                     </div>
                     ${vs.map(v => `<div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between">
                         <div><b>${v.name}</b><br><small>${v.inn}</small></div>
-                        <button onclick="store.del('vendors', '${v.id}'); app.render('partners')" style="color:red;border:none;background:none"><i class="fa-times"></i></button>
+                        <button onclick="if (confirm('O\\'chirasizmi?')) { store.del('vendors', '${v.id}'); app.render('partners'); }" style="color:red;border:none;background:none"><i class="fa-solid fa-times"></i></button>
                     </div>`).join('')}
                 </div>
                 <div class="card">
@@ -934,7 +935,7 @@
                     </div>
                     ${es.map(e => `<div style="border-bottom:1px solid #eee; padding:10px 0; display:flex; justify-content:space-between">
                         <div><b>${e.name}</b><br><small>${e.position} | ${e.passport}</small></div>
-                        <button onclick="store.del('employees', '${e.id}'); app.render('partners')" style="color:red;border:none;background:none"><i class="fa-times"></i></button>
+                        <button onclick="if (confirm('O\\'chirasizmi?')) { store.del('employees', '${e.id}'); app.render('partners'); }" style="color:red;border:none;background:none"><i class="fa-solid fa-times"></i></button>
                     </div>`).join('')}
                 </div>
             </div>
@@ -977,26 +978,32 @@
                 closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
             };
 
-            window.onload = () => {
-                // Migrate old data if exists
-                if (localStorage.getItem('cred_vendors')) {
-                    const oldV = JSON.parse(localStorage.getItem('cred_vendors'));
-                    const oldT = JSON.parse(localStorage.getItem('cred_transactions'));
-                    if (oldV.length > 0 && store.get('vendors').length == 0) localStorage.setItem('kred_vendors', JSON.stringify(oldV));
-                    if (oldT.length > 0 && store.get('txs').length == 0) {
-                        // Need to map old tx format to new
-                        const newTxs = oldT.map(t => ({
+            // Eski (foydalanuvchisiz) ma'lumotlarni login qilgandan keyin joriy foydalanuvchiga ko'chirish.
+            // Eski kalitlar o'chirilmaydi; ko'chirish faqat bir marta (birinchi kirgan foydalanuvchi uchun) bajariladi.
+            function migrateLegacy() {
+                if (!currentUser || localStorage.getItem('kred_legacy_migrated')) return;
+                try {
+                    const oldV = JSON.parse(localStorage.getItem('cred_vendors') || '[]');
+                    const oldT = JSON.parse(localStorage.getItem('cred_transactions') || '[]');
+                    if (!Array.isArray(oldV) || !Array.isArray(oldT) || (oldV.length === 0 && oldT.length === 0)) return;
+                    if (store.get('vendors').length > 0 || store.get('txs').length > 0) return;
+                    if (oldV.length > 0) store.set('vendors', oldV);
+                    if (oldT.length > 0) {
+                        store.set('txs', oldT.map(t => ({
                             id: t.id || utils.genId(),
                             type: t.type,
-                            vendorId: t.vendorId, // might need numeric to string check if IDs changed format, but simplistic migration usually works for same session
+                            vendorId: t.vendorId,
                             date: t.date,
                             amount: t.amount,
                             docNumber: '-',
                             note: t.desc
-                        }));
-                        localStorage.setItem('kred_txs', JSON.stringify(newTxs));
+                        })));
                     }
-                }
+                    localStorage.setItem('kred_legacy_migrated', currentUser);
+                } catch (e) { /* eski ma'lumot buzilgan bo'lsa, e'tiborsiz qoldiriladi */ }
+            }
+
+            window.onload = () => {
                 checkLogin();
             };
         </script>

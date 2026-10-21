@@ -222,9 +222,22 @@
             color: #78350f;
         }
 
+        #print-area {
+            display: none;
+        }
+
         @media print {
             .no-print {
                 display: none !important;
+            }
+
+            /* Faqat kalkulyatsiya varaqasini chop etish */
+            body.print-kalk > *:not(#print-area) {
+                display: none !important;
+            }
+
+            body.print-kalk #print-area {
+                display: block !important;
             }
 
             body {
@@ -351,7 +364,7 @@
                 style="background:#8b5cf6; color:white; border:none; box-shadow:0 4px 10px rgba(139, 92, 246, 0.4);">
                 🧠 Bilimni Sinash
             </button>
-            <button onclick="window.print()" class="btn btn-sm"
+            <button onclick="printCurrent()" class="btn btn-sm"
                 style="background:white; color:var(--primary-color);">🖨️
                 Chop etish</button>
             <!-- USER DISPLAY -->
@@ -391,7 +404,7 @@
                     </div>
                     <div>
                         <label>Narxi (1 birlik uchun)</label>
-                        <input type="number" id="m-price" placeholder="5000" required>
+                        <input type="number" id="m-price" placeholder="5000" min="0" step="any" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Qo'shish</button>
                 </form>
@@ -471,13 +484,13 @@
 
                     <!-- 2. Direct Labor -->
                     <div style="background:white; padding:15px; border:1px solid #e5e7eb; border-radius:8px;">
-                        <h4 style="margin-top:0; color:#2563eb;">2. Ish Haqi (Kt 6700)</h4>
+                        <h4 style="margin-top:0; color:#2563eb;">2. Ish Haqi (Kt 6710)</h4>
                         <div style="margin-bottom:10px;">
                             <label style="font-size:0.8rem;">Umumiy ish haqi:</label>
                             <input type="number" id="calc-labor" placeholder="0" oninput="updateTotals()">
                         </div>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:0.8rem;">Ijtimoiy Soliq (12%):</label>
+                            <label style="font-size:0.8rem;">Ijtimoiy Soliq (12%, Kt 6520):</label>
                             <input type="number" id="calc-social" placeholder="Avto" readonly
                                 style="background:#f3f4f6;">
                         </div>
@@ -727,7 +740,8 @@
             document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none';
 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            const tabIdx = ['materials', 'production', 'history'].indexOf(tab);
+            document.querySelectorAll('.tab-btn')[tabIdx].classList.add('active');
 
             if (tab === 'production') updateMatSelect();
         }
@@ -773,9 +787,10 @@
         function addMaterialToCalc() {
             const id = document.getElementById('calc-mat-select').value;
             const qty = parseFloat(document.getElementById('calc-mat-qty').value);
-            if (!id || !qty) return;
+            if (!id || !qty || qty <= 0) return;
 
             const m = materials.find(x => x.id == id);
+            if (!m) return;
             currentMats.push({
                 id: m.id,
                 name: m.name,
@@ -841,11 +856,10 @@
 
         document.getElementById('prod-qty').addEventListener('input', updateTotals);
 
-        function saveProduction() {
+        // Joriy kalkulyatsiyani yozuv ko'rinishida yig'ish (saqlash va chop etish uchun)
+        function collectCalc() {
             const name = document.getElementById('prod-name').value;
             const qty = parseFloat(document.getElementById('prod-qty').value);
-            if (!name || !qty) { alert("Mahsulot nomi va sonini kiriting!"); return; }
-
             const matTotal = currentMats.reduce((sum, i) => sum + i.total, 0);
             const labor = parseFloat(document.getElementById('calc-labor').value) || 0;
             const social = labor * 0.12;
@@ -856,7 +870,7 @@
             const grossTotal = matTotal + labor + social + amort + overhead;
             const total = grossTotal - wip - brak;
 
-            history.unshift({
+            return {
                 id: Date.now(),
                 date: new Date().toLocaleDateString(),
                 product: name,
@@ -870,7 +884,15 @@
                 total: total,
                 unit_cost: total / qty,
                 materials: [...currentMats]
-            });
+            };
+        }
+
+        function saveProduction() {
+            const rec = collectCalc();
+            if (!rec.product || !rec.qty || rec.qty <= 0) { alert("Mahsulot nomi va sonini kiriting!"); return; }
+            if (rec.total < 0) { alert("Xatolik: Chegirmalar (chala qoldiq va brak) jami sarfdan oshib ketdi!"); return; }
+
+            history.unshift(rec);
 
             localStorage.setItem('mfg_history_' + currentUser, JSON.stringify(history));
             alert("Ishlab chiqarish saqlandi! Tayyor mahsulot tannarxi hisoblandi.");
@@ -926,7 +948,64 @@
         }
 
         function printKalk(id) {
-            alert("Kalkulyatsiya nusxasi chop etishga yuborilmoqda...");
+            const rec = history.find(h => h.id === id);
+            if (!rec) return;
+            printKalkRecord(rec);
+        }
+
+        // Sarlavhadagi "Chop etish": kalkulyatsiya oynasida joriy hisob-kitobni, boshqa oynalarda sahifani chop etadi
+        function printCurrent() {
+            if (document.getElementById('tab-production').style.display === 'block') {
+                const rec = collectCalc();
+                if (!rec.qty || rec.qty <= 0) { rec.qty = 1; rec.unit_cost = rec.total; }
+                printKalkRecord(rec);
+            } else {
+                window.print();
+            }
+        }
+
+        function printKalkRecord(h) {
+            const f = v => (v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+            const matRows = (h.materials || []).map(m => `
+                <tr><td>${m.name}</td><td>${m.unit}</td><td style="text-align:right">${f(m.qty)}</td>
+                <td style="text-align:right">${f(m.price)}</td><td style="text-align:right">${f(m.total)}</td></tr>`).join('');
+            const user = sessionStorage.getItem('mfg_user') || '';
+            const group = sessionStorage.getItem('mfg_group') || '';
+            document.getElementById('print-area').innerHTML = `
+                <div style="font-family:Arial, sans-serif; color:black; padding:10px;">
+                    <div style="text-align:center; font-weight:bold; font-size:1.2rem;">"FAXR MADAD KONSALT"</div>
+                    <h2 style="text-align:center; margin:10px 0;">MAHSULOT TANNARXI KALKULYATSIYASI</h2>
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:15px;">
+                        <tr><td><b>Mahsulot:</b> ${h.product || '-'}</td><td style="text-align:right"><b>Sana:</b> ${h.date}</td></tr>
+                        <tr><td><b>Ishlab chiqarilgan soni:</b> ${f(h.qty)}</td><td style="text-align:right"><b>Tuzdi:</b> ${user} ${group ? '(' + group + ')' : ''}</td></tr>
+                    </table>
+                    <h4 style="margin:10px 0 5px;">1. Xomashyo (Dt 2010 - Kt 1010)</h4>
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead><tr><th>Nomi</th><th>Birlik</th><th>Miqdor</th><th>Narxi</th><th>Summa</th></tr></thead>
+                        <tbody>${matRows || '<tr><td colspan="5" style="text-align:center">-</td></tr>'}</tbody>
+                    </table>
+                    <h4 style="margin:15px 0 5px;">Xarajatlar taqsimoti</h4>
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tbody>
+                            <tr><td>Xomashyo (Kt 1010)</td><td style="text-align:right">${f(h.cost_mat)}</td></tr>
+                            <tr><td>Ish haqi + Ijtimoiy soliq 12% (Kt 6710, 6520)</td><td style="text-align:right">${f(h.cost_labor)}</td></tr>
+                            <tr><td>Amortizatsiya (Kt 0230)</td><td style="text-align:right">${f(h.cost_amort)}</td></tr>
+                            <tr><td>Bilvosita xarajatlar (Kt 2510)</td><td style="text-align:right">${f(h.cost_overhead)}</td></tr>
+                            <tr><td><b>Jami sarf</b></td><td style="text-align:right"><b>${f(h.total + (h.cost_wip || 0) + (h.cost_brak || 0))}</b></td></tr>
+                            <tr><td>(-) Chala qoldiq (2010)</td><td style="text-align:right">${f(h.cost_wip)}</td></tr>
+                            <tr><td>(-) Yaroqsiz mahsulot (Brak 2610)</td><td style="text-align:right">${f(h.cost_brak)}</td></tr>
+                            <tr><td><b>Tayyor mahsulot tannarxi (Dt 2810 - Kt 2010)</b></td><td style="text-align:right"><b>${f(h.total)}</b></td></tr>
+                            <tr><td><b>1 birlik tannarxi</b></td><td style="text-align:right"><b>${f(h.unit_cost)}</b></td></tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex; justify-content:space-between; margin-top:40px;">
+                        <div>Tuzdi: __________________</div>
+                        <div>Bosh hisobchi: __________________</div>
+                    </div>
+                </div>
+            `;
+            document.body.classList.add('print-kalk');
+            window.addEventListener('afterprint', () => document.body.classList.remove('print-kalk'), { once: true });
             window.print();
         }
 
@@ -1040,6 +1119,8 @@
             </div>
         </div>
     </div>
+    <!-- KALKULYATSIYA CHOP ETISH VARAQASI -->
+    <div id="print-area"></div>
 </body>
 
 </html>

@@ -413,6 +413,17 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label>Kirim asosi (manba)</label>
+                                <select id="av-source">
+                                    <option value="6010">Mol yetkazib beruvchidan sotib olindi (Kt 6010)</option>
+                                    <option value="4610">Ta'sischi ustav kapitaliga hissa sifatida kiritdi (Kt 4610)</option>
+                                    <option value="5110">Bank hisobidan to'lab sotib olindi (Kt 5110)</option>
+                                    <option value="5010">Kassadan naqd to'lab sotib olindi (Kt 5010)</option>
+                                    <option value="8530">Tekin (bepul) olindi (Kt 8530)</option>
+                                </select>
+                            </div>
+                            <div id="av-prov" style="background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85rem;"></div>
+                            <div class="form-group">
                                 <label>Sotib Olish Sanasi</label>
                                 <input type="date" id="av-date" required>
                             </div>
@@ -738,18 +749,44 @@
             }
 
             // --- ASSET MANAGEMENT ---
+            // AV kirimi ikki bosqichda: avval 0820 (kapital qo'yilma), so'ng foydalanishga topshirilganda AV schyotiga
+            function kirimProvodkalari(a) {
+                const src = a.source || '6010';
+                return [
+                    { dt: '0820', kt: src, sum: a.cost, izoh: "Kapital qo'yilma sifatida qabul qilindi" },
+                    { dt: a.account, kt: '0820', sum: a.cost, izoh: 'Foydalanishga topshirildi' }
+                ];
+            }
+            function provodkaNamunasi() {
+                const box = document.getElementById('av-prov');
+                if (!box) return;
+                const a = {
+                    account: document.getElementById('av-group').value,
+                    source: document.getElementById('av-source').value,
+                    cost: parseFloat(document.getElementById('av-cost').value) || 0
+                };
+                box.innerHTML = '<b>Provodkalar:</b><br>' + kirimProvodkalari(a).map((p, k) =>
+                    `${k + 1}) Dt ${p.dt} - Kt ${p.kt} — ${p.sum.toLocaleString()} so'm <span style="color:#64748b">(${p.izoh})</span>`).join('<br>');
+            }
+            setTimeout(provodkaNamunasi, 0);
+            ['av-group', 'av-source', 'av-cost'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', provodkaNamunasi); el.addEventListener('input', provodkaNamunasi); }
+            });
+
             document.getElementById('av-kirim-form').onsubmit = function (e) {
                 e.preventDefault();
 
                 const method = document.getElementById('av-method').value;
                 const paramValue = parseFloat(document.getElementById('av-rate').value);
-                const salvage = parseFloat(document.getElementById('av-salvage').value) || 0;
+                const salvage = method === 'straight_rate' ? 0 : (parseFloat(document.getElementById('av-salvage').value) || 0); // straight_rate uchun maydon yashirin
 
                 const asset = {
                     id: editingId || Date.now(),
                     inv: document.getElementById('av-inv').value,
                     name: document.getElementById('av-name').value,
                     account: document.getElementById('av-group').value,
+                    source: document.getElementById('av-source').value,
                     date: document.getElementById('av-date').value,
                     cost: parseFloat(document.getElementById('av-cost').value),
                     method: method,
@@ -766,13 +803,14 @@
                 if (editingId) {
                     const old = assets.find(a => a.id === editingId);
                     if (old) asset.accumulatedDepr = old.accumulatedDepr;
+                    if (old && old.deprMonths) asset.deprMonths = old.deprMonths;
 
                     const idx = assets.findIndex(a => a.id === editingId);
                     assets[idx] = asset;
                     addLog(`Tahrirlandi: ${asset.name} (${asset.inv})`);
                 } else {
                     assets.push(asset);
-                    addLog(`Kirim qilindi: ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm`);
+                    addLog(`Kirim qilindi: ${asset.name} (${asset.inv}) - ${asset.cost.toLocaleString()} so'm. Provodkalar: ` + kirimProvodkalari(asset).map(p => `Dt ${p.dt} Kt ${p.kt}`).join('; '));
                 }
 
                 saveData();
@@ -788,7 +826,13 @@
                 let totalInitial = 0;
                 let totalDepr = 0;
 
-                assets.filter(a => a.status === 'Active').forEach(a => {
+                const searchQuery = document.getElementById('search').value.toLowerCase();
+                const filteredAssets = assets.filter(a =>
+                    a.status === 'Active' &&
+                    (a.name.toLowerCase().includes(searchQuery) || a.inv.toLowerCase().includes(searchQuery))
+                );
+
+                filteredAssets.forEach(a => {
                     const bookValue = a.cost - a.accumulatedDepr;
                     totalInitial += a.cost;
                     totalDepr += a.accumulatedDepr;
@@ -800,8 +844,8 @@
                     <td>${a.date}</td>
                     <td><span class="badge">${a.account}</span></td>
                     <td class="num-col">${a.cost.toLocaleString()}</td>
-                    <td class="num-col" style="color:var(--danger-color)">${a.accumulatedDepr.toLocaleString()}</td>
-                    <td class="num-col" style="color:var(--success-color)">${bookValue.toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--danger-color)">${Math.round(a.accumulatedDepr).toLocaleString()}</td>
+                    <td class="num-col" style="color:var(--success-color)">${Math.round(bookValue).toLocaleString()}</td>
                     <td class="no-print">
                         <button onclick="editAsset(${a.id})" class="btn btn-sm btn-secondary">✏️</button>
                         <button onclick="deleteAsset(${a.id})" class="btn btn-sm" style="background:#fee2e2; color:red;">🗑️</button>
@@ -812,9 +856,12 @@
 
                 // Update Summary
                 document.getElementById('sum-initial').innerText = totalInitial.toLocaleString() + " so'm";
-                document.getElementById('sum-deprey').innerText = totalDepr.toLocaleString() + " so'm";
-                document.getElementById('sum-book').innerText = (totalInitial - totalDepr).toLocaleString() + " so'm";
+                document.getElementById('sum-deprey').innerText = Math.round(totalDepr).toLocaleString() + " so'm";
+                document.getElementById('sum-book').innerText = Math.round(totalInitial - totalDepr).toLocaleString() + " so'm";
             }
+
+            // Search listener
+            document.getElementById('search').addEventListener('input', renderAssets);
 
             // --- EDITING ---
             function editAsset(id) {
@@ -827,6 +874,7 @@
                 document.getElementById('av-inv').value = a.inv;
                 document.getElementById('av-name').value = a.name;
                 document.getElementById('av-group').value = a.account;
+                document.getElementById('av-source').value = a.source || '6010';
                 document.getElementById('av-date').value = a.date;
                 document.getElementById('av-cost').value = a.cost;
 
@@ -841,13 +889,16 @@
                 document.getElementById('av-rate').value = (a.method && a.method !== 'straight_rate') ? a.life : (a.rate || 15);
 
                 document.getElementById('btn-save').innerText = "💾 O'zgartirish";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'block';
             }
 
             function cancelEdit() {
                 editingId = null;
                 document.getElementById('av-kirim-form').reset();
+                document.getElementById('av-method').onchange(); // label va qoldiq maydonini qayta tiklash
                 document.getElementById('btn-save').innerText = "💾 Saqlash";
+                provodkaNamunasi();
                 document.getElementById('btn-cancel').style.display = 'none';
                 document.getElementById('av-date').value = new Date().toISOString().split('T')[0];
             }
@@ -870,10 +921,20 @@
 
                 let monthTotal = 0;
                 let count = 0;
+                let skippedDone = 0;
+                let skippedNew = 0;
 
                 assets.forEach(a => {
                     const method = a.method || 'straight_rate';
                     const salvage = a.salvage || 0;
+                    const doneMonths = a.deprMonths || [];
+
+                    if (a.status === 'Active') {
+                        // Shu oy uchun allaqachon hisoblangan bo'lsa - qayta hisoblanmaydi
+                        if (doneMonths.includes(month)) { skippedDone++; return; }
+                        // Eskirish kirim qilingan oydan keyingi oydan boshlanadi
+                        if ((a.date || '').slice(0, 7) >= month) { skippedNew++; return; }
+                    }
 
                     if (a.status === 'Active' && a.accumulatedDepr < a.cost - salvage) {
                         let actualCharge = 0;
@@ -915,6 +976,7 @@
 
                         if (actualCharge > 0) {
                             a.accumulatedDepr += actualCharge;
+                            a.deprMonths = doneMonths.concat(month);
                             monthTotal += actualCharge;
                             count++;
                         }
@@ -923,7 +985,10 @@
 
                 addLog(`Eskirish hisoblandi: ${month} - ${count} ta AV, Jami: ${monthTotal.toLocaleString()} so'm`);
                 saveData();
-                alert(`Muvaffaqiyatli! Jami hisoblangan eskirish: ${monthTotal.toLocaleString()} so'm`);
+                let note = '';
+                if (skippedDone) note += `\n${skippedDone} ta AV uchun ${month} oyi bo'yicha eskirish avval hisoblangan - qayta hisoblanmadi.`;
+                if (skippedNew) note += `\n${skippedNew} ta AV ${month} oyida yoki undan keyin kirim qilingan - eskirish keyingi oydan boshlanadi.`;
+                alert(`Muvaffaqiyatli! Jami hisoblangan eskirish: ${monthTotal.toLocaleString()} so'm` + note);
             };
 
             // LOGGING
@@ -988,7 +1053,8 @@
                 { q: "Hisobdan chiqarilgan noutbuk kompyuterning (0150) eskirishi (3,500,000 so'm) hisobdan o'chirildi", dt: "0250", kt: "9210", sum: 3500000 },
 
                 // === TA'SISCHI HISSASI — BINO (0120) ===
-                { q: "Ta'sischidan ustav kapitaliga ma'muriy bino (0120) qabul qilindi (500,000,000 so'm)", dt: "0120", kt: "4610", sum: 500000000 },
+                { q: "Ta'sischidan ustav kapitaliga ma'muriy bino qabul qilindi (kapital qo'yilma sifatida) (500,000,000 so'm)", dt: "0820", kt: "4610", sum: 500000000 },
+                { q: "Ta'sischidan qabul qilingan ma'muriy bino (0120) foydalanishga topshirildi (500,000,000 so'm)", dt: "0120", kt: "0820", sum: 500000000 },
 
                 // === SOTISH — TRANSPORT (0160) ===
                 { q: "Korxona avtomobili (Transport vositasi, 0160) sotildi (100,000,000 so'm)", dt: "9210", kt: "0160", sum: 100000000 },
@@ -999,8 +1065,11 @@
 
             let currentQIndex = 0;
 
+            let quizTemplate = null;
             function openQuiz() {
                 currentQIndex = 0;
+                const qc = document.getElementById('quiz-content');
+                if (quizTemplate === null) quizTemplate = qc.innerHTML; else if (!document.getElementById('q-text')) qc.innerHTML = quizTemplate;
                 document.getElementById('quiz-modal').style.display = 'flex';
                 loadQuestion();
             }

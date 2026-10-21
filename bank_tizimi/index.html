@@ -476,8 +476,6 @@
 
 <body>
 
-    <body>
-
         <!-- LOGIN MODAL -->
         <div class="modal-overlay" id="login-modal">
             <div class="login-modal-box">
@@ -487,7 +485,6 @@
                 <input type="text" id="group-input" placeholder="Guruh (Masalan: 304-guruh)">
                 <button onclick="loginUser()">Boshlash</button>
             </div>
-        </div>
         </div>
 
         <!-- USER DISPLAY -->
@@ -580,7 +577,7 @@
                 <!-- 2. PAYMENT ORDER (PLATYOJKA) -->
                 <div id="view-payment" class="view-section" style="display:none;">
                     <div class="content-card">
-                        <h3 class="section-title">To'lov Topshiriqnomasi Yaratish (Chiqim)</h3>
+                        <h3 class="section-title" id="payment-title">To'lov Topshiriqnomasi Yaratish (Chiqim)</h3>
                         <form id="payment-form">
                             <div class="form-grid">
                                 <div class="form-group">
@@ -988,11 +985,8 @@
                 cancelEdit(); // Resets form and ID
                 document.getElementById('p-date').value = date; // Keep date for convenience
 
-                if (!editingTxId) {
-                    // Only redirect if it was a new creation, or stay if edit? 
-                    // Let's go to history to see changes
-                    showView('history');
-                }
+                // Go to history to see changes (both after create and after edit)
+                showView('history');
             };
 
             function editTransaction(id) {
@@ -1020,7 +1014,7 @@
                 document.getElementById('p-purpose').value = tx.purpose;
 
                 // Change UI
-                document.querySelector('.section-title').innerText = "To'lov Topshiriqnomasi (Tahrirlash)";
+                document.getElementById('payment-title').innerText = "To'lov Topshiriqnomasi (Tahrirlash)";
                 document.getElementById('submit-btn').innerText = "💾 Saqlash";
                 document.getElementById('submit-btn').classList.remove('btn-primary');
                 document.getElementById('submit-btn').classList.add('btn-success');
@@ -1031,7 +1025,7 @@
                 document.getElementById('payment-form').reset();
 
                 // Reset UI
-                document.querySelector('.section-title').innerText = "To'lov Topshiriqnomasi Yaratish (Chiqim)";
+                document.getElementById('payment-title').innerText = "To'lov Topshiriqnomasi Yaratish (Chiqim)";
                 document.getElementById('submit-btn').innerText = "To'lash va Saqlash";
                 document.getElementById('submit-btn').classList.add('btn-primary');
                 document.getElementById('submit-btn').classList.remove('btn-success');
@@ -1349,7 +1343,6 @@
                 document.body.removeChild(link);
             }
         </script>
-    </body>
 
     <script>
         // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
@@ -1367,9 +1360,13 @@
         ];
 
         let currentQIndex = 0;
+        let quizTemplate = null;
 
         function openQuiz() {
             currentQIndex = 0;
+            const qc = document.getElementById('quiz-content');
+            if (quizTemplate === null) quizTemplate = qc.innerHTML;
+            else if (!document.getElementById('q-text')) qc.innerHTML = quizTemplate;
             document.getElementById('quiz-modal').style.display = 'flex';
             loadQuestion();
         }
