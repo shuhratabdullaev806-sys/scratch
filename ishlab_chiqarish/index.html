@@ -381,6 +381,7 @@
         <div class="tabs no-print">
             <button class="tab-btn active" onclick="setTab('materials')">📦 Xomashyo Baza</button>
             <button class="tab-btn" onclick="setTab('production')">⚙️ Ishlab Chiqarish</button>
+            <button class="tab-btn" onclick="setTab('goods')">🏭 Tayyor Mahsulot (2810)</button>
             <button class="tab-btn" onclick="setTab('history')">📜 Tarix</button>
         </div>
 
@@ -410,14 +411,50 @@
                 </form>
             </div>
 
+            <div class="card no-print">
+                <h3 class="section-title">Xomashyo Kirimi (Dt 1010 - Kt 6010)</h3>
+                <form id="rcpt-form" class="form-row" style="align-items:end;">
+                    <div>
+                        <label>Sana</label>
+                        <input type="date" id="r-date" required>
+                    </div>
+                    <div>
+                        <label>Xomashyo</label>
+                        <select id="r-mat" required></select>
+                    </div>
+                    <div>
+                        <label>Miqdori</label>
+                        <input type="number" id="r-qty" placeholder="100" min="0" step="any" required>
+                    </div>
+                    <div>
+                        <label>Narxi (1 birlik uchun)</label>
+                        <input type="number" id="r-price" placeholder="yoki jami summani kiriting" min="0" step="any">
+                    </div>
+                    <div>
+                        <label>Jami summa</label>
+                        <input type="number" id="r-total" placeholder="Avto (miqdor x narx)" min="0" step="any">
+                    </div>
+                    <div>
+                        <label>Yetkazib beruvchi (ixtiyoriy)</label>
+                        <input type="text" id="r-supplier" placeholder="Masalan: Don Mahsulot MChJ">
+                    </div>
+                    <button type="submit" class="btn btn-success">📥 Kirim qilish</button>
+                </form>
+            </div>
+
             <div class="card">
-                <h3 class="section-title">Xomashyolar Ro'yxati</h3>
+                <h3 class="section-title">Xomashyolar Ro'yxati va Qoldiqlari (1010)</h3>
+                <p style="margin:0 0 10px; font-size:0.85rem; color:#78350f;">Ishlab chiqarishga berilgan xomashyo
+                    <b>o'rtacha tannarx</b> usulida baholanadi: qoldiq summasi / qoldiq miqdori.</p>
                 <table>
                     <thead>
                         <tr>
                             <th>Nomi</th>
                             <th>Birlik</th>
                             <th class="num-col">Narx (so'm)</th>
+                            <th class="num-col">Qoldiq miqdor</th>
+                            <th class="num-col">Qoldiq summa</th>
+                            <th class="num-col">O'rtacha tannarx</th>
                             <th class="no-print">Amal</th>
                         </tr>
                     </thead>
@@ -433,7 +470,12 @@
                 <div
                     style="margin-bottom:20px; padding:10px; background:#fff7ed; border-left:4px solid var(--primary-color);">
                     <strong>Jarayon:</strong> Mahsulot nomini kiriting, keyin unga ketadigan xarajatlarni (xomashyo, ish
-                    haqi, boshqa) qo'shing. Tizim tannarxni hisoblaydi.
+                    haqi, boshqa) qo'shing. Tizim tannarxni hisoblaydi.<br>
+                    <small>Saqlashda xomashyo qoldig'i tekshiriladi va <b>o'rtacha tannarx</b> bo'yicha ombordan
+                        chiqariladi. Barcha xarajatlar Dt 2010 ga yig'iladi (Kt 1010, 6710, 6520, 0230, 2510). Brak
+                        summasi Dt 2610 Kt 2010 bilan chiqariladi, chala qoldiq (tugallanmagan ishlab chiqarish) 2010
+                        schyotida qoladi, qolgan tannarx Dt 2810 Kt 2010 bilan tayyor mahsulot omboriga
+                        o'tkaziladi.</small>
                 </div>
 
                 <div
@@ -459,6 +501,10 @@
                     <div>
                         <label>Ishlab Chiqarish Soni (Qancha?)</label>
                         <input type="number" id="prod-qty" value="100" min="1">
+                    </div>
+                    <div>
+                        <label>Sana</label>
+                        <input type="date" id="prod-date">
                     </div>
                 </div>
 
@@ -577,7 +623,45 @@
             </div>
         </div>
 
-        <!-- TAB 3: HISTORY -->
+        <!-- TAB 3: FINISHED GOODS (2810) -->
+        <div id="tab-goods" style="display:none;">
+            <div class="card no-print">
+                <h3 class="section-title">Sotishga Chiqim (Dt 9110 - Kt 2810)</h3>
+                <form id="sale-form" class="form-row" style="align-items:end;">
+                    <div>
+                        <label>Sana</label>
+                        <input type="date" id="s-date" required>
+                    </div>
+                    <div>
+                        <label>Tayyor mahsulot</label>
+                        <select id="s-product" required></select>
+                    </div>
+                    <div>
+                        <label>Miqdori (qoldiqdan oshmasin)</label>
+                        <input type="number" id="s-qty" placeholder="10" min="0" step="any" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">📤 Chiqim qilish</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3 class="section-title">Tayyor Mahsulot Ombori (2810)</h3>
+                <p style="margin:0 0 10px; font-size:0.85rem; color:#78350f;">Ishlab chiqarish yakunlanganda
+                    mahsulot haqiqiy tannarxda kirim qilinadi; chiqim o'rtacha tannarxda baholanadi.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mahsulot</th>
+                            <th class="num-col">Miqdor</th>
+                            <th class="num-col">1 birlik tannarxi</th>
+                            <th class="num-col">Jami summa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goods-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 4: HISTORY -->
         <div id="tab-history" style="display:none;">
             <div class="card">
                 <h3 class="section-title">Ishlab Chiqarish Tarixi</h3>
@@ -663,10 +747,110 @@
             materials = JSON.parse(localStorage.getItem('mfg_materials_' + currentUser) || '[]');
             history = JSON.parse(localStorage.getItem('mfg_history_' + currentUser) || '[]');
             recipes = JSON.parse(localStorage.getItem('mfg_recipes_' + currentUser) || '[]');
+            ['r-date', 's-date', 'prod-date'].forEach(id => { if (!document.getElementById(id).value) document.getElementById(id).value = todayStr(); });
             renderMaterials();
+            renderGoods();
             renderHistory();
             renderRecipesCombo();
         }
+
+        // --- OMBOR: qoldiqlar hujjatlardan (eskidan yangiga) o'rtacha tannarx bo'yicha hisoblanadi ---
+        const r2 = v => Math.round((v || 0) * 100) / 100;
+        const rq = v => Math.round((v || 0) * 1e6) / 1e6;
+        function todayStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        // Provodkali (yangi) hujjatlargina qoldiqqa ta'sir qiladi; eski kalkulyatsiyalar faqat ko'rsatiladi
+        function isStockDoc(h) { return Array.isArray(h.provodkalar); }
+        function computeStock() {
+            const mats = {}, goods = {};
+            const g = (o, k) => o[k] || (o[k] = { qty: 0, sum: 0 });
+            history.slice().reverse().forEach(h => {
+                if (!isStockDoc(h)) return;
+                if (h.type === 'kirim') { const s = g(mats, h.mat_id); s.qty += h.qty; s.sum += h.total; }
+                else if (h.type === 'sotish') { const s = g(goods, h.product); s.qty -= h.qty; s.sum -= h.total; }
+                else {
+                    (h.materials || []).forEach(m => { const s = g(mats, m.id); s.qty -= m.qty; s.sum -= m.total; });
+                    const s = g(goods, h.product); s.qty += h.qty; s.sum += h.total;
+                }
+            });
+            [mats, goods].forEach(o => Object.values(o).forEach(s => { s.qty = rq(s.qty); s.sum = r2(s.sum); }));
+            return { mats, goods };
+        }
+        // O'rtacha tannarx (qoldiq bo'lmasa — katalog narxi)
+        function matCost(m, stock) {
+            const s = (stock || computeStock()).mats[m.id];
+            return s && s.qty > 0 ? s.sum / s.qty : m.price;
+        }
+        // Qoldiqdan miqdor bo'yicha chiqim summasi (hammasi chiqsa — qoldiq summasi to'liq)
+        function issueSum(s, qty) {
+            return Math.abs(s.qty - qty) < 1e-9 ? r2(s.sum) : r2(qty * s.sum / s.qty);
+        }
+        function saveHistory() {
+            localStorage.setItem('mfg_history_' + currentUser, JSON.stringify(history));
+            renderMaterials();
+            renderGoods();
+            renderHistory();
+        }
+        function provHtml(list) {
+            return (list || []).map(p => `Dt ${p.dt} Kt ${p.kt}: ${p.sum.toLocaleString()}`).join('<br>');
+        }
+
+        document.getElementById('rcpt-form').onsubmit = function (e) {
+            e.preventDefault();
+            const m = materials.find(x => x.id == document.getElementById('r-mat').value);
+            const date = document.getElementById('r-date').value;
+            const qty = parseFloat(document.getElementById('r-qty').value);
+            const price = parseFloat(document.getElementById('r-price').value) || 0;
+            const totalIn = parseFloat(document.getElementById('r-total').value) || 0;
+            const supplier = document.getElementById('r-supplier').value.trim();
+            if (!m || !date || !qty || qty <= 0) { alert("Sana, xomashyo va miqdorni kiriting!"); return; }
+            const total = r2(totalIn > 0 ? totalIn : price * qty);
+            if (total <= 0) { alert("Narx (1 birlik) yoki jami summani kiriting!"); return; }
+            history.unshift({
+                id: Date.now(), type: 'kirim', date: date, mat_id: m.id, product: m.name, unit: m.unit,
+                qty: qty, total: total, unit_cost: total / qty, supplier: supplier,
+                provodkalar: [{ dt: '1010', kt: '6010', sum: total, izoh: `Xomashyo kirimi: ${m.name} ${qty} ${m.unit}${supplier ? ' (' + supplier + ')' : ''}` }]
+            });
+            saveHistory();
+            this.reset();
+            document.getElementById('r-date').value = date;
+            alert(`Kirim qilindi: ${m.name} ${qty} ${m.unit} = ${total.toLocaleString()} so'm (Dt 1010 Kt 6010)`);
+        };
+
+        function renderGoods() {
+            const goods = computeStock().goods;
+            const names = Object.keys(goods).filter(k => goods[k].qty > 0 || goods[k].sum !== 0);
+            document.getElementById('goods-tbody').innerHTML = names.map(k => `
+                <tr>
+                    <td><b>${k}</b></td>
+                    <td class="num-col">${goods[k].qty.toLocaleString()}</td>
+                    <td class="num-col">${(goods[k].qty > 0 ? goods[k].sum / goods[k].qty : 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                    <td class="num-col">${goods[k].sum.toLocaleString()}</td>
+                </tr>`).join('') || '<tr><td colspan="4" style="text-align:center; color:#9ca3af;">Tayyor mahsulot yo\'q</td></tr>';
+            document.getElementById('s-product').innerHTML = '<option value="">-- Mahsulot tanlang --</option>' +
+                names.filter(k => goods[k].qty > 0).map(k => `<option value="${k}">${k} (qoldiq: ${goods[k].qty})</option>`).join('');
+        }
+
+        document.getElementById('sale-form').onsubmit = function (e) {
+            e.preventDefault();
+            const product = document.getElementById('s-product').value;
+            const date = document.getElementById('s-date').value;
+            const qty = parseFloat(document.getElementById('s-qty').value);
+            if (!product || !date || !qty || qty <= 0) { alert("Sana, mahsulot va miqdorni kiriting!"); return; }
+            const s = computeStock().goods[product];
+            if (!s || qty > s.qty + 1e-9) { alert(`Omborda yetarli mahsulot yo'q! ${product}: qoldiq ${s ? s.qty : 0}, so'ralgan ${qty}`); return; }
+            const total = issueSum(s, qty);
+            history.unshift({
+                id: Date.now(), type: 'sotish', date: date, product: product, qty: qty, total: total, unit_cost: total / qty,
+                provodkalar: [{ dt: '9110', kt: '2810', sum: total, izoh: `Sotilgan mahsulot tannarxi hisobdan chiqarildi: ${product} ${qty}` }]
+            });
+            saveHistory();
+            this.reset();
+            document.getElementById('s-date').value = date;
+            alert(`Chiqim qilindi: ${product} ${qty} = ${total.toLocaleString()} so'm (Dt 9110 Kt 2810)`);
+        };
 
         function renderRecipesCombo() {
             const sel = document.getElementById('recipe-select');
@@ -723,6 +907,8 @@
 
             // Reconstruct currentMats deep copy
             currentMats = JSON.parse(JSON.stringify(r.mats));
+            const st = computeStock();
+            currentMats.forEach(l => { const m = materials.find(x => x.id == l.id); if (m) { l.price = r2(matCost(m, st)); l.total = r2(l.price * l.qty); } });
 
             document.getElementById('calc-labor').value = r.labor || '';
             document.getElementById('calc-amort').value = r.amort || '';
@@ -737,10 +923,11 @@
         function setTab(tab) {
             document.getElementById('tab-materials').style.display = tab === 'materials' ? 'block' : 'none';
             document.getElementById('tab-production').style.display = tab === 'production' ? 'block' : 'none';
+            document.getElementById('tab-goods').style.display = tab === 'goods' ? 'block' : 'none';
             document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none';
 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            const tabIdx = ['materials', 'production', 'history'].indexOf(tab);
+            const tabIdx = ['materials', 'production', 'goods', 'history'].indexOf(tab);
             document.querySelectorAll('.tab-btn')[tabIdx].classList.add('active');
 
             if (tab === 'production') updateMatSelect();
@@ -762,26 +949,42 @@
 
         function renderMaterials() {
             const tbody = document.getElementById('mat-tbody');
+            const st = computeStock().mats;
+            const f = v => (v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
             tbody.innerHTML = materials.map(m => `
                 <tr>
                     <td>${m.name}</td>
                     <td>${m.unit}</td>
                     <td class="num-col">${m.price.toLocaleString()}</td>
+                    <td class="num-col">${f(st[m.id] ? st[m.id].qty : 0)}</td>
+                    <td class="num-col">${f(st[m.id] ? st[m.id].sum : 0)}</td>
+                    <td class="num-col">${st[m.id] && st[m.id].qty > 0 ? f(st[m.id].sum / st[m.id].qty) : '-'}</td>
                     <td class="no-print"><button onclick="delMat(${m.id})" style="color:red;border:none;background:none;cursor:pointer;">x</button></td>
                 </tr>
             `).join('');
+            document.getElementById('r-mat').innerHTML = '<option value="">-- Xomashyo tanlang --</option>' +
+                materials.map(m => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join('');
         }
         function saveMats() {
             if (!currentUser) return;
             localStorage.setItem('mfg_materials_' + currentUser, JSON.stringify(materials));
         }
-        function delMat(id) { if (confirm('Ochirilsinmi?')) { materials = materials.filter(x => x.id !== id); saveMats(); renderMaterials(); } }
+        function delMat(id) {
+            if (history.some(h => isStockDoc(h) && (h.type === 'kirim' ? h.mat_id == id : (h.materials || []).some(x => x.id == id)))) {
+                alert("Bu xomashyo bo'yicha ombor hujjatlari bor — o'chirib bo'lmaydi.");
+                return;
+            }
+            if (confirm('Ochirilsinmi?')) { materials = materials.filter(x => x.id !== id); saveMats(); renderMaterials(); } }
 
         // --- PRODUCTION CALC ---
         function updateMatSelect() {
             const sel = document.getElementById('calc-mat-select');
+            const st = computeStock();
             sel.innerHTML = '<option value="">-- Xomashyo tanlang --</option>' +
-                materials.map(m => `<option value="${m.id}">${m.name} (${m.price} so'm/${m.unit})</option>`).join('');
+                materials.map(m => {
+                    const s = st.mats[m.id];
+                    return `<option value="${m.id}">${m.name} (${r2(matCost(m, st))} so'm/${m.unit}, qoldiq: ${s ? s.qty : 0})</option>`;
+                }).join('');
         }
 
         function addMaterialToCalc() {
@@ -791,13 +994,14 @@
 
             const m = materials.find(x => x.id == id);
             if (!m) return;
+            const price = r2(matCost(m));
             currentMats.push({
                 id: m.id,
                 name: m.name,
                 unit: m.unit,
-                price: m.price,
+                price: price,
                 qty: qty,
-                total: m.price * qty
+                total: r2(price * qty)
             });
 
             renderCalcMats();
@@ -872,11 +1076,13 @@
 
             return {
                 id: Date.now(),
-                date: new Date().toLocaleDateString(),
+                date: document.getElementById('prod-date').value || todayStr(),
                 product: name,
                 qty: qty,
                 cost_mat: matTotal,
                 cost_labor: labor + social,
+                cost_wage: labor,
+                cost_social: social,
                 cost_amort: amort,
                 cost_overhead: overhead,
                 cost_wip: wip,
@@ -887,15 +1093,62 @@
             };
         }
 
+        // Ishlab chiqarish hujjati provodkalari (faqat summasi > 0 bo'lganlar)
+        function buildProdEntries(h) {
+            const p = [], add = (dt, kt, sum, izoh) => { sum = r2(sum); if (sum > 0) p.push({ dt, kt, sum, izoh }); };
+            add('2010', '1010', h.cost_mat, "Xomashyo ishlab chiqarishga berildi (o'rtacha tannarx)");
+            add('2010', '6710', h.cost_wage, "Ishlab chiqarish ishchilariga ish haqi hisoblandi");
+            add('2010', '6520', h.cost_social, "Ish haqidan ijtimoiy soliq (12%) hisoblandi");
+            add('2010', '0230', h.cost_amort, "Mashina va asbob-uskunalar eskirishi (amortizatsiya)");
+            add('2010', '2510', h.cost_overhead, "Umumishlab chiqarish xarajatlari taqsimlandi");
+            add('2610', '2010', h.cost_brak, "Yaroqsiz mahsulot (brak) hisobdan chiqarildi");
+            add('2810', '2010', h.total, `Tayyor mahsulot omborga kirim qilindi: ${h.product} (${h.qty})`);
+            return p;
+        }
+
         function saveProduction() {
+            const name = document.getElementById('prod-name').value.trim();
+            const qty = parseFloat(document.getElementById('prod-qty').value);
+            if (!name || !qty || qty <= 0) { alert("Mahsulot nomi va sonini kiriting!"); return; }
+            if (!document.getElementById('prod-date').value) { alert("Sanani kiriting!"); return; }
+
+            // Xomashyo qoldig'ini tekshirish
+            const stock = computeStock();
+            const need = {};
+            currentMats.forEach(l => need[l.id] = rq((need[l.id] || 0) + l.qty));
+            const short = Object.keys(need).map(id => {
+                const m = materials.find(x => x.id == id), s = stock.mats[id];
+                const have = s ? s.qty : 0;
+                return (!m || have + 1e-9 < need[id]) ? `• ${m ? m.name : 'O\'chirilgan xomashyo'}: kerak ${need[id]}, omborda ${have} ${m ? m.unit : ''}` : null;
+            }).filter(Boolean);
+            if (short.length) {
+                alert("Omborda xomashyo yetarli emas! Avval \"Xomashyo Kirimi\" hujjatini kiriting.\n" + short.join('\n'));
+                return;
+            }
+            // O'rtacha tannarx bo'yicha baholash
+            const work = {};
+            Object.keys(stock.mats).forEach(k => work[k] = { ...stock.mats[k] });
+            currentMats = currentMats.map(l => {
+                const s = work[l.id];
+                const price = r2(s.sum / s.qty), total = issueSum(s, l.qty);
+                s.qty = rq(s.qty - l.qty); s.sum = r2(s.sum - total);
+                return { ...l, price: price, total: total };
+            });
+            renderCalcMats();
+            updateTotals();
+
             const rec = collectCalc();
-            if (!rec.product || !rec.qty || rec.qty <= 0) { alert("Mahsulot nomi va sonini kiriting!"); return; }
+            rec.product = name;
             if (rec.total < 0) { alert("Xatolik: Chegirmalar (chala qoldiq va brak) jami sarfdan oshib ketdi!"); return; }
+            rec.type = 'ishlab';
+            rec.cost_mat = r2(rec.cost_mat);
+            rec.total = r2(rec.total);
+            rec.unit_cost = rec.total / rec.qty;
+            rec.provodkalar = buildProdEntries(rec);
 
             history.unshift(rec);
-
-            localStorage.setItem('mfg_history_' + currentUser, JSON.stringify(history));
-            alert("Ishlab chiqarish saqlandi! Tayyor mahsulot tannarxi hisoblandi.");
+            saveHistory();
+            alert("Ishlab chiqarish saqlandi! Xomashyo ombordan chiqarildi, tayyor mahsulot (2810) kirim qilindi.");
 
             // Reset
             currentMats = [];
@@ -914,7 +1167,18 @@
         // --- HISTORY ---
         function renderHistory() {
             const tbody = document.getElementById('hist-tbody');
-            tbody.innerHTML = history.map(h => `
+            const delBtn = h => `<button onclick="deleteHistory(${h.id})" class="btn-sm" style="background:#fee2e2; color:#b91c1c; border:none; padding:5px; border-radius:4px; cursor:pointer;" title="O'chirish">🗑️</button>`;
+            const ent = h => isStockDoc(h) && h.provodkalar.length ? `<div style="margin-top:4px; color:#1d4ed8;"><b>Provodkalar:</b><br>${provHtml(h.provodkalar)}</div>` : '';
+            tbody.innerHTML = history.map(h => (h.type === 'kirim' || h.type === 'sotish') ? `
+                <tr>
+                    <td>${h.date}</td>
+                    <td>${h.type === 'kirim' ? '📥 Xomashyo kirimi' : '📤 Sotishga chiqim'}: <b>${h.product}</b>${h.supplier ? `<br><small>${h.supplier}</small>` : ''}</td>
+                    <td>${h.qty} ${h.unit || ''}</td>
+                    <td class="num-col">${h.total.toLocaleString()}</td>
+                    <td class="num-col">${h.unit_cost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                    <td class="no-print"><small>${ent(h)}</small></td>
+                    <td class="no-print" style="white-space:nowrap;">${delBtn(h)}</td>
+                </tr>` : `
                 <tr>
                     <td>${h.date}</td>
                     <td><b>${h.product}</b></td>
@@ -929,21 +1193,27 @@
                             Bilvosita: ${h.cost_overhead.toLocaleString()}<br>
                             ${h.cost_wip ? `<i>Chala: -${h.cost_wip.toLocaleString()}</i><br>` : ''}
                             ${h.cost_brak ? `<i>Brak: -${h.cost_brak.toLocaleString()}</i>` : ''}
+                            ${ent(h)}
                         </small>
                     </td>
                     <td class="no-print" style="white-space:nowrap;">
                         <button onclick="printKalk(${h.id})" class="btn-sm" style="background:#e0f2fe; color:#0284c7; border:none; padding:5px; border-radius:4px; cursor:pointer;" title="Chop etish">🖨️</button>
-                        <button onclick="deleteHistory(${h.id})" class="btn-sm" style="background:#fee2e2; color:#b91c1c; border:none; padding:5px; border-radius:4px; cursor:pointer;" title="O'chirish">🗑️</button>
+                        ${delBtn(h)}
                     </td>
                 </tr>
             `).join('');
         }
 
         function deleteHistory(id) {
+            const h = history.find(x => x.id === id);
+            // Qoldiq va o'rtacha tannarx buzilmasligi uchun faqat eng oxirgi ombor hujjatini o'chirish mumkin
+            if (h && isStockDoc(h) && history.find(isStockDoc) !== h) {
+                alert("Ombor qoldig'i buzilmasligi uchun avval keyingi (yangiroq) ombor hujjatlarini o'chiring.");
+                return;
+            }
             if (confirm("Bu hujjatni o'chirishga ishonchingiz komilmi?")) {
                 history = history.filter(h => h.id !== id);
-                localStorage.setItem('mfg_history_' + currentUser, JSON.stringify(history));
-                renderHistory();
+                saveHistory();
             }
         }
 
@@ -958,6 +1228,7 @@
             if (document.getElementById('tab-production').style.display === 'block') {
                 const rec = collectCalc();
                 if (!rec.qty || rec.qty <= 0) { rec.qty = 1; rec.unit_cost = rec.total; }
+                rec.provodkalar = buildProdEntries(rec);
                 printKalkRecord(rec);
             } else {
                 window.print();
@@ -998,6 +1269,12 @@
                             <tr><td><b>1 birlik tannarxi</b></td><td style="text-align:right"><b>${f(h.unit_cost)}</b></td></tr>
                         </tbody>
                     </table>
+                    ${(h.provodkalar || []).length ? `
+                    <h4 style="margin:15px 0 5px;">Buxgalteriya provodkalari</h4>
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead><tr><th>Dt</th><th>Kt</th><th>Summa</th><th>Mazmuni</th></tr></thead>
+                        <tbody>${h.provodkalar.map(p => `<tr><td>${p.dt}</td><td>${p.kt}</td><td style="text-align:right">${f(p.sum)}</td><td>${p.izoh}</td></tr>`).join('')}</tbody>
+                    </table>` : ''}
                     <div style="display:flex; justify-content:space-between; margin-top:40px;">
                         <div>Tuzdi: __________________</div>
                         <div>Bosh hisobchi: __________________</div>
