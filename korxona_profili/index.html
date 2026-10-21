@@ -332,9 +332,7 @@
             <div id="header-student-info" class="student-display" style="display:none;">
                 👤 Talaba: <span id="disp_name">...</span> | Guruh: <span id="disp_group">...</span>
             </div>
-    </div>
-    </div>
-    </header>
+        </header>
 
     <form id="profileForm" onsubmit="event.preventDefault(); saveData();">
 
@@ -347,7 +345,7 @@
             </div>
             <div class="form-group">
                 <label>STIR (INN)</label>
-                <input type="number" id="company_inn" placeholder="9 xonalik son">
+                <input type="text" id="company_inn" inputmode="numeric" maxlength="9" placeholder="9 xonalik son">
             </div>
             <div class="form-group" style="grid-column: span 2;">
                 <label>Yuridik Manzil</label>
@@ -543,7 +541,7 @@
             const tbody = document.querySelector('#foundersTable tbody');
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td><input type="text" value="${name}" class="f_name" placeholder="F.I.Sh"></td>
+                <td><input type="text" value="${String(name).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}" class="f_name" placeholder="F.I.Sh"></td>
                 <td>
                     <select class="f_type">
                         <option value="physical" ${type === 'physical' ? 'selected' : ''}>Jismoniy Shaxs</option>
@@ -572,9 +570,20 @@
         // STORAGE LOGIC
         function saveData() {
             if (!currentUser) return;
+
+            // STIR: 9 ta raqam bo'lishi kerak (bo'sh qoldirish mumkin)
+            const inn = document.getElementById('company_inn').value.trim();
+            if (inn && !/^\d{9}$/.test(inn)) {
+                alert("STIR (INN) 9 ta raqamdan iborat bo'lishi kerak!");
+                document.getElementById('company_inn').focus();
+                return;
+            }
+
+            toggleAccountantField(); // Direktor nomi o'zgargan bo'lsa, buxgalter maydonini yangilash
+
             const data = {};
-            // Inputs
-            document.querySelectorAll('input:not(.f_name):not(.f_percent):not(.f_sum), select:not(.f_type), textarea').forEach(el => {
+            // Inputs (faqat profil formasi; login va test maydonlari saqlanmaydi)
+            document.querySelectorAll('#profileForm input:not(.f_name):not(.f_percent):not(.f_sum), #profileForm select:not(.f_type), #profileForm textarea').forEach(el => {
                 if (el.id) data[el.id] = el.value;
             });
 
@@ -603,7 +612,7 @@
             const raw = localStorage.getItem('company_profile_' + currentUser);
 
             // Clear inputs first
-            document.querySelectorAll('input:not(.f_name):not(.f_percent):not(.f_sum), select:not(.f_type), textarea').forEach(el => {
+            document.querySelectorAll('#profileForm input:not(.f_name):not(.f_percent):not(.f_sum), #profileForm select:not(.f_type), #profileForm textarea').forEach(el => {
                 if (el.id) {
                     if (el.tagName === 'SELECT') el.selectedIndex = 0;
                     else el.value = '';
@@ -625,7 +634,7 @@
             for (let key in data) {
                 if (key === 'founders') continue;
                 const el = document.getElementById(key);
-                if (el) el.value = data[key];
+                if (el && el.closest('#profileForm')) el.value = data[key]; // eski yozuvlardagi login/test maydonlari e'tiborsiz
             }
 
             // Founders

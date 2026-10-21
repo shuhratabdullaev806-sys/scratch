@@ -394,18 +394,19 @@
             <div class="card">
                 <div style="text-align:center; padding: 20px;">
                     <h2>🔒 Davrni Yopish (Zakritiya Perioda)</h2>
-                    <p>Ushbu funksiya barcha daromad (9000) va xarajat (9100, 9400, 9500, 9800) schyotlarini yopib,
-                        Moliyaviy Natijani
-                        (9910) aniqlaydi.</p>
+                    <p>Ushbu funksiya barcha daromad (9000, 9300, 9500) va xarajat (9100, 9400, 9600, 9800) schyotlarini
+                        yopib, Yakuniy Moliyaviy Natijani
+                        (9910) aniqlaydi (BHMS 21).</p>
 
                     <div
                         style="margin: 20px 0; background:#f0f9ff; padding:15px; border-left:4px solid #0284c7; text-align:left;">
                         <strong>Yopiladigan Schyotlar:</strong>
                         <ul>
-                            <li>Daromadlar: 9010, 9020, 9030, 9510, 9520, 9540 ... -> 9910 (Kreditlanadi)</li>
-                            <li>Xarajatlar: 9110, 9410, 9420, 9430, 9610, 9620 ... -> 9910 (Debetlanadi)</li>
-                            <li>Foyda Solig'i: 9810 -> 6410</li>
-                            <li>Sof Foyda: 9910 -> 8710 (Taqsimlanmagan foyda)</li>
+                            <li>Daromadlar (kredit qoldiq): 9010, 9020, 9030, 9310, 9390, 9510, 9520, 9540 ... -> Dt schyot, Kt 9910</li>
+                            <li>Xarajatlar (debet qoldiq): 9040, 9110, 9410, 9420, 9430, 9610, 9620 ... -> Dt 9910, Kt schyot</li>
+                            <li>9200, 9700 schyotlari ham qoldig'iga qarab 9910 ga yopiladi</li>
+                            <li>Foyda Solig'i: avval qo'lda Dt 9810 Kt 6410 kiritiladi, so'ng 9810 -> 9910 (Dt 9910, Kt 9810)</li>
+                            <li>Sof Foyda: Dt 9910, Kt 8710 (Taqsimlanmagan foyda); Zarar: Dt 8710, Kt 9910</li>
                         </ul>
                     </div>
 
@@ -479,7 +480,7 @@
             const name = document.getElementById('username-input').value.trim();
             const group = document.getElementById('group-input').value.trim();
 
-            if (name) {
+            if (name && group) {
                 currentUser = name;
                 sessionStorage.setItem('bk_user', name);
                 sessionStorage.setItem('bk_group', group);
@@ -521,6 +522,10 @@
             if (tab === 'mizan') renderMizan();
         }
 
+        function escHtml(v) {
+            return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
         // --- JOURNAL ---
         function addEntry() {
             const date = document.getElementById('p-date').value;
@@ -551,9 +556,9 @@
             <tr>
                 <td><small>${new Date(r.id).toLocaleTimeString()}</small></td>
                 <td>${r.date}</td>
-                <td>${r.desc}</td>
-                <td><b>${r.dt}</b></td>
-                <td><b>${r.kt}</b></td>
+                <td>${escHtml(r.desc)}</td>
+                <td><b>${escHtml(r.dt)}</b></td>
+                <td><b>${escHtml(r.kt)}</b></td>
                 <td class="num">${r.sum.toLocaleString()}</td>
                 <td class="no-print">
                     <button onclick="editEntry(${r.id})" class="btn" style="font-size:0.7rem; background:#f59e0b; padding:4px 8px;" title="Tahrirlash">✏️</button>
@@ -582,16 +587,16 @@
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <div class="form-group">
                             <label>Sana</label>
-                            <input type="date" id="edit-date" value="${entry.date}">
+                            <input type="date" id="edit-date" value="${escHtml(entry.date)}">
                         </div>
                         <div style="display:flex; gap:10px;">
                             <div class="form-group" style="flex:1;">
                                 <label>Debet (Schyot)</label>
-                                <input type="text" id="edit-dt" value="${entry.dt}">
+                                <input type="text" id="edit-dt" value="${escHtml(entry.dt)}">
                             </div>
                             <div class="form-group" style="flex:1;">
                                 <label>Kredit (Schyot)</label>
-                                <input type="text" id="edit-kt" value="${entry.kt}">
+                                <input type="text" id="edit-kt" value="${escHtml(entry.kt)}">
                             </div>
                         </div>
                         <div class="form-group">
@@ -600,7 +605,7 @@
                         </div>
                         <div class="form-group">
                             <label>Izoh / Mazmuni</label>
-                            <input type="text" id="edit-desc" value="${entry.desc}">
+                            <input type="text" id="edit-desc" value="${escHtml(entry.desc)}">
                         </div>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button onclick="saveEdit(${id})" class="btn btn-success" style="flex:1; padding:12px;">✅ Saqlash</button>
@@ -705,24 +710,16 @@
 
             let newEntries = [];
 
-            // 1. Close Income (90xx, 93xx, 95xx) -> 9910
-            // Expected Balance for Income is Credit (Kt > Dt). To close, we Debit Income, Credit 9910.
+            // BHMS 21: all result accounts 9010-9890 (90xx-98xx) are closed to 9910 by the sign of their balance.
+            // 1. Credit balance (income: 90xx, 93xx, 95xx, 9710 ...): Dt account, Kt 9910
+            // 2. Debit balance (expense: 9040/9050, 91xx, 94xx, 96xx, 9720, 98xx tax ...): Dt 9910, Kt account
             keys.forEach(k => {
-                if (k.startsWith('90') || k.startsWith('93') || k.startsWith('95')) {
-                    const bal = (accs[k].kt - accs[k].dt);
+                if (/^9[0-8]\d\d$/.test(k)) {
+                    const bal = accs[k].kt - accs[k].dt;
                     if (bal > 0) {
                         newEntries.push({ id: Date.now() + Math.random(), date, dt: k, kt: '9910', sum: bal, desc: 'Daromad yopilishi' });
-                    }
-                }
-            });
-
-            // 2. Close Expenses (91xx - COGS, 94xx - Period Exp, 96xx - Fin Exp, 98xx - Tax) -> 9910
-            // Expected Balance for Expense is Debit (Dt > Kt). To close, we Credit Expense, Debit 9910.
-            keys.forEach(k => {
-                if (k.startsWith('91') || k.startsWith('94') || k.startsWith('96') || k.startsWith('98')) {
-                    const bal = (accs[k].dt - accs[k].kt);
-                    if (bal > 0) {
-                        newEntries.push({ id: Date.now() + Math.random(), date, dt: '9910', kt: k, sum: bal, desc: 'Xarajat yopilishi' });
+                    } else if (bal < 0) {
+                        newEntries.push({ id: Date.now() + Math.random(), date, dt: '9910', kt: k, sum: -bal, desc: 'Xarajat yopilishi' });
                     }
                 }
             });
@@ -735,24 +732,16 @@
             // Apply first batch to calc profit
             journal.push(...newEntries);
 
-            // 3. Calculate Tax (9810) and Final Result (8710)
-            // Recalculate 9910 balance
-            const updatedAccs = getBalances(); // Need to re-run locally or simulate
-            // Let's rely on simple math from newEntries.
-
+            // 3. Final Result: whole 9910 balance -> 8710 (tax 9810 is already closed to 9910 above)
             let credit9910 = newEntries.filter(x => x.kt === '9910').reduce((a, b) => a + b.sum, 0); // Income
             let debit9910 = newEntries.filter(x => x.dt === '9910').reduce((a, b) => a + b.sum, 0); // Expense
 
-            let profit = credit9910 - debit9910;
+            const updatedAccs = getBalances();
+            let profit = updatedAccs['9910'] ? updatedAccs['9910'].kt - updatedAccs['9910'].dt : 0;
             let finalEntries = [];
 
             if (profit > 0) {
-                // Profit Tax (Simplified 12% or turnover tax? Let's assume standard profit tax entry if needed or skip)
-                // User requested: 9810 -> 6411? 
-                // If we have 9810 balance it should be closed. If we need to CALCULATE tax:
-                // "Foyda solig'ini hisoblab..."
-                // Let's assume 0 for now unless we add tax logic.
-                // Let's transfer Profit to 8710
+                // Net profit -> 8710 Taqsimlanmagan foyda
                 finalEntries.push({ id: Date.now() + Math.random(), date, dt: '9910', kt: '8710', sum: profit, desc: 'Sof foyda (8710 ga)' });
             } else if (profit < 0) {
                 // Loss
