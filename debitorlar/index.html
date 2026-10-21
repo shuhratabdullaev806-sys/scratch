@@ -731,15 +731,15 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-header"><div class="stat-icon" style="background:#ecfdf5;color:#10b981"><i class="fa-solid fa-file-invoice-dollar"></i></div></div>
-                    <div class="stat-label">Savdo (Kt 90)</div><div class="stat-value">${utils.formatMoney(totalInv)}</div>
+                    <div class="stat-label">Savdo (Kt 9010)</div><div class="stat-value">${utils.formatMoney(totalInv)}</div>
                 </div>
                  <div class="stat-card">
                     <div class="stat-header"><div class="stat-icon" style="background:#fef2f2;color:#ef4444"><i class="fa-solid fa-hand-holding-dollar"></i></div></div>
-                    <div class="stat-label">Undirilgan (Dt 51)</div><div class="stat-value">${utils.formatMoney(totalPay)}</div>
+                    <div class="stat-label">Undirilgan (Dt 5110)</div><div class="stat-value">${utils.formatMoney(totalPay)}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header"><div class="stat-icon" style="background:#fff7ed;color:#f97316"><i class="fa-solid fa-money-bill-trend-up"></i></div></div>
-                    <div class="stat-label">Qarzdorlik (Dt 40)</div><div class="stat-value">${utils.formatMoney(totalInv - totalPay)}</div>
+                    <div class="stat-label">Qarzdorlik (Dt 4010)</div><div class="stat-value">${utils.formatMoney(totalInv - totalPay)}</div>
                 </div>
             </div>
         `;
@@ -831,7 +831,7 @@
                                     <td>${x.clientName}</td>
                                     <td>${x.contract}</td>
                                     <td><strong>${utils.formatMoney(x.grandTotal)}</strong></td>
-                                    <td><span class="badge badge-blue">Dt 40 - Kt 90</span></td>
+                                    <td><span class="badge badge-blue" title="Dt 4010 - Xaridor va buyurtmachilardan olinadigan schyotlar / Kt 9010 - Tayyor mahsulot sotishdan daromad; QQS: Dt 4010 - Kt 6410">Dt 4010 - Kt 9010<br>QQS: Dt 4010 - Kt 6410</span></td>
                                     <td>
                                         <button class="btn-outline btn-sm" onclick="app.printInv('${x.id}')"><i class="fa-print fa-solid"></i></button>
                                         <button class="btn-outline btn-sm" onclick="app.editInvoice('${x.id}')"><i class="fa-edit fa-solid"></i></button>
@@ -1089,7 +1089,6 @@
 
                 closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
             };
-            window.onload = () => app.init();
         </script>
         <script>
             // --- QUIZ LOGIC (MINI-TRENAJYOR) ---
@@ -1107,9 +1106,13 @@
             ];
 
             let currentQIndex = 0;
+            let quizTemplate = null; // savol formasining asl HTML'i (tabrik ekranidan keyin tiklash uchun)
 
             function openQuiz() {
                 currentQIndex = 0;
+                const qc = document.getElementById('quiz-content');
+                if (quizTemplate === null) quizTemplate = qc.innerHTML;
+                else if (!document.getElementById('q-text')) qc.innerHTML = quizTemplate;
                 document.getElementById('quiz-modal').style.display = 'flex';
                 loadQuestion();
             }
@@ -1171,7 +1174,7 @@
                     <button class="btn-outline btn-sm" onclick="closeQuiz()">&times;</button>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body" id="quiz-content">
                     <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:20px; font-weight:bold; color:#1f2937;"
                         id="q-text">
                         Savol yuklanmoqda...

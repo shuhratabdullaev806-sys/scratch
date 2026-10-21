@@ -471,7 +471,10 @@
         </div>
 
         <div class="log-area" id="log-area">
-            <div style="font-weight:bold; margin-bottom:10px;">📋 Operatsiyalar Tarixi:</div>
+            <div style="font-weight:bold; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">📋 Operatsiyalar Tarixi:
+                <button onclick="resetSim()" title="Balansni boshlang'ich holatga qaytarish"
+                    style="font-size:0.8rem; padding:4px 10px; cursor:pointer; border:1px solid #cbd5e1; border-radius:6px; background:#fff;">🔄 Qayta boshlash</button>
+            </div>
         </div>
 
     </div>
@@ -571,6 +574,13 @@
             render();
         }
 
+        function resetSim() {
+            if (!currentUser) return;
+            if (!confirm("Barcha operatsiyalar o'chiriladi va balans boshlang'ich holatga qaytadi. Davom etasizmi?")) return;
+            localStorage.removeItem('sim_data_' + currentUser);
+            location.reload();
+        }
+
         function saveData() {
             if (!currentUser) return;
             localStorage.setItem('sim_data_' + currentUser, JSON.stringify(data));
@@ -644,7 +654,8 @@
             const area = document.getElementById('log-area');
             const d = new Date().toLocaleTimeString();
             const color = type === 'neutral' ? '#000' : (type === 'good' ? 'green' : 'red');
-            area.innerHTML = `<div class="log-entry"><span class="log-time">[${d}]</span> <span style="color:${color}">${msg}</span></div>` + area.innerHTML;
+            // Yangi yozuv sarlavhadan keyin (ro'yxat boshiga) qo'shiladi
+            area.firstElementChild.insertAdjacentHTML('afterend', `<div class="log-entry"><span class="log-time">[${d}]</span> <span style="color:${color}">${msg}</span></div>`);
         }
 
         function runOp(type) {
