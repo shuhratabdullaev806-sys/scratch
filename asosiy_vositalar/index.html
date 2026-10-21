@@ -383,6 +383,7 @@
                         <div class="tabs" style="flex-wrap: wrap;">
                             <button class="tab-btn active" onclick="showForm('kirim')">Kirim</button>
                             <button class="tab-btn" onclick="showForm('eskirish')">Eskirish</button>
+                            <button class="tab-btn" onclick="showForm('chiqim')">Chiqim</button>
                             <button class="tab-btn" onclick="showForm('mashq')"
                                 style="background:#f59e0b; color:white;">Mashq (4 usul)</button>
                         </div>
@@ -477,6 +478,43 @@
                             <button type="submit" class="btn"
                                 style="background:var(--warning-color); color:white; width:100%;">⚙️ Hisoblash va
                                 Saqlash</button>
+                        </form>
+
+                        <!-- CHIQIM FORM -->
+                        <form id="av-chiqim-form" style="display:none;">
+                            <h3 class="section-title">AV Chiqimi (Hisobdan chiqarish)</h3>
+                            <div class="form-group">
+                                <label>Asosiy vosita (faol)</label>
+                                <select id="av-ch-asset"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Chiqim Sanasi</label>
+                                <input type="date" id="av-ch-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Chiqim Turi</label>
+                                <select id="av-ch-turi">
+                                    <option value="sotish">Sotish</option>
+                                    <option value="tugatish">Tugatish (hisobdan chiqarish)</option>
+                                    <option value="bepul">Bepul berish</option>
+                                </select>
+                            </div>
+                            <div id="av-ch-sotish-group">
+                                <div class="form-group">
+                                    <label>Sotish narxi (QQSsiz, so'm)</label>
+                                    <input type="number" id="av-ch-narx" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                                        <input type="checkbox" id="av-ch-qqs" style="width:auto;"> QQS 12% hisoblansin (Kt 6410)</label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="av-ch-mat-group" style="display:none;">
+                                <label>Tugatishdan olingan yaroqli materiallar qiymati (so'm)</label>
+                                <input type="number" id="av-ch-mat" value="0" min="0">
+                            </div>
+                            <div id="av-ch-prov" style="background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px; padding:10px; margin-bottom:12px; font-size:0.85rem;"></div>
+                            <button type="submit" class="btn btn-primary">📤 Chiqim Qilish</button>
                         </form>
 
                         <!-- MASHQ FORM -->
@@ -719,11 +757,13 @@
                 const kirimForm = document.getElementById('av-kirim-form');
                 const calcForm = document.getElementById('av-calc-form');
                 const mashqForm = document.getElementById('av-mashq-form');
+                const chiqimForm = document.getElementById('av-chiqim-form');
                 const btns = document.querySelectorAll('.tab-btn');
 
                 kirimForm.style.display = 'none';
                 calcForm.style.display = 'none';
                 if (mashqForm) mashqForm.style.display = 'none';
+                chiqimForm.style.display = 'none';
 
                 btns.forEach(b => {
                     b.classList.remove('active');
@@ -733,16 +773,21 @@
                 if (type === 'kirim') {
                     kirimForm.style.display = 'block';
                     btns[0].classList.add('active');
-                    if (btns[2]) btns[2].style.opacity = '1';
+                    if (btns[3]) btns[3].style.opacity = '1';
                 } else if (type === 'eskirish') {
                     calcForm.style.display = 'block';
                     btns[1].classList.add('active');
-                    if (btns[2]) btns[2].style.opacity = '1';
+                    if (btns[3]) btns[3].style.opacity = '1';
+                } else if (type === 'chiqim') {
+                    chiqimForm.style.display = 'block';
+                    btns[2].classList.add('active');
+                    if (btns[3]) btns[3].style.opacity = '1';
+                    chiqimFormaTayyorla();
                 } else if (type === 'mashq') {
                     if (mashqForm) mashqForm.style.display = 'block';
-                    if (btns[2]) {
-                        btns[2].classList.add('active');
-                        btns[2].style.opacity = '1';
+                    if (btns[3]) {
+                        btns[3].classList.add('active');
+                        btns[3].style.opacity = '1';
                     }
                     if (Object.keys(currentMashq).length === 0) generateMashq();
                 }
@@ -800,10 +845,12 @@
                 // Calculate Accumulated Depr if editing? 
                 // If editing, we preserve old accumulated depr unless we want to reset?
                 // Let's assume editing is for typo correction, so we keep old accumulated value if exists.
+                asset.provodkalar = kirimProvodkalari(asset); // keyinchalik bosh kitobga o'tkazish uchun
                 if (editingId) {
                     const old = assets.find(a => a.id === editingId);
                     if (old) asset.accumulatedDepr = old.accumulatedDepr;
                     if (old && old.deprMonths) asset.deprMonths = old.deprMonths;
+                    if (old && old.chiqim) { asset.status = old.status; asset.chiqim = old.chiqim; }
 
                     const idx = assets.findIndex(a => a.id === editingId);
                     assets[idx] = asset;
@@ -828,29 +875,35 @@
 
                 const searchQuery = document.getElementById('search').value.toLowerCase();
                 const filteredAssets = assets.filter(a =>
-                    a.status === 'Active' &&
+                    (a.status === 'Active' || a.status === 'Chiqarilgan') &&
                     (a.name.toLowerCase().includes(searchQuery) || a.inv.toLowerCase().includes(searchQuery))
                 );
 
                 filteredAssets.forEach(a => {
                     const bookValue = a.cost - a.accumulatedDepr;
-                    totalInitial += a.cost;
-                    totalDepr += a.accumulatedDepr;
+                    const chiq = a.status === 'Chiqarilgan'; // chiqarilganlar ro'yxatda qoladi, jamiga kirmaydi
+                    if (!chiq) {
+                        totalInitial += a.cost;
+                        totalDepr += a.accumulatedDepr;
+                    }
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                     <td>${a.inv}</td>
-                    <td><b>${a.name}</b></td>
+                    <td><b>${a.name}</b>${chiq ? ` <span class="badge" style="background:#fee2e2; color:#b91c1c;">Chiqarilgan ${a.chiqim ? a.chiqim.date : ''}</span>` : ''}</td>
                     <td>${a.date}</td>
                     <td><span class="badge">${a.account}</span></td>
                     <td class="num-col">${a.cost.toLocaleString()}</td>
                     <td class="num-col" style="color:var(--danger-color)">${Math.round(a.accumulatedDepr).toLocaleString()}</td>
                     <td class="num-col" style="color:var(--success-color)">${Math.round(bookValue).toLocaleString()}</td>
                     <td class="no-print">
-                        <button onclick="editAsset(${a.id})" class="btn btn-sm btn-secondary">✏️</button>
+                        ${chiq ? `<button onclick="cancelChiqim(${a.id})" class="btn btn-sm btn-secondary" title="Chiqimni bekor qilish">↩️</button>`
+                        : `<button onclick="editAsset(${a.id})" class="btn btn-sm btn-secondary">✏️</button>
+                        <button onclick="chiqimOch(${a.id})" class="btn btn-sm btn-secondary" title="Chiqim qilish">📤</button>`}
                         <button onclick="deleteAsset(${a.id})" class="btn btn-sm" style="background:#fee2e2; color:red;">🗑️</button>
                     </td>
                 `;
+                    if (chiq) tr.style.opacity = '0.6';
                     tbody.appendChild(tr);
                 });
 
@@ -858,6 +911,7 @@
                 document.getElementById('sum-initial').innerText = totalInitial.toLocaleString() + " so'm";
                 document.getElementById('sum-deprey').innerText = Math.round(totalDepr).toLocaleString() + " so'm";
                 document.getElementById('sum-book').innerText = Math.round(totalInitial - totalDepr).toLocaleString() + " so'm";
+                chiqimRoyxati();
             }
 
             // Search listener
@@ -867,6 +921,7 @@
             function editAsset(id) {
                 const a = assets.find(x => x.id === id);
                 if (!a) return;
+                if (a.status === 'Chiqarilgan') { alert('Chiqarilgan aktivni tahrirlab bo\'lmaydi. Avval chiqimni bekor qiling.'); return; }
 
                 showForm('kirim');
                 editingId = id;
@@ -911,6 +966,98 @@
                     assets.splice(idx, 1);
                     saveData();
                 }
+            }
+
+            // --- CHIQIM (HISOBDAN CHIQARISH), BHMS 21 ---
+            // Chiqib ketish 9210 schyotida yig'iladi: foyda Kt 9310, zarar Dt 9430
+            function eskirishSchyoti(acc) { return acc[0] + String(+acc[1] + 1) + acc.slice(2); } // masalan 0130 -> 0230, 0410 -> 0510
+            function yaxlitla(x) { return Math.round((x || 0) * 100) / 100; }
+            // Kirim provodkalari: saqlangan bo'lsa o'shalar, eski yozuvlar uchun qayta hisoblanadi
+            function aktivKirimProvodkalari(a) { return a.provodkalar || kirimProvodkalari(a); }
+            function chiqimProvodkalari(a, d) {
+                const ch = '9210', depr = yaxlitla(a.accumulatedDepr);
+                const p = [{ dt: ch, kt: a.account, sum: yaxlitla(a.cost), izoh: "Boshlang'ich qiymat hisobdan chiqarildi" }];
+                if (depr > 0) p.push({ dt: eskirishSchyoti(a.account), kt: ch, sum: depr, izoh: "Jamg'arilgan eskirish hisobdan chiqarildi" });
+                if (d.turi === 'sotish') {
+                    p.push({ dt: '4010', kt: ch, sum: yaxlitla(d.narx + d.qqs), izoh: d.qqs ? 'Xaridorga sotildi (QQS bilan)' : 'Xaridorga sotildi' });
+                    if (d.qqs) p.push({ dt: ch, kt: '6410', sum: d.qqs, izoh: 'QQS hisoblandi (12%)' });
+                } else if (d.turi === 'tugatish' && d.material > 0) {
+                    p.push({ dt: '1010', kt: ch, sum: yaxlitla(d.material), izoh: 'Tugatishdan olingan yaroqli materiallar kirim qilindi' });
+                }
+                const natija = yaxlitla(p.reduce((s, x) => s + (x.kt === ch ? x.sum : 0) - (x.dt === ch ? x.sum : 0), 0));
+                if (natija > 0) p.push({ dt: ch, kt: '9310', sum: natija, izoh: 'Asosiy vositalar chiqib ketishidan foyda' });
+                else if (natija < 0) p.push({ dt: '9430', kt: ch, sum: -natija, izoh: 'Chiqib ketishdan zarar (boshqa operatsion xarajatlar)' });
+                return p;
+            }
+            const CHIQIM_TURLARI = { sotish: 'Sotish', tugatish: 'Tugatish (hisobdan chiqarish)', bepul: 'Bepul berish' };
+            function chiqimMalumoti() {
+                const turi = document.getElementById('av-ch-turi').value;
+                const narx = turi === 'sotish' ? (parseFloat(document.getElementById('av-ch-narx').value) || 0) : 0;
+                const qqs = turi === 'sotish' && document.getElementById('av-ch-qqs').checked ? yaxlitla(narx * 0.12) : 0;
+                const material = turi === 'tugatish' ? (parseFloat(document.getElementById('av-ch-mat').value) || 0) : 0;
+                return { date: document.getElementById('av-ch-date').value, turi: turi, narx: narx, qqs: qqs, material: material };
+            }
+            function chiqimRoyxati() {
+                const sel = document.getElementById('av-ch-asset');
+                if (!sel) return;
+                const old = sel.value;
+                sel.innerHTML = '<option value="">-- Faol aktivni tanlang --</option>' + assets.filter(a => a.status === 'Active').map(a =>
+                    `<option value="${a.id}">${a.inv} - ${a.name} (qoldiq: ${Math.round(a.cost - a.accumulatedDepr).toLocaleString()} so'm)</option>`).join('');
+                sel.value = old;
+                if (sel.value !== old) sel.value = '';
+                chiqimNamunasi();
+            }
+            function chiqimNamunasi() {
+                const box = document.getElementById('av-ch-prov');
+                if (!box) return;
+                const turi = document.getElementById('av-ch-turi').value;
+                document.getElementById('av-ch-sotish-group').style.display = turi === 'sotish' ? 'block' : 'none';
+                document.getElementById('av-ch-mat-group').style.display = turi === 'tugatish' ? 'block' : 'none';
+                const a = assets.find(x => String(x.id) === document.getElementById('av-ch-asset').value);
+                if (!a) { box.innerHTML = '<b>Provodkalar:</b><br><span style="color:#64748b">Avval aktivni tanlang</span>'; return; }
+                box.innerHTML = '<b>Provodkalar:</b><br>' + chiqimProvodkalari(a, chiqimMalumoti()).map((p, k) =>
+                    `${k + 1}) Dt ${p.dt} - Kt ${p.kt} — ${p.sum.toLocaleString()} so'm <span style="color:#64748b">(${p.izoh})</span>`).join('<br>');
+            }
+            ['av-ch-asset', 'av-ch-turi', 'av-ch-narx', 'av-ch-qqs', 'av-ch-mat'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.addEventListener('change', chiqimNamunasi); el.addEventListener('input', chiqimNamunasi); }
+            });
+            function chiqimFormaTayyorla() {
+                const dt = document.getElementById('av-ch-date');
+                if (!dt.value) dt.value = new Date().toISOString().split('T')[0];
+                chiqimRoyxati();
+            }
+            function chiqimOch(id) {
+                showForm('chiqim');
+                document.getElementById('av-ch-asset').value = id;
+                chiqimNamunasi();
+            }
+            document.getElementById('av-chiqim-form').onsubmit = function (e) {
+                e.preventDefault();
+                const a = assets.find(x => String(x.id) === document.getElementById('av-ch-asset').value);
+                if (!a || a.status !== 'Active') { alert('Iltimos, faol aktivni tanlang!'); return; }
+                const d = chiqimMalumoti();
+                if (!d.date) { alert('Chiqim sanasini kiriting!'); return; }
+                if (a.date && d.date < a.date) { alert("Chiqim sanasi kirim sanasidan oldin bo'lishi mumkin emas!"); return; }
+                if (d.turi === 'sotish' && !(d.narx > 0)) { alert('Sotish narxini kiriting!'); return; }
+                const provodkalar = chiqimProvodkalari(a, d);
+                if (!confirm(`"${a.name}" (${a.inv}) - ${CHIQIM_TURLARI[d.turi]} - chiqim qilinsinmi?`)) return;
+                a.status = 'Chiqarilgan';
+                a.chiqim = { date: d.date, turi: d.turi, narx: d.narx, qqs: d.qqs, material: d.material, provodkalar: provodkalar };
+                addLog(`Chiqim (${CHIQIM_TURLARI[d.turi]}): ${a.name} (${a.inv}). Provodkalar: ` + provodkalar.map(p => `Dt ${p.dt} Kt ${p.kt} ${p.sum.toLocaleString()}`).join('; '));
+                this.reset();
+                chiqimFormaTayyorla();
+            };
+            // Chiqimni bekor qilish: aktiv yana faol bo'ladi, bekor qilingan chiqim tarix uchun chiqimBekor ga ko'chiriladi
+            function cancelChiqim(id) {
+                const a = assets.find(x => x.id === id);
+                if (!a || a.status !== 'Chiqarilgan') return;
+                if (!confirm(`"${a.name}" chiqimi bekor qilinsinmi? Aktiv yana faol holatga qaytadi.`)) return;
+                const ch = a.chiqim || { provodkalar: [] };
+                a.chiqimBekor = (a.chiqimBekor || []).concat([Object.assign({}, ch, { bekorSana: new Date().toISOString().split('T')[0] })]);
+                delete a.chiqim;
+                a.status = 'Active';
+                addLog(`Chiqim bekor qilindi: ${a.name} (${a.inv}). Storno: ` + (ch.provodkalar || []).map(p => `Dt ${p.dt} Kt ${p.kt} ${p.sum.toLocaleString()}`).join('; '));
             }
 
             // --- DEPRECIATION LOGIC ---
