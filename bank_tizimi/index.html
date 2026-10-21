@@ -511,6 +511,11 @@
                     </button>
                 </li>
                 <li class="nav-item">
+                    <button class="nav-btn" onclick="showView('income')">
+                        📥 <span>Kirim (Tushum)</span>
+                    </button>
+                </li>
+                <li class="nav-item">
                     <button class="nav-btn" onclick="showView('history')">
                         📜 <span>Ko'chirma (Tarix)</span>
                     </button>
@@ -674,6 +679,114 @@
                                 <button type="submit" id="submit-btn" class="btn btn-primary">To'lash va
                                     Saqlash</button>
                                 <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Tozalash / Bekor
+                                    qilish</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 2b. INCOME (KIRIM / TUSHUM) -->
+                <div id="view-income" class="view-section" style="display:none;">
+                    <div class="content-card">
+                        <h3 class="section-title" id="income-title">Bankka Kirim (Tushum) Qayd Etish</h3>
+                        <form id="income-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Sana (bank ko'chirmasi bo'yicha)</label>
+                                    <input type="date" id="i-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>To'lov Hujjati Raqami (to'lovchiniki)</label>
+                                    <input type="text" id="i-num" required placeholder="Masalan: 245">
+                                </div>
+                            </div>
+
+                            <div class="form-grid"
+                                style="margin-top:1rem; border-top:1px dashed #cbd5e1; padding-top:1rem;">
+                                <!-- PAYER (KONTRAGENT) -->
+                                <div>
+                                    <h4 style="margin-top:0; color:var(--primary-dark)">To'lovchi (Kontragent)</h4>
+                                    <div class="form-group">
+                                        <label>Kontragentni tanlang</label>
+                                        <div style="display:flex; gap:5px;">
+                                            <select id="i-payer-select" onchange="fillPayerDetails()">
+                                                <option value="">Tanlang...</option>
+                                            </select>
+                                            <button type="button" class="btn btn-secondary"
+                                                onclick="showView('counterparties')" title="Yangi qo'shish">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nomi</label>
+                                        <input type="text" id="i-payer-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hisob Raqam</label>
+                                        <input type="text" id="i-payer-account" required placeholder="2020 ..."
+                                            maxlength="20">
+                                    </div>
+                                    <div class="form-group"
+                                        style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                        <div>
+                                            <label>MFO</label>
+                                            <input type="text" id="i-payer-mfo" required maxlength="5">
+                                        </div>
+                                        <div>
+                                            <label>STIR (INN)</label>
+                                            <input type="text" id="i-payer-inn" required maxlength="9">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PAYEE (BIZ) -->
+                                <div>
+                                    <h4 style="margin-top:0; color:var(--primary-dark)">Qabul Qiluvchi (Biz)</h4>
+                                    <div class="form-group">
+                                        <label>Nomi</label>
+                                        <input type="text" value="FAXR MADAD KONSALT" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hisob Raqam (20 talik)</label>
+                                        <input type="text" value="2020 8000 9000 0012 3456" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>MFO</label>
+                                        <input type="text" value="00450" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top:1rem;">
+                                <label>Kelib Tushgan Summa (so'm)</label>
+                                <input type="number" id="i-amount" min="1" step="0.01" required
+                                    style="font-size:1.2rem; font-weight:bold; color:#059669;">
+                            </div>
+                            <div class="form-group">
+                                <label>To'lov Maqsadi</label>
+                                <textarea id="i-purpose" rows="2" required
+                                    placeholder="Masalan: 15-sonli shartnoma bo'yicha mahsulot uchun to'lov..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Provodka Turi</label>
+                                <select id="i-type-code">
+                                    <option value="4010">Xaridordan sotilgan mahsulot/tovar uchun tushum (Dt 5110 - Kt 4010)</option>
+                                    <option value="6310">Xaridordan olingan bo'nak (avans) (Dt 5110 - Kt 6310)</option>
+                                    <option value="4610">Ta'sischining ustav kapitaliga ulushi (Dt 5110 - Kt 4610)</option>
+                                    <option value="6810">Qisqa muddatli bank krediti olindi (Dt 5110 - Kt 6810)</option>
+                                    <option value="5010">Kassadan bankka naqd pul topshirildi (Dt 5110 - Kt 5010)</option>
+                                    <option value="5710">Yo'ldagi pul (inkassatsiya) bankka tushdi (Dt 5110 - Kt 5710)</option>
+                                    <option value="9390">Boshqa operatsion daromad (jarima, penya) (Dt 5110 - Kt 9390)</option>
+                                </select>
+                            </div>
+
+                            <div class="accounting-hint">
+                                <strong>☝️ Buxgalteriya:</strong> Ushbu operatsiya <b>5110 (Hisob-kitob schyoti)</b>ni
+                                debetlaydi (pul kelib tushadi) va tanlangan schyotni kreditlaydi.
+                            </div>
+
+                            <div style="margin-top:2rem; display:flex; gap:1rem;">
+                                <button type="submit" id="i-submit-btn" class="btn btn-success">Kirimni Saqlash</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelIncomeEdit()">Tozalash / Bekor
                                     qilish</button>
                             </div>
                         </form>
@@ -863,10 +976,17 @@
 
                 // Set default date
                 document.getElementById('p-date').valueAsDate = new Date();
+                document.getElementById('i-date').valueAsDate = new Date();
 
                 // Set next doc number
-                const lastDoc = transactions.length > 0 ? Math.max(...transactions.map(t => parseInt(t.docNum || 0))) : 0;
+                const lastDoc = nextOutDocBase();
                 document.getElementById('p-num').value = lastDoc + 1;
+            }
+
+            // To'lov topshiriqnomasi raqami faqat chiqimlar bo'yicha (kirimda to'lovchining raqami yoziladi)
+            function nextOutDocBase() {
+                const outs = transactions.filter(t => t.type !== 'Kirim');
+                return outs.length > 0 ? Math.max(...outs.map(t => parseInt(t.docNum || 0) || 0)) : 0;
             }
 
             // --- NAVIGATION ---
@@ -880,8 +1000,9 @@
                 const btns = document.querySelectorAll('.nav-btn');
                 if (viewId === 'dashboard') btns[0].classList.add('active');
                 if (viewId === 'payment') btns[1].classList.add('active');
-                if (viewId === 'history') btns[2].classList.add('active');
-                if (viewId === 'counterparties') btns[3].classList.add('active');
+                if (viewId === 'income') btns[2].classList.add('active');
+                if (viewId === 'history') btns[3].classList.add('active');
+                if (viewId === 'counterparties') btns[4].classList.add('active');
             }
 
             // --- CORE FUNCTIONS ---
@@ -992,6 +1113,7 @@
             function editTransaction(id) {
                 const tx = transactions.find(t => t.id === id);
                 if (!tx) return;
+                if (tx.type === 'Kirim') { editIncome(tx); return; }
 
                 editingTxId = id;
 
@@ -1031,9 +1153,90 @@
                 document.getElementById('submit-btn').classList.remove('btn-success');
 
                 // Restore ID logic
-                const lastDoc = transactions.length > 0 ? Math.max(...transactions.map(t => parseInt(t.docNum || 0))) : 0;
+                const lastDoc = nextOutDocBase();
                 document.getElementById('p-num').value = lastDoc + 1;
                 document.getElementById('p-date').valueAsDate = new Date();
+            }
+
+            // --- INCOME (KIRIM) LOGIC ---
+            let editingIncomeId = null;
+
+            document.getElementById('income-form').onsubmit = function (e) {
+                e.preventDefault();
+                const amount = parseFloat(document.getElementById('i-amount').value);
+                const data = {
+                    docNum: document.getElementById('i-num').value.trim(),
+                    date: document.getElementById('i-date').value,
+                    payee: document.getElementById('i-payer-name').value,
+                    payeeDetails: {
+                        acc: document.getElementById('i-payer-account').value,
+                        mfo: document.getElementById('i-payer-mfo').value,
+                        inn: document.getElementById('i-payer-inn').value
+                    },
+                    amount: amount,
+                    purpose: document.getElementById('i-purpose').value,
+                    dt: '5110',
+                    kt: document.getElementById('i-type-code').value
+                };
+
+                if (editingIncomeId) {
+                    const index = transactions.findIndex(t => t.id === editingIncomeId);
+                    if (index === -1) return;
+                    const oldTx = transactions[index];
+                    // Kirim kamaytirilsa, allaqachon sarflangan pul tufayli qoldiq manfiy bo'lmasligi kerak
+                    if (balance - oldTx.amount + amount < 0) {
+                        alert("Bu o'zgarishdan keyin hisob raqam qoldig'i manfiy bo'lib qoladi!");
+                        return;
+                    }
+                    balance = balance - oldTx.amount + amount;
+                    transactions[index] = { ...oldTx, ...data };
+                    alert("O'zgarishlar saqlandi!");
+                } else {
+                    balance += amount;
+                    transactions.unshift({ id: Date.now(), type: 'Kirim', ...data });
+                }
+
+                saveTx();
+                const date = data.date;
+                cancelIncomeEdit();
+                document.getElementById('i-date').value = date;
+                showView('history');
+            };
+
+            function editIncome(tx) {
+                editingIncomeId = tx.id;
+                showView('income');
+                document.getElementById('i-num').value = tx.docNum || '';
+                document.getElementById('i-date').value = tx.date;
+                document.getElementById('i-payer-name').value = tx.payee;
+                document.getElementById('i-payer-account').value = (tx.payeeDetails && tx.payeeDetails.acc) || '';
+                document.getElementById('i-payer-mfo').value = (tx.payeeDetails && tx.payeeDetails.mfo) || '';
+                document.getElementById('i-payer-inn').value = (tx.payeeDetails && tx.payeeDetails.inn) || '';
+                document.getElementById('i-type-code').value = tx.kt || '4010';
+                document.getElementById('i-amount').value = tx.amount;
+                document.getElementById('i-purpose').value = tx.purpose;
+                document.getElementById('income-title').innerText = "Bankka Kirim (Tahrirlash)";
+                document.getElementById('i-submit-btn').innerText = "💾 Saqlash";
+            }
+
+            function cancelIncomeEdit() {
+                editingIncomeId = null;
+                document.getElementById('income-form').reset();
+                document.getElementById('income-title').innerText = "Bankka Kirim (Tushum) Qayd Etish";
+                document.getElementById('i-submit-btn').innerText = "Kirimni Saqlash";
+                document.getElementById('i-date').valueAsDate = new Date();
+            }
+
+            function fillPayerDetails() {
+                const id = document.getElementById('i-payer-select').value;
+                if (!id) return;
+                const c = counterparties.find(x => x.id == id);
+                if (c) {
+                    document.getElementById('i-payer-name').value = c.name;
+                    document.getElementById('i-payer-account').value = c.account;
+                    document.getElementById('i-payer-mfo').value = c.mfo;
+                    document.getElementById('i-payer-inn').value = c.inn;
+                }
             }
 
             // --- COUNTERPARTIES LOGIC ---
@@ -1184,13 +1387,15 @@
             };
 
             function updateCPSelect() {
-                const sel = document.getElementById('p-payee-select');
-                sel.innerHTML = '<option value="">Tanlang...</option>';
-                counterparties.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.text = c.name;
-                    sel.appendChild(opt);
+                ['p-payee-select', 'i-payer-select'].forEach(selId => {
+                    const sel = document.getElementById(selId);
+                    sel.innerHTML = '<option value="">Tanlang...</option>';
+                    counterparties.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.text = c.name;
+                        sel.appendChild(opt);
+                    });
                 });
             }
 
@@ -1268,24 +1473,29 @@
             function printPaymentOrder(tx) {
                 const div = document.getElementById('print-area');
                 const dateObj = new Date(tx.date);
+                const biz = { name: 'FAXR MADAD KONSALT', inn: '123456789', acc: '2020 8000 9000 0012 3456', bank: 'AT "XALQ BANKI" OPERU', mfo: '00450' };
+                const u = { name: tx.payee, inn: tx.payeeDetails.inn, acc: tx.payeeDetails.acc, bank: "Bank kodi bo'yicha filial", mfo: tx.payeeDetails.mfo };
+                const isIn = tx.type === 'Kirim';
+                const payer = isIn ? u : biz, payee = isIn ? biz : u;
 
                 div.innerHTML = `
                 <div class="po-container">
                     <div style="text-align:right; font-size:0.8rem;">0903802-shakl</div>
                     <h2 style="text-align:center; margin-bottom:5px;">TO'LOV TOPSHIRIQNOMASI № ${tx.docNum}</h2>
+                    ${isIn ? `<p style="text-align:center; margin:0; font-size:0.85rem;">(Kirim — bank ko'chirmasi asosida, Dt 5110 - Kt ${tx.kt})</p>` : ''}
                     <p style="text-align:center; margin-top:0;">${tx.date} yil</p>
 
                     <table class="po-table">
                          <tr>
                             <td width="5%"></td>
-                            <td width="45%">To'lovchi: <b>FAXR MADAD KONSALT</b></td>
-                            <td width="15%">STIR: 123456789</td>
-                            <td width="35%"><strong>DEBET</strong><br>H/R: 2020 8000 9000 0012 3456</td>
+                            <td width="45%">To'lovchi: <b>${payer.name}</b></td>
+                            <td width="15%">STIR: ${payer.inn}</td>
+                            <td width="35%"><strong>DEBET</strong><br>H/R: ${payer.acc}</td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td>Bank: AT "XALQ BANKI" OPERU</td>
-                            <td>Bank kodi: 00450</td>
+                            <td>Bank: ${payer.bank}</td>
+                            <td>Bank kodi: ${payer.mfo}</td>
                             <td>Summa: <b>${tx.amount.toLocaleString()}</b></td>
                         </tr>
                     </table>
@@ -1293,14 +1503,14 @@
                     <table class="po-table">
                          <tr>
                             <td width="5%"></td>
-                            <td width="45%">Qabul qiluvchi: <b>${tx.payee}</b></td>
-                            <td width="15%">STIR: ${tx.payeeDetails.inn}</td>
-                            <td width="35%"><strong>KREDIT</strong><br>H/R: ${tx.payeeDetails.acc}</td>
+                            <td width="45%">Qabul qiluvchi: <b>${payee.name}</b></td>
+                            <td width="15%">STIR: ${payee.inn}</td>
+                            <td width="35%"><strong>KREDIT</strong><br>H/R: ${payee.acc}</td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td>Bank: Bank kodi bo'yicha filial</td>
-                            <td>Bank kodi: ${tx.payeeDetails.mfo}</td>
+                            <td>Bank: ${payee.bank}</td>
+                            <td>Bank kodi: ${payee.mfo}</td>
                             <td>Summa: <b>${tx.amount.toLocaleString()}</b></td>
                         </tr>
                     </table>
