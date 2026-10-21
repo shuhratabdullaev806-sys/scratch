@@ -459,6 +459,8 @@
                 </li>
                 <li class="nav-item" onclick="app.navigate('payments')"><i class="fa-solid fa-money-bill-transfer"></i>
                     To'lovlar (Chiqim)</li>
+                <li class="nav-item" onclick="app.navigate('akt')"><i class="fa-solid fa-scale-balanced"></i>
+                    Akt Sverka</li>
                 <li class="nav-item" onclick="app.navigate('proxy')"><i class="fa-solid fa-file-signature"></i>
                     Ishonchnomalar (M-2)</li>
                 <li class="nav-item" onclick="app.navigate('partners')"><i class="fa-solid fa-building"></i>
@@ -519,7 +521,60 @@
         <script>
             const utils = {
                 fmtMoney: (n) => new Intl.NumberFormat('uz-UZ').format(n) + ' so\'m',
+                fmtNum: (n) => new Intl.NumberFormat('uz-UZ').format(n),
                 genId: () => Date.now().toString(36) + Math.random().toString(36).substr(2)
+            };
+
+            // --- BUXGALTERIYA PROVODKALARI (BHMS 21 schyotlar rejasi) ---
+            const ACCTS = {
+                '1010': 'Xomashyo va materiallar',
+                '2910': 'Tovarlar',
+                '0820': 'Asosiy vositalar (kapital qo\'yilma)',
+                '0830': 'Nomoddiy aktivlar (kapital qo\'yilma)',
+                '2010': 'Asosiy ishlab chiqarish (xizmat)',
+                '9410': 'Sotish xarajatlari (xizmat)',
+                '9420': 'Ma\'muriy xarajatlar (xizmat/kommunal)'
+            };
+            const PAY_KINDS = { payment: 'To\'lov (qarzni uzish)', advance: 'Bo\'nak (oldindan to\'lov)', offset: 'Bo\'nakni hisobga olish' };
+            const PAY_ACCTS = { '5110': 'Bank (hisob-kitob schyoti)', '5010': 'Kassa' };
+
+            const acc = {
+                r2: (n) => Math.round(n * 100) / 100,
+                calcVat(net, rate) { const vat = acc.r2(net * rate / 100); return { net, vat, gross: acc.r2(net + vat) }; },
+                // 'purchase' | 'payment' | 'advance' | 'offset' (eski to'lovlarda kind yo'q => 'payment')
+                kind: (t) => t.type === 'purchase' ? 'purchase' : (t.kind || 'payment'),
+                build(t) {
+                    const k = acc.kind(t);
+                    if (k === 'purchase') {
+                        const a = t.account || '1010';
+                        const name = 'Kirim: ' + (ACCTS[a] || a);
+                        // Eski yozuv (net yo'q): summa QQS bilan jami deb olinadi
+                        if (t.net === undefined || !t.vat) return [{ dt: a, kt: '6010', sum: t.amount, izoh: name }];
+                        if (t.vatPayer) return [
+                            { dt: a, kt: '6010', sum: t.net, izoh: name },
+                            { dt: '4410', kt: '6010', sum: t.vat, izoh: 'QQS hisobga olindi' }
+                        ];
+                        return [{ dt: a, kt: '6010', sum: t.amount, izoh: name + ' (QQS tannarxga kiritildi)' }];
+                    }
+                    const pa = t.payAcct || '5110';
+                    if (k === 'advance') return [{ dt: '4310', kt: pa, sum: t.amount, izoh: 'Ta\'minotchiga bo\'nak berildi' }];
+                    if (k === 'offset') return [{ dt: '6010', kt: '4310', sum: t.amount, izoh: 'Bo\'nak hisobga olindi' }];
+                    return [{ dt: '6010', kt: pa, sum: t.amount, izoh: 'Ta\'minotchiga to\'lov' }];
+                },
+                prov: (t) => Array.isArray(t.provodkalar) ? t.provodkalar : acc.build(t),
+                provHtml: (t) => acc.prov(t).map(p => `<div style="white-space:nowrap; font-size:0.8rem">Dt ${p.dt} Kt ${p.kt} — ${utils.fmtNum(p.sum)}</div>`).join(''),
+                // Ta'minotchi bo'yicha qoldiqlar: debt = 6010 kredit qoldig'i, adv = 4310 qoldig'i
+                bal(txs, vid) {
+                    let cr = 0, dr = 0, adv = 0;
+                    txs.filter(t => t.vendorId === vid).forEach(t => {
+                        const k = acc.kind(t), s = Number(t.amount) || 0;
+                        if (k === 'purchase') cr += s;
+                        else if (k === 'payment') dr += s;
+                        else if (k === 'advance') adv += s;
+                        else if (k === 'offset') { dr += s; adv -= s; }
+                    });
+                    return { debt: acc.r2(cr - dr), adv: acc.r2(adv) };
+                }
             };
 
             let currentUser = null;
@@ -612,6 +667,7 @@
                     if (view === 'dashboard') { t.innerText = 'Bosh sahifa'; this.renderDash(c); }
                     else if (view === 'registry') { t.innerText = 'Kiruvchi Hisob-fakturalar Reestri'; this.renderRegistry(c); }
                     else if (view === 'payments') { t.innerText = 'To\'lovlar (Kreditorlarga)'; this.renderPayments(c); }
+                    else if (view === 'akt') { t.innerText = 'Akt Sverka (Solishtirma dalolatnoma)'; this.renderAkt(c); }
                     else if (view === 'proxy') { t.innerText = 'Ishonchnomalar (M-2)'; this.renderProxy(c); }
                     else if (view === 'partners') { t.innerText = 'Ta\'minotchilar & Xodimlar'; this.renderPartners(c); }
                 },
@@ -621,11 +677,11 @@
                     const vendors = store.get('vendors');
                     const txs = store.get('txs');
 
-                    let totalDebt = 0;
+                    let totalDebt = 0, totalAdv = 0;
                     vendors.forEach(v => {
-                        const purchased = txs.filter(t => t.vendorId === v.id && t.type === 'purchase').reduce((s, t) => s + t.amount, 0);
-                        const paid = txs.filter(t => t.vendorId === v.id && t.type === 'payment').reduce((s, t) => s + t.amount, 0);
-                        totalDebt += (purchased - paid);
+                        const b = acc.bal(txs, v.id);
+                        totalDebt += b.debt;
+                        totalAdv += b.adv;
                     });
 
                     c.innerHTML = `
@@ -633,6 +689,10 @@
                 <div class="stat-card">
                     <span style="color:#64748b">Jami Kreditorlik Qarzi</span>
                     <div class="stat-value" style="color:#ef4444">${utils.fmtMoney(totalDebt)}</div>
+                </div>
+                <div class="stat-card">
+                    <span style="color:#64748b">Berilgan bo'naklar (4310)</span>
+                    <div class="stat-value" style="color:#0ea5e9">${utils.fmtMoney(totalAdv)}</div>
                 </div>
                 <div class="stat-card">
                     <span style="color:#64748b">Jami Hamkorlar</span>
@@ -645,14 +705,12 @@
                     <div class="card-title">Eng katta qarzlarimiz</div>
                 </div>
                 <table>
-                    <thead><tr><th>Ta'minotchi</th><th>Qarz Miqdori</th><th>Holat</th></tr></thead>
+                    <thead><tr><th>Ta'minotchi</th><th>Qarz Miqdori (6010)</th><th>Bo'nak (4310)</th><th>Holat</th></tr></thead>
                     <tbody>
                         ${vendors.map(v => {
-                        const p = txs.filter(t => t.vendorId === v.id && t.type === 'purchase').reduce((s, t) => s + t.amount, 0);
-                        const pay = txs.filter(t => t.vendorId === v.id && t.type === 'payment').reduce((s, t) => s + t.amount, 0);
-                        const bal = p - pay;
-                        if (bal <= 0) return '';
-                        return `<tr><td>${v.name}</td><td><b>${utils.fmtMoney(bal)}</b></td><td><span style="color:red">Qarzdormiz</span></td></tr>`;
+                        const b = acc.bal(txs, v.id);
+                        if (b.debt <= 0) return '';
+                        return `<tr><td>${v.name}</td><td><b>${utils.fmtMoney(b.debt)}</b></td><td>${b.adv ? utils.fmtMoney(b.adv) : '-'}</td><td><span style="color:red">Qarzdormiz</span></td></tr>`;
                     }).join('')}
                     </tbody>
                 </table>
@@ -672,8 +730,7 @@
                     <button class="btn btn-primary btn-sm" onclick="app.modalTx('purchase')"><i class="fa-solid fa-plus"></i> Yangi Faktura (Kirim)</button>
                 </div>
                 <table>
-                <table>
-                    <thead><tr><th>Sana</th><th>Faktura №</th><th>Shartnoma №</th><th>Ta'minotchi</th><th>Summa (Jami)</th><th>To'lov maqsad (Izoh)</th><th>Amallar</th></tr></thead>
+                    <thead><tr><th>Sana</th><th>Faktura №</th><th>Shartnoma №</th><th>Ta'minotchi</th><th>Summa (QQSsiz)</th><th>QQS</th><th>Summa (Jami)</th><th>Provodkalar</th><th>To'lov maqsad (Izoh)</th><th>Amallar</th></tr></thead>
                     <tbody>
                         ${txs.map(t => {
                         const v = vendors.find(x => x.id === t.vendorId) || {};
@@ -683,7 +740,10 @@
                                     <td>${t.docNumber}</td>
                                     <td>${t.contractBox || '-'}</td>
                                     <td>${v.name || 'Noma\'lum'}</td>
+                                    <td>${utils.fmtMoney(t.net !== undefined ? t.net : t.amount)}</td>
+                                    <td>${t.vat ? utils.fmtMoney(t.vat) + ' (' + t.vatRate + '%)' : 'QQSsiz'}</td>
                                     <td><strong>${utils.fmtMoney(t.amount)}</strong></td>
+                                    <td class="prov">${acc.provHtml(t)}</td>
                                     <td>${t.note || '-'}</td>
                                     <td>
                                         <button class="btn-outline btn-sm" onclick="app.editTx('${t.id}')"><i class="fa-edit fa-solid"></i></button>
@@ -708,7 +768,7 @@
                     <button class="btn btn-success btn-sm" onclick="app.modalTx('payment')"><i class="fa-solid fa-plus"></i> Yangi To'lov</button>
                 </div>
                 <table>
-                    <thead><tr><th>Sana</th><th>Ta'minotchi</th><th>Hujjat</th><th>Summa</th><th>Amallar</th></tr></thead>
+                    <thead><tr><th>Sana</th><th>Ta'minotchi</th><th>Hujjat</th><th>Turi</th><th>Summa</th><th>Provodka</th><th>Amallar</th></tr></thead>
                     <tbody>
                          ${txs.map(t => {
                         const v = vendors.find(x => x.id === t.vendorId) || {};
@@ -717,7 +777,9 @@
                                     <td>${t.date}</td>
                                     <td>${v.name || '-'}</td>
                                     <td>${t.docNumber}</td>
+                                    <td>${PAY_KINDS[acc.kind(t)]}</td>
                                     <td><strong>${utils.fmtMoney(t.amount)}</strong></td>
+                                    <td class="prov">${acc.provHtml(t)}</td>
                                     <td>
                                         <button class="btn-outline btn-sm" onclick="app.editTx('${t.id}')"><i class="fa-edit fa-solid"></i></button>
                                         <button class="btn-outline btn-sm" onclick="app.delTx('${t.id}', 'payments')" style="color:red"><i class="fa-trash fa-solid"></i></button>
@@ -733,8 +795,49 @@
                 modalTx(type, id) {
                     const tx = id ? store.get('txs').find(x => x.id === id) : { type };
                     const vendors = store.get('vendors');
+                    const isP = tx.type === 'purchase';
+                    const acct = tx.account || '1010';
+                    const rate = tx.vatRate !== undefined ? String(tx.vatRate) : (id ? '0' : '12');
+                    const net = tx.net !== undefined ? tx.net : (tx.amount || '');
+                    const payer = tx.vatPayer !== undefined ? tx.vatPayer : true;
+                    const kind = acc.kind(tx);
+                    const pa = tx.payAcct || '5110';
 
-                    document.getElementById('modalTitle').innerText = (id ? 'Tahrirlash: ' : 'Yangi: ') + (tx.type === 'purchase' ? 'Faktura' : 'To\'lov');
+                    const purchaseFields = `
+                <div class="form-group"><label class="form-label">Nima olindi (Debet schyoti)</label>
+                    <select name="account" class="form-control" onchange="app.calcTx(this.form)">
+                        ${Object.keys(ACCTS).map(a => `<option value="${a}" ${a === acct ? 'selected' : ''}>${a} — ${ACCTS[a]}</option>`).join('')}
+                    </select>
+                    <small style="color:#64748b">* Asosiy vositalar avval 0820 (kapital qo'yilmalar) orqali kirim qilinadi, foydalanishga topshirilgach Dt 01xx Kt 0820.</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Summa (QQSsiz)</label><input type="number" step="0.01" min="0" name="net" class="form-control" value="${net}" required oninput="app.calcTx(this.form)"></div>
+                    <div class="form-group"><label class="form-label">QQS stavkasi</label>
+                        <select name="vatRate" class="form-control" onchange="app.calcTx(this.form)">
+                            <option value="12" ${rate === '12' ? 'selected' : ''}>12%</option>
+                            <option value="0" ${rate === '0' ? 'selected' : ''}>0% (QQSsiz)</option>
+                        </select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">QQS summasi</label><input id="tx-vat" class="form-control" readonly style="background:#f8fafc"></div>
+                    <div class="form-group"><label class="form-label">Jami (QQS bilan)</label><input id="tx-gross" class="form-control" readonly style="background:#f8fafc; font-weight:600"></div>
+                </div>
+                <div class="form-group"><label><input type="checkbox" name="vatPayer" ${payer ? 'checked' : ''} onchange="app.calcTx(this.form)"> Korxona QQS to'lovchisi (QQS hisobga olinadi)</label></div>`;
+
+                    const paymentFields = `
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Operatsiya turi</label>
+                        <select name="kind" class="form-control" onchange="app.calcTx(this.form)">
+                            ${Object.keys(PAY_KINDS).map(k => `<option value="${k}" ${k === kind ? 'selected' : ''}>${PAY_KINDS[k]}</option>`).join('')}
+                        </select></div>
+                    <div class="form-group"><label class="form-label">To'lov usuli</label>
+                        <select name="payAcct" class="form-control" onchange="app.calcTx(this.form)">
+                            ${Object.keys(PAY_ACCTS).map(a => `<option value="${a}" ${a === pa ? 'selected' : ''}>${a} — ${PAY_ACCTS[a]}</option>`).join('')}
+                        </select></div>
+                </div>
+                <div class="form-group"><label class="form-label">Summa</label><input type="number" step="0.01" min="0" name="amount" class="form-control" value="${tx.amount || ''}" required oninput="app.calcTx(this.form)"></div>`;
+
+                    document.getElementById('modalTitle').innerText = (id ? 'Tahrirlash: ' : 'Yangi: ') + (isP ? 'Faktura' : 'To\'lov');
                     document.getElementById('modalBody').innerHTML = `
             <form onsubmit="app.saveTx(event)">
                 <input type="hidden" name="id" value="${tx.id || ''}">
@@ -751,12 +854,43 @@
                     <div class="form-group"><label class="form-label">Hujjat №</label><input name="docNumber" class="form-control" value="${tx.docNumber || ''}" required></div>
                 </div>
                 <div class="form-group"><label class="form-label">Shartnoma № (va sanasi)</label><input name="contractBox" class="form-control" value="${tx.contractBox || ''}" placeholder="Masalan: № 15 (10.01.20xx)"></div>
-                <div class="form-group"><label class="form-label">Summa</label><input type="number" name="amount" class="form-control" value="${tx.amount || ''}" required></div>
+                ${isP ? purchaseFields : paymentFields}
                 <div class="form-group"><label class="form-label">Izoh</label><input name="note" class="form-control" value="${tx.note || ''}"></div>
+                <div class="form-group" style="background:#f5f3ff; padding:0.75rem; border-radius:0.5rem">
+                    <div class="form-label">Provodkalar</div><div id="tx-prov"></div>
+                </div>
                 <button type="submit" class="btn btn-primary" style="width:100%">Saqlash</button>
             </form>
         `;
                     document.getElementById('formModal').classList.add('active');
+                    this.calcTx(document.querySelector('#modalBody form'));
+                },
+
+                // Formadan hujjat ma'lumotlarini yig'ish (QQS va provodkalar bilan)
+                readTx(form) {
+                    const fd = new FormData(form);
+                    const data = Object.fromEntries(fd.entries());
+                    if (data.type === 'purchase') {
+                        const c = acc.calcVat(parseFloat(data.net) || 0, parseFloat(data.vatRate) || 0);
+                        data.net = c.net; data.vat = c.vat; data.amount = c.gross;
+                        data.vatPayer = fd.has('vatPayer');
+                    } else {
+                        data.amount = parseFloat(data.amount) || 0;
+                    }
+                    data.provodkalar = acc.build(data);
+                    return data;
+                },
+
+                calcTx(form) {
+                    if (!form) return;
+                    const d = this.readTx(form);
+                    if (d.type === 'purchase') {
+                        document.getElementById('tx-vat').value = utils.fmtNum(d.vat);
+                        document.getElementById('tx-gross').value = utils.fmtNum(d.amount);
+                    } else {
+                        form.payAcct.disabled = d.kind === 'offset';
+                    }
+                    document.getElementById('tx-prov').innerHTML = d.provodkalar.map(p => `<div>Dt ${p.dt} Kt ${p.kt} — ${utils.fmtNum(p.sum)} <small style="color:#64748b">(${p.izoh})</small></div>`).join('');
                 },
 
                 editTx(id) {
@@ -766,9 +900,11 @@
 
                 saveTx(e) {
                     e.preventDefault();
-                    const fd = new FormData(e.target);
-                    const data = Object.fromEntries(fd.entries());
-                    data.amount = parseFloat(data.amount);
+                    const data = this.readTx(e.target);
+                    if (data.type === 'payment' && data.kind === 'offset') {
+                        const b = acc.bal(store.get('txs').filter(t => t.id !== data.id), data.vendorId);
+                        if (data.amount > b.adv) return alert('Bu ta\'minotchiga berilgan bo\'nak qoldig\'i: ' + utils.fmtMoney(b.adv) + '. Hisobga olinadigan summa undan oshmasligi kerak.');
+                    }
 
                     if (data.id) store.update('txs', data.id, data);
                     else { data.id = utils.genId(); store.add('txs', data); }
@@ -778,6 +914,100 @@
                 },
 
                 delTx(id, view) { if (confirm('O\'chirasizmi?')) { store.del('txs', id); this.render(view); } },
+
+                // --- AKT SVERKA (O'zaro hisob-kitoblarni solishtirish dalolatnomasi) ---
+                renderAkt(c) {
+                    const vendors = store.get('vendors');
+                    const today = new Date().toISOString().split('T')[0];
+                    c.innerHTML = `
+            <div class="card no-print">
+                <div class="card-header"><div class="card-title">Solishtirma dalolatnoma tuzish</div></div>
+                <div class="form-row" style="grid-template-columns: 2fr 1fr 1fr auto; align-items:end">
+                    <div class="form-group"><label class="form-label">Ta'minotchi</label>
+                        <select id="akt-v" class="form-control">
+                            <option value="">Tanlang...</option>
+                            ${vendors.map(v => `<option value="${v.id}">${v.name}</option>`).join('')}
+                        </select></div>
+                    <div class="form-group"><label class="form-label">Davr (dan)</label><input type="date" id="akt-from" class="form-control" value="${today.slice(0, 4)}-01-01"></div>
+                    <div class="form-group"><label class="form-label">Davr (gacha)</label><input type="date" id="akt-to" class="form-control" value="${today}"></div>
+                    <div class="form-group"><button class="btn btn-primary" onclick="app.buildAkt()">Shakllantirish</button></div>
+                </div>
+            </div>
+            <div id="akt-result"></div>
+        `;
+                },
+
+                buildAkt() {
+                    const vid = document.getElementById('akt-v').value;
+                    const from = document.getElementById('akt-from').value;
+                    const to = document.getElementById('akt-to').value;
+                    if (!vid) return alert('Ta\'minotchini tanlang!');
+                    if (!from || !to || from > to) return alert('Davrni to\'g\'ri kiriting!');
+                    this.aktHtmlCache = this.aktHtml(vid, from, to);
+                    document.getElementById('akt-result').innerHTML = `
+            <div class="card">
+                <div class="card-header no-print"><div class="card-title">Natija</div>
+                    <button class="btn btn-primary btn-sm" onclick="app.printAkt()"><i class="fa-solid fa-print"></i> Chop etish</button></div>
+                ${this.aktHtmlCache}
+            </div>`;
+                },
+
+                printAkt() {
+                    document.getElementById('printBody').innerHTML = this.aktHtmlCache || '';
+                    document.getElementById('printModal').classList.add('active');
+                },
+
+                // Bizning hisob (6010 + 4310) bo'yicha: Debet = to'lov/bo'nak, Kredit = kirim (QQS bilan).
+                // Bo'nakni hisobga olish (Dt 6010 Kt 4310) ichki provodka — ta'minotchi bilan hisob-kitobga ta'sir qilmaydi.
+                aktHtml(vid, from, to) {
+                    const v = store.get('vendors').find(x => x.id === vid) || {};
+                    const txs = store.get('txs').filter(t => t.vendorId === vid && acc.kind(t) !== 'offset')
+                        .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+                    const mv = (t) => acc.kind(t) === 'purchase' ? { d: 0, c: Number(t.amount) || 0 } : { d: Number(t.amount) || 0, c: 0 };
+                    const desc = (t) => {
+                        const k = acc.kind(t);
+                        if (k === 'purchase') return 'Kirim: ' + (ACCTS[t.account || '1010'] || t.account) + (t.vat ? ` (QQS ${utils.fmtNum(t.vat)})` : '');
+                        return (k === 'advance' ? 'Bo\'nak' : 'To\'lov') + ' (' + ((t.payAcct || '5110') === '5010' ? 'kassa' : 'bank') + ')';
+                    };
+                    let open = 0;
+                    txs.filter(t => t.date < from).forEach(t => { const m = mv(t); open += m.c - m.d; });
+                    open = acc.r2(open);
+                    const rows = txs.filter(t => t.date >= from && t.date <= to);
+                    let td = 0, tc = 0;
+                    rows.forEach(t => { const m = mv(t); td += m.d; tc += m.c; });
+                    td = acc.r2(td); tc = acc.r2(tc);
+                    const close = acc.r2(open + tc - td);
+                    const f = (n) => n ? utils.fmtNum(n) : '';
+                    const saldo = (n) => `<td style="text-align:right">${n < 0 ? f(-n) : ''}</td><td style="text-align:right">${n > 0 ? f(n) : ''}</td>`;
+                    const co = '"FAXR MADAD KONSALT" MChJ';
+                    const res = close > 0 ? `${to} holatiga ${co} ${v.name} oldida <b>${utils.fmtMoney(close)}</b> qarzdor.`
+                        : close < 0 ? `${to} holatiga ${v.name} ${co} oldida <b>${utils.fmtMoney(-close)}</b> qarzdor (bo'nak).`
+                        : `${to} holatiga o'zaro qarzdorlik yo'q.`;
+                    return `
+             <div class="proxy-form" id="akt-doc">
+                <div class="proxy-header">
+                    <h3>O'ZARO HISOB-KITOBLARNI SOLISHTIRISH DALOLATNOMASI</h3>
+                    <p>(Akt sverka) ${from} dan ${to} gacha davr uchun</p>
+                </div>
+                <p>${co} va ${v.name}${v.inn ? ' (STIR ' + v.inn + ')' : ''} o'rtasidagi hisob-kitoblar bo'yicha (${co} ma'lumotlari, so'mda):</p>
+                <table class="proxy-table">
+                    <thead><tr><th>Sana</th><th>Hujjat №</th><th>Mazmuni</th><th>Debet</th><th>Kredit</th></tr></thead>
+                    <tbody>
+                        <tr class="akt-open"><td colspan="3" style="text-align:left"><b>Boshlang'ich qoldiq (${from})</b></td>${saldo(open)}</tr>
+                        ${rows.map(t => { const m = mv(t); return `<tr class="akt-row"><td>${t.date}</td><td>${t.docNumber || '-'}</td><td style="text-align:left">${desc(t)}</td><td style="text-align:right">${f(m.d)}</td><td style="text-align:right">${f(m.c)}</td></tr>`; }).join('')}
+                        <tr class="akt-turn"><td colspan="3" style="text-align:left"><b>Davr aylanmasi</b></td><td style="text-align:right"><b>${f(td)}</b></td><td style="text-align:right"><b>${f(tc)}</b></td></tr>
+                        <tr class="akt-close"><td colspan="3" style="text-align:left"><b>Oxirgi qoldiq (${to})</b></td>${saldo(close)}</tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:15px" id="akt-res">${res}</p>
+                <p style="font-size:0.8rem; color:#555">Debet — to'lov va bo'naklar, Kredit — olingan tovar/xizmatlar (QQS bilan). Kredit qoldiq — bizning qarzimiz, debet qoldiq — ta'minotchining qarzi.</p>
+                <br>
+                <div class="proxy-row" style="align-items:flex-start">
+                    <div style="width:48%"><b>Bizning korxona:</b><br>${co}<br><br>Rahbar: _______________<br><br>Bosh hisobchi: _______________<br><br>M.O'.</div>
+                    <div style="width:48%"><b>Ta'minotchi:</b><br>${v.name}<br><br>Rahbar: _______________<br><br>Bosh hisobchi: _______________<br><br>M.O'.</div>
+                </div>
+             </div>`;
+                },
 
                 // --- PROXY (ISHONCHNOMA) ---
                 renderProxy(c) {
