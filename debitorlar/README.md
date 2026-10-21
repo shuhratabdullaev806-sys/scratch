@@ -25,16 +25,20 @@ O'quvchilarga quyidagi ko'nikmalarni shakllantirish:
 - Avtomatik raqamlanadigan elektron hisob-faktura yaratish.
 - Tovar/Xizmat nomi va narxini kiritish.
 - **QQS (NDS)** hisoblash (0% yoki 12%).
-- Avtomatik provodka ko'rsatish: **Dt 4010 - Kt 9020**.
+- Bir nechta tovar/xizmat qatori ("Qator qo'shish").
+- **Daromad turi:** 9010 Tayyor mahsulot / 9020 Tovarlar / 9030 Ish va xizmatlar.
+- Avtomatik provodkalar: **Dt 4010 - Kt 9010/9020/9030** (QQSsiz summa), **Dt 4010 - Kt 6410** (QQS).
+- Ixtiyoriy **Tannarx**: Dt 9110 - Kt 2810 / Dt 9120 - Kt 2910 / Dt 9130 - Kt 2010.
 - **Chop etish:** Rasmiy tasdiqlangan shakldagi Hisob-faktura blankasini printerga chiqarish.
 
 ### 3. To'lovlar
-- Bank yoki Kassa orqali tushgan to'lovlarni qayd etish.
-- Provodka: **Dt 5110 (5010) - Kt 4010**.
+- Bank yoki Kassa orqali tushgan to'lovlarni qayd etish: **Dt 5110 (5010) - Kt 4010**.
+- Bo'nak (avans) olindi: **Dt 5110 (5010) - Kt 6310**; bo'nakni hisobga olish: **Dt 6310 - Kt 4010**.
+- Har bir hujjat `provodkalar: [{dt, kt, sum, izoh}]` ko'rinishida saqlanadi (eski yozuvlar uchun avtomatik hisoblanadi).
 
 ### 4. Hisobotlar
 - **Oborotka (Qoldiq):** Har bir mijoz bo'yicha qancha sotilgan, qancha to'langan va hozirgi qarzni ko'rish.
-- **Akt Sverka:** Tanlangan mijoz bilan bo'lgan barcha operatsiyalar tarixini sana bo'yicha ko'rish va chop etish.
+- **Akt Sverka:** Mijoz va davr tanlanadi: davr boshiga qoldiq, davrdagi hujjatlar (debet - hisob-fakturalar, kredit - to'lovlar va hisobga olingan bo'nak), aylanmalar, davr oxiriga qoldiq; ikki tomon imzosi bilan chop etish.
 
 ## 🛠 Texnik Ma'lumotlar
 - **Texnologiyalar:** HTML5, CSS3, JavaScript (Vanilla).
