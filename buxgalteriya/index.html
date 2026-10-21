@@ -308,6 +308,23 @@
                 Bilimni Sinash</button>
         </div>
 
+        <!-- HISOBOT DAVRI (Aylanma qoldiq va hisobotlar uchun) -->
+        <div class="card no-print" id="period-bar" style="display:none; padding:10px 15px;">
+            <div class="form-row" style="align-items:flex-end;">
+                <div class="form-group">
+                    <label>Hisobot davri: dan</label>
+                    <input type="date" id="per-from" onchange="refreshPeriodViews()">
+                </div>
+                <div class="form-group">
+                    <label>gacha</label>
+                    <input type="date" id="per-to" onchange="refreshPeriodViews()">
+                </div>
+                <button onclick="document.getElementById('per-from').value=''; document.getElementById('per-to').value=''; refreshPeriodViews();" class="btn btn-ghost">Barcha davr</button>
+                <small style="color:#64748b; flex:1;">Boshlang'ich qoldiq — "dan" sanasigacha bo'lgan provodkalar; aylanma — davr ichidagi;
+                    Balans (F-1) — "gacha" sanasi holatiga.</small>
+            </div>
+        </div>
+
         <!-- JOURNAL TAB -->
         <div id="tab-journal">
             <div class="card no-print">
@@ -362,6 +379,7 @@
         <div id="tab-mizan" style="display:none;">
             <div class="card">
                 <h3>Aylanma Qoldiqlar (Mizan)</h3>
+                <p id="mizan-period" style="margin-top:0; color:#475569;"></p>
                 <button onclick="renderMizan()" class="btn no-print" style="margin-bottom:10px;">🔄
                     Yangilash</button>
                 <table id="mizan-table">
@@ -519,6 +537,7 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
 
+            document.getElementById('period-bar').style.display = (tab === 'mizan' || tab === 'reports') ? 'block' : 'none';
             if (tab === 'mizan') renderMizan();
         }
 
@@ -663,42 +682,72 @@
             return accs;
         }
 
-        function renderMizan() {
-            const accs = getBalances();
-            const keys = Object.keys(accs).sort();
+        // --- HISOBOT DAVRI ---
+        let lastReport = null;
+        function getPeriod() {
+            const from = document.getElementById('per-from').value;
+            const to = document.getElementById('per-to').value;
+            const fmt = d => d.split('-').reverse().join('.');
+            const label = (from || to) ? `${from ? fmt(from) + ' dan ' : ''}${to ? fmt(to) + ' gacha' : ''}`.trim() : 'Barcha davr';
+            return { from, to, label };
+        }
+        function refreshPeriodViews() {
+            if (document.getElementById('tab-mizan').style.display !== 'none') renderMizan();
+            // Faqat davrga bog'liq hisobot (F-1) ochiq bo'lsa qayta chiziladi
+            if (lastReport && document.getElementById('f1-check') && document.getElementById('tab-reports').style.display !== 'none') lastReport();
+        }
+        // Schyot bo'yicha: open = "dan"gacha (Dt-Kt), dt/kt = davr aylanmasi; "gacha"dan keyingi provodkalar hisobga olinmaydi
+        function getPeriodBalances(from, to) {
+            const accs = {};
+            const acc = k => { k = String(k).trim(); return accs[k] || (accs[k] = { open: 0, dt: 0, kt: 0 }); };
+            journal.forEach(r => {
+                const d = r.date || '';
+                if (to && d > to) return;
+                const a = acc(r.dt), c = acc(r.kt);
+                if (from && d < from) { a.open += r.sum; c.open -= r.sum; }
+                else { a.dt += r.sum; c.kt += r.sum; }
+            });
+            return accs;
+        }
 
-            let tDt = 0, tKt = 0;
+        function renderMizan() {
+            const per = getPeriod();
+            const accs = getPeriodBalances(per.from, per.to);
+            const keys = Object.keys(accs).sort();
+            const r2 = x => Math.round(x * 100) / 100;
+            const f = x => x > 0 ? x.toLocaleString() : '-';
+
+            let t = { oDt: 0, oKt: 0, dt: 0, kt: 0, eDt: 0, eKt: 0 };
+            document.getElementById('mizan-period').innerText = 'Davr: ' + per.label;
 
             const tbody = document.getElementById('mizan-tbody');
             tbody.innerHTML = keys.map(k => {
                 const inf = accs[k];
-                tDt += inf.dt;
-                tKt += inf.kt;
-
-                // Simplified logic: If Dt > Kt -> Debit Bal. If Kt > Dt -> Credit Bal.
-                // In real accounting depends on account type.
-                let endDt = 0, endKt = 0;
-                if (inf.dt > inf.kt) endDt = inf.dt - inf.kt;
-                else endKt = inf.kt - inf.dt;
+                // Qoldiq schyotning saldo tomoniga qarab (Dt yoki Kt) ko'rsatiladi
+                const open = r2(inf.open), end = r2(inf.open + inf.dt - inf.kt);
+                const oDt = open > 0 ? open : 0, oKt = open < 0 ? -open : 0;
+                const eDt = end > 0 ? end : 0, eKt = end < 0 ? -end : 0;
+                t.oDt += oDt; t.oKt += oKt; t.dt += inf.dt; t.kt += inf.kt; t.eDt += eDt; t.eKt += eKt;
 
                 return `
             <tr>
-                <td><b>${k}</b></td>
-                <td class="num">-</td><td class="num">-</td>
+                <td><b>${escHtml(k)}</b></td>
+                <td class="num">${f(oDt)}</td><td class="num">${f(oKt)}</td>
                 <td class="num">${inf.dt.toLocaleString()}</td>
                 <td class="num">${inf.kt.toLocaleString()}</td>
-                <td class="num" style="background:#f0fdf4">${endDt > 0 ? endDt.toLocaleString() : '-'}</td>
-                <td class="num" style="background:#fef2f2">${endKt > 0 ? endKt.toLocaleString() : '-'}</td>
+                <td class="num" style="background:#f0fdf4">${f(eDt)}</td>
+                <td class="num" style="background:#fef2f2">${f(eKt)}</td>
             </tr>
             `;
             }).join('');
 
+            Object.keys(t).forEach(k => t[k] = r2(t[k]));
             document.getElementById('mizan-total').innerHTML = `
             <td>JAMI:</td>
-            <td></td><td></td>
-            <td class="num">${tDt.toLocaleString()}</td>
-            <td class="num">${tKt.toLocaleString()}</td>
-            <td></td><td></td>
+            <td class="num">${t.oDt.toLocaleString()}</td><td class="num">${t.oKt.toLocaleString()}</td>
+            <td class="num">${t.dt.toLocaleString()}</td>
+            <td class="num">${t.kt.toLocaleString()}</td>
+            <td class="num">${t.eDt.toLocaleString()}</td><td class="num">${t.eKt.toLocaleString()}</td>
         `;
         }
 
@@ -764,57 +813,173 @@
         }
 
         // --- REPORTS ---
-        function renderBalanceSheet() {
-            const accs = getBalances();
-            // Simple mapping: 
-            // Assets: 01xx-29xx, 5xxx
-            // Liability: 6xxx, 7xxx
-            // Equity: 8xxx (inc 8710)
+        // --- F-1: BUXGALTERIYA BALANSI (BHMS 15, 1-son shakl; schyotlar rejasi BHMS 21) ---
+        // Har bir schyotning sof debet qoldig'i (Dt-Kt) tegishli balans satriga joylanadi.
+        // Kontr-aktiv schyotlar (02xx eskirish, 05xx amortizatsiya, 2980, 49xx rezerv) aktivdan ayriladi;
+        // "teskari" qoldiqlar (6010 Dt = berilgan bo'nak, 4010 Kt = olingan bo'nak, 8710 Dt = zarar) to'g'ri tomonda ko'rsatiladi.
+        const F1_LINES = [
+            { id: 'av', code: '010', side: 'A', sec: 'A1', label: "Asosiy vositalar: boshlang'ich (tiklash) qiymati (0100, 0300)" },
+            { id: 'av_esk', code: '011', side: 'A', sec: 'A1', label: 'Eskirish summasi (0200)' },
+            { id: 'nma', code: '020', side: 'A', sec: 'A1', label: "Nomoddiy aktivlar: boshlang'ich qiymati (0400)" },
+            { id: 'nma_am', code: '021', side: 'A', sec: 'A1', label: 'Amortizatsiya summasi (0500)' },
+            { id: 'inv_l', code: '030', side: 'A', sec: 'A1', label: 'Uzoq muddatli investitsiyalar (0600)' },
+            { id: 'ornat', code: '090', side: 'A', sec: 'A1', label: "O'rnatiladigan asbob-uskunalar (0700)" },
+            { id: 'kapq', code: '100', side: 'A', sec: 'A1', label: "Kapital qo'yilmalar (0800)" },
+            { id: 'deb_l', code: '110', side: 'A', sec: 'A1', label: 'Uzoq muddatli debitorlik qarzlari va kechiktirilgan xarajatlar (0900)' },
+            { id: 'tmz_m', code: '150', side: 'A', sec: 'A2', label: 'Ishlab chiqarish zahiralari (1000, 1100, 1500, 1600)' },
+            { id: 'tmz_t', code: '160', side: 'A', sec: 'A2', label: 'Tugallanmagan ishlab chiqarish (2000-2700)' },
+            { id: 'tmz_tm', code: '170', side: 'A', sec: 'A2', label: 'Tayyor mahsulot (2800)' },
+            { id: 'tmz_tov', code: '180', side: 'A', sec: 'A2', label: 'Tovarlar (2900)' },
+            { id: 'tmz_rez', code: '', side: 'A', sec: 'A2', label: 'TMZ qiymatini pasaytirish rezervi (2980)' },
+            { id: 'kdx', code: '190', side: 'A', sec: 'A2', label: 'Kelgusi davr xarajatlari (3100)' },
+            { id: 'kech', code: '200', side: 'A', sec: 'A2', label: 'Kechiktirilgan xarajatlar (3200)' },
+            { id: 'deb_x', code: '220', side: 'A', sec: 'A2', label: 'Xaridor va buyurtmachilarning qarzi (4000)' },
+            { id: 'deb_rez', code: '', side: 'A', sec: 'A2', label: 'Shubhali qarzlar bo\'yicha rezerv (4900)' },
+            { id: 'deb_aj', code: '230', side: 'A', sec: 'A2', label: "Ajratilgan bo'linmalar va sho''ba korxonalar qarzi (4100, 4200)" },
+            { id: 'deb_av', code: '270', side: 'A', sec: 'A2', label: "Mol yetkazib beruvchilarga berilgan bo'naklar (4300, 60xx Dt)" },
+            { id: 'deb_bu', code: '280', side: 'A', sec: 'A2', label: "Budjet va jamg'armalarga to'lovlar bo'yicha bo'naklar (4400, 64xx/65xx Dt)" },
+            { id: 'deb_ts', code: '300', side: 'A', sec: 'A2', label: "Ta'sischilarning ustav kapitaliga ulushlar bo'yicha qarzi (4600, 66xx Dt)" },
+            { id: 'deb_xod', code: '310', side: 'A', sec: 'A2', label: 'Xodimlarning qarzi (4700, 67xx Dt)' },
+            { id: 'deb_b', code: '320', side: 'A', sec: 'A2', label: 'Boshqa debitorlik qarzlari (4500, 4800, boshqa Dt qoldiqlar)' },
+            { id: 'pul_k', code: '330', side: 'A', sec: 'A2', label: "Kassadagi pul mablag'lari (5000)" },
+            { id: 'pul_h', code: '340', side: 'A', sec: 'A2', label: "Hisob-kitob schyotidagi pul mablag'lari (5100)" },
+            { id: 'pul_v', code: '350', side: 'A', sec: 'A2', label: "Xorijiy valyutadagi pul mablag'lari (5200)" },
+            { id: 'pul_b', code: '360', side: 'A', sec: 'A2', label: "Boshqa pul mablag'lari va ekvivalentlari (5500, 5600, 5700)" },
+            { id: 'inv_q', code: '370', side: 'A', sec: 'A2', label: 'Qisqa muddatli investitsiyalar (5800)' },
+            { id: 'boshqa_a', code: '380', side: 'A', sec: 'A2', label: 'Boshqa joriy aktivlar (5900)' },
+            { id: 'ustav', code: '410', side: 'P', sec: 'P1', label: 'Ustav kapitali (8300)' },
+            { id: 'qosh', code: '420', side: 'P', sec: 'P1', label: "Qo'shilgan kapital (8400)" },
+            { id: 'rez', code: '430', side: 'P', sec: 'P1', label: 'Rezerv kapitali (8500)' },
+            { id: 'aksiya', code: '440', side: 'P', sec: 'P1', label: 'Sotib olingan xususiy aksiyalar (8600)' },
+            { id: 'foyda', code: '450', side: 'P', sec: 'P1', label: 'Taqsimlanmagan foyda (qoplanmagan zarar) (8700)' },
+            { id: 'maqsad', code: '460', side: 'P', sec: 'P1', label: 'Maqsadli tushumlar (8800)' },
+            { id: 'zaxira', code: '470', side: 'P', sec: 'P1', label: "Kelgusi davr xarajatlari va to'lovlari uchun zaxiralar (8900)" },
+            { id: 'joriy_nat', code: '', side: 'P', sec: 'P1', label: 'Joriy davr moliyaviy natijasi (yopilmagan 9000-9900 schyotlar)' },
+            { id: 'uzoq', code: '490', side: 'P', sec: 'P2', label: 'Uzoq muddatli majburiyatlar (7000-7900)' },
+            { id: 'kr_m', code: '610', side: 'P', sec: 'P2', label: 'Mol yetkazib beruvchilar va pudratchilarga qarz (6000)' },
+            { id: 'kr_aj', code: '620', side: 'P', sec: 'P2', label: "Ajratilgan bo'linmalarga qarz (6100, 6200)" },
+            { id: 'kr_av', code: '680', side: 'P', sec: 'P2', label: "Olingan bo'naklar (6300, 40xx Kt)" },
+            { id: 'kr_bu', code: '690', side: 'P', sec: 'P2', label: "Budjetga to'lovlar bo'yicha qarz (6400, 44xx Kt)" },
+            { id: 'kr_sug', code: '700', side: 'P', sec: 'P2', label: "Sug'urta va maqsadli davlat jamg'armalariga qarz (6500)" },
+            { id: 'kr_ts', code: '720', side: 'P', sec: 'P2', label: "Ta'sischilarga qarz (6600, 46xx Kt)" },
+            { id: 'kr_xod', code: '730', side: 'P', sec: 'P2', label: "Mehnatga haq to'lash bo'yicha qarz (6700, 47xx Kt)" },
+            { id: 'kr_kr', code: '740', side: 'P', sec: 'P2', label: 'Qisqa muddatli bank kreditlari va qarzlar (6800)' },
+            { id: 'kr_b', code: '760', side: 'P', sec: 'P2', label: 'Boshqa kreditorlik qarzlari (6900, boshqa Kt qoldiqlar)' }
+        ];
 
-            // This is a naive categorization for demo purposes
-            let assets = [], passives = [];
-            let totA = 0, totP = 0;
+        // d = sof debet qoldiq (Dt-Kt). Qaytaradi: [satr id, satrdagi qiymat]
+        function f1Place(k, d) {
+            const g2 = k.slice(0, 2), g3 = k.slice(0, 3), n = parseInt(k.slice(0, 4), 10);
+            if (!/^\d{4}/.test(k)) return d >= 0 ? ['deb_b', d] : ['kr_b', -d];
+            // Aktiv schyotlar (aktiv tomonda Dt qoldiq bilan; kontr-aktivlar manfiy)
+            if (g2 === '01' || g2 === '03') return ['av', d];
+            if (g2 === '02') return ['av_esk', d];
+            if (g2 === '04') return ['nma', d];
+            if (g2 === '05') return ['nma_am', d];
+            if (g2 === '06') return ['inv_l', d];
+            if (g2 === '07') return ['ornat', d];
+            if (g2 === '08') return ['kapq', d];
+            if (g2 === '09') return ['deb_l', d];
+            if (g3 === '298') return ['tmz_rez', d];
+            if (g2 === '10' || g2 === '11' || g2 === '15' || g2 === '16') return ['tmz_m', d];
+            if (n >= 2000 && n < 2800) return ['tmz_t', d];
+            if (g2 === '28') return ['tmz_tm', d];
+            if (g2 === '29') return ['tmz_tov', d];
+            if (n >= 1000 && n < 3000) return ['tmz_m', d];
+            if (g2 === '31') return ['kdx', d];
+            if (g2 === '32' || g2[0] === '3') return ['kech', d];
+            if (g2 === '49') return ['deb_rez', d];
+            if (g2[0] === '4') {
+                if (d >= 0) return [{ '40': 'deb_x', '41': 'deb_aj', '42': 'deb_aj', '43': 'deb_av', '44': 'deb_bu', '46': 'deb_ts', '47': 'deb_xod' }[g2] || 'deb_b', d];
+                // Teskari (Kt) qoldiq -> majburiyat
+                return [{ '40': 'kr_av', '43': 'kr_m', '44': 'kr_bu', '46': 'kr_ts', '47': 'kr_xod' }[g2] || 'kr_b', -d];
+            }
+            if (g2[0] === '5') {
+                const id = { '50': 'pul_k', '51': 'pul_h', '52': 'pul_v', '55': 'pul_b', '56': 'pul_b', '57': 'pul_b', '58': 'inv_q', '59': 'boshqa_a' }[g2] || 'boshqa_a';
+                return d >= 0 ? [id, d] : ['kr_kr', -d]; // Kt qoldiq (overdraft) -> qisqa muddatli kredit
+            }
+            // Majburiyatlar (passiv tomonda Kt qoldiq bilan; Dt qoldiq -> debitorlik)
+            if (g2[0] === '6') {
+                if (d <= 0) return [{ '60': 'kr_m', '61': 'kr_aj', '62': 'kr_aj', '63': 'kr_av', '64': 'kr_bu', '65': 'kr_sug', '66': 'kr_ts', '67': 'kr_xod', '68': 'kr_kr' }[g2] || 'kr_b', -d];
+                return [{ '60': 'deb_av', '64': 'deb_bu', '65': 'deb_bu', '66': 'deb_ts', '67': 'deb_xod' }[g2] || 'deb_b', d];
+            }
+            if (g2[0] === '7') return d <= 0 ? ['uzoq', -d] : ['deb_l', d];
+            // O'z mablag'lari (Dt qoldiq manfiy ko'rsatiladi: 8600 aksiyalar, 8710 zarar)
+            if (g2[0] === '8') return [{ '83': 'ustav', '84': 'qosh', '85': 'rez', '86': 'aksiya', '87': 'foyda', '88': 'maqsad', '89': 'zaxira' }[g2] || 'zaxira', -d];
+            if (g2[0] === '9') return ['joriy_nat', -d];
+            return d >= 0 ? ['deb_b', d] : ['kr_b', -d];
+        }
 
-            Object.keys(accs).sort().forEach(k => {
-                let bal = 0;
-                // Active Accounts: 0xxx (Asosiy vositalar), 1xxx (Inventar), 2xxx (Ishlab chiqarish), 3xxx (Kechiktirilgan), 4xxx (Debitorlar), 5xxx (Pul mablag'lari)
-                if (k.startsWith('0') || k.startsWith('1') || k.startsWith('2') || k.startsWith('3') || k.startsWith('4') || k.startsWith('5')) {
-                    bal = accs[k].dt - accs[k].kt;
-                    if (bal !== 0) {
-                        assets.push({ code: k, sum: bal });
-                        totA += bal;
-                    }
-                }
-                // Passive Accounts: 6xxx (Kreditorlar), 7xxx (Uzoq muddatli), 8xxx (Kapital), 9xxx (Natijalar)
-                else if (k.startsWith('6') || k.startsWith('7') || k.startsWith('8') || k.startsWith('9')) {
-                    bal = accs[k].kt - accs[k].dt; // Credit balance is positive for passive
-                    if (bal !== 0) {
-                        passives.push({ code: k, sum: bal });
-                        totP += bal;
-                    }
-                }
+        function f1Compute(bal) {
+            const v = {}, accs = {};
+            F1_LINES.forEach(l => { v[l.id] = 0; accs[l.id] = []; });
+            Object.keys(bal).forEach(k => {
+                const d = Math.round(bal[k] * 100) / 100;
+                if (!d) return;
+                const [id, val] = f1Place(k, d);
+                v[id] += val; accs[id].push(k);
             });
+            const sum = sec => F1_LINES.filter(l => l.sec === sec).reduce((a, l) => a + v[l.id], 0);
+            const r2 = x => Math.round(x * 100) / 100;
+            return {
+                v, accs, A1: r2(sum('A1')), A2: r2(sum('A2')), P1: r2(sum('P1')), P2: r2(sum('P2')),
+                avNet: r2(v.av + v.av_esk), nmaNet: r2(v.nma + v.nma_am),
+                get A() { return r2(this.A1 + this.A2); }, get P() { return r2(this.P1 + this.P2); }
+            };
+        }
+
+        function renderBalanceSheet() {
+            lastReport = renderBalanceSheet;
+            const per = getPeriod();
+            // "dan" sanasi holatiga (davr boshi) va "gacha" sanasi holatiga (davr oxiri)
+            const pb = getPeriodBalances(per.from, per.to);
+            const startBal = {}, endBal = {};
+            Object.keys(pb).forEach(k => { startBal[k] = pb[k].open; endBal[k] = pb[k].open + pb[k].dt - pb[k].kt; });
+            const S = f1Compute(startBal), E = f1Compute(endBal);
+            const fmt = x => { x = Math.round(x * 100) / 100; return x === 0 ? '-' : (x < 0 ? '(' + (-x).toLocaleString() + ')' : x.toLocaleString()); };
+            const row = (label, code, a, b, style, accList) => `<tr style="${style || ''}"><td>${label}${accList && accList.length ? ` <small style="color:#64748b">[${accList.map(escHtml).join(', ')}]</small>` : ''}</td><td style="text-align:center">${code}</td><td class="num">${fmt(a)}</td><td class="num">${fmt(b)}</td></tr>`;
+            const lines = sec => F1_LINES.filter(l => l.sec === sec && (S.v[l.id] || E.v[l.id])).map(l => {
+                let label = l.label;
+                if (l.id === 'foyda' && E.v.foyda < 0) label = 'Qoplanmagan zarar (8700)';
+                const r = row(label, l.code, S.v[l.id], E.v[l.id], ['av_esk', 'nma_am', 'tmz_rez', 'deb_rez'].includes(l.id) ? 'color:#b91c1c' : '', [...new Set([...S.accs[l.id], ...E.accs[l.id]])]);
+                // Asosiy vositalar va NMA: qoldiq (balans) qiymati
+                if (l.id === 'av_esk' || (l.id === 'av' && !S.v.av_esk && !E.v.av_esk)) return r + row('&nbsp;&nbsp;Asosiy vositalarning qoldiq (balans) qiymati', '012', S.avNet, E.avNet, 'font-weight:bold');
+                if (l.id === 'nma_am' || (l.id === 'nma' && !S.v.nma_am && !E.v.nma_am)) return r + row('&nbsp;&nbsp;Nomoddiy aktivlarning qoldiq (balans) qiymati', '022', S.nmaNet, E.nmaNet, 'font-weight:bold');
+                return r;
+            }).join('');
+            const head = t => `<tr style="background:#e2e8f0;"><td colspan="4"><b>${t}</b></td></tr>`;
+            const tot = (t, c, a, b) => row(`<b>${t}</b>`, c, a, b, 'font-weight:bold; background:#f1f5f9;');
+            const diff = Math.round((E.A - E.P) * 100) / 100;
+            const unclosed = E.v.joriy_nat !== 0;
+            const check = diff === 0
+                ? `<div style="background:#dcfce7; color:#166534; padding:10px; border-radius:6px; margin-top:10px;">✅ Aktivlar jami = Passivlar jami (${E.A.toLocaleString()})</div>`
+                : `<div style="background:#fee2e2; color:#991b1b; padding:10px; border-radius:6px; margin-top:10px;">❌ Balans teng emas! Farq: ${diff.toLocaleString()}. Schyot kodlarini tekshiring.</div>`;
+            const warn = unclosed ? `<div style="background:#fef9c3; color:#854d0e; padding:10px; border-radius:6px; margin-top:10px;">⚠️ 9000-9900 schyotlarda yopilmagan qoldiq bor (${E.v.joriy_nat.toLocaleString()}). Ular "Joriy davr moliyaviy natijasi" satrida ko'rsatildi. To'g'ri balans uchun avval "Davrni yopish" (9xxx → 9910 → 8710) bajaring.</div>` : '';
 
             const html = `
-            <h2 style="text-align:center;">Buxgalteriya Balansi (Forma-1)</h2>
-            <div style="display:flex; gap:20px;">
-                <div style="flex:1;">
-                    <h3 style="border-bottom:2px solid #000;">Aktivlar</h3>
-                    <table>
-                        <tr><th>Schyot</th><th class="num">Summa</th></tr>
-                        ${assets.map(x => `<tr><td>${x.code}</td><td class="num">${x.sum.toLocaleString()}</td></tr>`).join('')}
-                        <tr style="font-weight:bold; background:#eee;"><td>JAMI AKTIV:</td><td class="num">${totA.toLocaleString()}</td></tr>
-                    </table>
-                </div>
-                <div style="flex:1;">
-                    <h3 style="border-bottom:2px solid #000;">Passivlar</h3>
-                    <table>
-                        <tr><th>Schyot</th><th class="num">Summa</th></tr>
-                        ${passives.map(x => `<tr><td>${x.code}</td><td class="num">${x.sum.toLocaleString()}</td></tr>`).join('')}
-                        <tr style="font-weight:bold; background:#eee;"><td>JAMI PASSIV:</td><td class="num">${totP.toLocaleString()}</td></tr>
-                    </table>
-                </div>
-            </div>
+            <h2 style="text-align:center; margin-bottom:0;">Buxgalteriya Balansi (1-son shakl)</h2>
+            <p style="text-align:center; margin-top:4px; color:#475569;">BHMS 15 · ${per.to ? per.to.split('-').reverse().join('.') + ' holatiga' : 'Joriy holatga'} · Davr: ${per.label}</p>
+            <table>
+                <tr><th>Ko'rsatkich</th><th style="text-align:center">Satr kodi</th><th class="num">Davr boshiga</th><th class="num">Davr oxiriga</th></tr>
+                ${head('AKTIV')}
+                ${head('I. Uzoq muddatli aktivlar')}
+                ${lines('A1')}
+                ${tot('I bo\'lim bo\'yicha jami', '130', S.A1, E.A1)}
+                ${head('II. Joriy aktivlar')}
+                ${lines('A2')}
+                ${tot('II bo\'lim bo\'yicha jami', '390', S.A2, E.A2)}
+                ${row('<b>BALANS AKTIVI JAMI (130+390)</b>', '400', S.A, E.A, 'font-weight:bold; background:#dbeafe;')}
+                ${head('PASSIV')}
+                ${head('I. O\'z mablag\'lari manbalari')}
+                ${lines('P1')}
+                ${tot('I bo\'lim bo\'yicha jami', '480', S.P1, E.P1)}
+                ${head('II. Majburiyatlar')}
+                ${lines('P2')}
+                ${tot('II bo\'lim bo\'yicha jami', '770', S.P2, E.P2)}
+                ${row('<b>BALANS PASSIVI JAMI (480+770)</b>', '780', S.P, E.P, 'font-weight:bold; background:#dbeafe;')}
+            </table>
+            <p style="font-size:0.8rem; color:#64748b;">Qavs ichidagi summalar ayriladi (eskirish, amortizatsiya, rezervlar, zarar). Ko'rsatkichlar "Davr boshiga" — "dan" sanasigacha, "Davr oxiriga" — "gacha" sanasi holatiga.</p>
+            <div id="f1-check">${check}${warn}</div>
         `;
             document.getElementById('report-view').innerHTML = html;
         }

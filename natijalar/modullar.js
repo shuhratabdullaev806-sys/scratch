@@ -9,7 +9,7 @@ const MODULLAR = [
     // FIFO/ papkasi (eski nusxa) esa '..._fifo_' yozadi — ikkalasi ham bitta modul sifatida hisoblanadi.
     { id: 'fifo', nomi: 'Ombor (FIFO)', prefixlar: ['ombor_materials_fifo_', 'ombor_history_fifo_', 'ombor_materials_', 'ombor_history_'] },
     { id: 'aveco', nomi: 'Ombor (AVECO)', prefixlar: ['ombor_materials_aveco_', 'ombor_history_aveco_'] },
-    { id: 'kadrlar', nomi: 'Kadrlar', prefixlar: ['k_employees_', 'k_shtat_', 'k_tabel_', 'k_payrolls_'] },
+    { id: 'kadrlar', nomi: 'Kadrlar', prefixlar: ['k_employees_', 'k_shtat_', 'k_tabel_', 'k_payrolls_', 'k_provodkalar_'] },
     { id: 'safari', nomi: 'Xizmat Safari', prefixlar: ['safari_trips_', 'safari_employees_', 'safari_expenses_'] },
     { id: 'av', nomi: 'Asosiy Vositalar', prefixlar: ['av_assets_', 'av_logs_'] },
     { id: 'na', nomi: 'Nomoddiy Aktivlar', prefixlar: ['na_assets_', 'na_logs_'] },

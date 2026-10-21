@@ -28,5 +28,11 @@ Elektr, Gaz, Suv, Ijara va boshqa umumiy xarajatlar.
 5.  Ishchilarga to'langan haqni va boshqa xarajatlarni kiriting.
 6.  Tizim sizga **1 dona mahsulot tannarxini** hisoblab beradi.
 
+## Ombor va provodkalar
+- **Xomashyo Kirimi** (Xomashyo Baza oynasi): sana, xomashyo, miqdor, narx yoki jami summa, yetkazib beruvchi → Dt 1010 Kt 6010. Jadvalda qoldiq miqdor, summa va o'rtacha tannarx ko'rinadi.
+- **Ishlab chiqarish** saqlanganda xomashyo qoldig'i tekshiriladi (yetmasa — saqlanmaydi), o'rtacha tannarx bo'yicha chiqariladi va provodkalar tuziladi: Dt 2010 Kt 1010 / 6710 / 6520 (12%) / 0230 / 2510, brak Dt 2610 Kt 2010, tayyor mahsulot Dt 2810 Kt 2010. Chala qoldiq 2010 da qoladi.
+- **Tayyor Mahsulot (2810)** oynasi: mahsulot qoldiqlari va "Sotishga chiqim" (Dt 9110 Kt 2810).
+- Yangi hujjatlarda `provodkalar: [{dt, kt, sum, izoh}]` saqlanadi. Qoldiqlar shu hujjatlardan hisoblanadi; faqat eng oxirgi ombor hujjatini o'chirish mumkin.
+
 ## Saqlash
 Barcha tarix brauzer xotirasida saqlanadi.

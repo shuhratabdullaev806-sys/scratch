@@ -502,6 +502,7 @@
                                     <th rowspan="2" class="num">Netto</th>
                                     <th rowspan="2" class="num">Aliment</th>
                                     <th rowspan="2" class="num" style="background:#f0fdf4;">Qo'lga<br>(To'lanadi)</th>
+                                    <th rowspan="2" class="num" style="background:#fff7ed;" title="Ish haqidan ushlanmaydi, korxona xarajati (Dt 9420 - Kt 6520)">Ijtimoiy soliq (12%)<br><small>korxona hisobidan</small></th>
                                 </tr>
                                 <tr style="background:#ecfeff; font-size:0.8rem;">
                                     <th class="num">Imtiyoz</th>
@@ -522,11 +523,13 @@
                                     <td class="num" id="t-net">0</td>
                                     <td class="num" id="t-alim">0</td>
                                     <td class="num" id="t-pay">0</td>
+                                    <td class="num" id="t-social" style="background:#fff7ed;">0</td>
                                 </tr>
                             </tfoot>
                         </table>
                         <p style="font-size:0.85rem; color:#64748b; margin-top:8px;">INPS (0.1%) alohida ushlanmaydi: u JShDS (12%) ichidan shaxsiy jamg'arib boriladigan pensiya hisobiga ajratiladi. Budjetga JShDS 11.9% o'tkaziladi (Dt 6710 - Kt 6410), INPS 0.1% (Dt 6710 - Kt 6530).</p>
                     </div>
+                    <div id="pay-prov" style="margin-top:15px;"></div>
                 </div>
             </div>
 
@@ -556,6 +559,7 @@
                                 <th rowspan="2">Soliq Summasi<br>(040)</th>
                                 <th rowspan="2">Shu jumladan<br>INPS (0.1%)</th>
                                 <th rowspan="2">Budjetga<br>JShDS (11.9%)</th>
+                                <th rowspan="2" style="background:#fff7ed;">Ijtimoiy soliq (12%)<br><small>korxona hisobidan</small></th>
                             </tr>
                             <tr>
                                 <th>Summa</th>
@@ -1010,12 +1014,13 @@
                 document.getElementById('sheet-month-label').innerText = document.getElementById('pay-month').value + " oyi uchun";
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Ma\'lumot yo\'q. Hisoblashni bosing.</td></tr>';
-                    ['t-gross', 't-exempt', 't-tax', 't-inps', 't-util', 't-net', 't-alim', 't-pay'].forEach(id => document.getElementById(id).innerHTML = '0');
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Ma\'lumot yo\'q. Hisoblashni bosing.</td></tr>';
+                    ['t-gross', 't-exempt', 't-tax', 't-inps', 't-util', 't-net', 't-alim', 't-pay', 't-social'].forEach(id => document.getElementById(id).innerHTML = '0');
+                    document.getElementById('pay-prov').innerHTML = '';
                     return;
                 }
 
-                let totals = { g: 0, e: 0, t: 0, i: 0, u: 0, n: 0, a: 0, p: 0 };
+                let totals = { g: 0, e: 0, t: 0, i: 0, u: 0, n: 0, a: 0, p: 0, s: 0 };
 
                 tbody.innerHTML = data.map((r, i) => {
                     totals.g += r.gross;
@@ -1026,6 +1031,7 @@
                     totals.n += r.net;
                     totals.a += r.aliment;
                     totals.p += r.toPay;
+                    totals.s += socialOf(r);
 
                     return `
                 <tr>
@@ -1039,6 +1045,7 @@
                     <td class="num" style="font-weight:bold;">${r.net.toLocaleString()}</td>
                     <td class="num" style="color:#7c3aed">${r.aliment.toLocaleString()}</td>
                     <td class="num" style="background:#f0fdf4; font-weight:bold; color:#15803d">${r.toPay.toLocaleString()}</td>
+                    <td class="num" style="background:#fff7ed;">${socialOf(r).toLocaleString()}</td>
                 </tr>`;
                 }).join('');
 
@@ -1050,6 +1057,46 @@
                 document.getElementById('t-net').innerHTML = totals.n.toLocaleString();
                 document.getElementById('t-alim').innerHTML = totals.a.toLocaleString();
                 document.getElementById('t-pay').innerHTML = totals.p.toLocaleString();
+                document.getElementById('t-social').innerHTML = totals.s.toLocaleString();
+                renderPayrollProv(document.getElementById('pay-month').value, data);
+            }
+
+            // Ijtimoiy soliq (12%) - korxona hisobidan; eski saqlangan oylarda bo'lmasa qayta hisoblanadi
+            function socialOf(r) {
+                return (typeof r.social === 'number' && !isNaN(r.social)) ? r.social : Math.round((r.gross || 0) * 0.12);
+            }
+
+            // Oy bo'yicha provodkalar: [{dt, kt, sum, izoh}]
+            function buildPayrollProv(data) {
+                const s = { g: 0, t: 0, i: 0, soc: 0 };
+                (data || []).forEach(r => { s.g += r.gross || 0; s.t += r.tax || 0; s.i += r.inps || 0; s.soc += socialOf(r); });
+                return [
+                    { dt: '9420', kt: '6710', sum: s.g, izoh: "Ish haqi hisoblandi" },
+                    { dt: '6710', kt: '6410', sum: s.t - s.i, izoh: "JShDS budjetga (11.9%)" },
+                    { dt: '6710', kt: '6530', sum: s.i, izoh: "INPS (0.1%) - JShDS ichidan, shaxsiy jamg'arib boriladigan pensiya hisobi" },
+                    { dt: '9420', kt: '6520', sum: s.soc, izoh: "Ijtimoiy soliq (12%) - korxona hisobidan" }
+                ].filter(p => p.sum > 0);
+            }
+
+            // Provodkalar alohida kalitda saqlanadi (k_payrolls_ oy yozuvi massiv bo'lgani uchun): { 'YYYY-MM': [...] }
+            function savePayrollProv(m, data) {
+                if (!currentUser || !m) return;
+                let all = {};
+                try { all = JSON.parse(localStorage.getItem('k_provodkalar_' + currentUser) || '{}') || {}; } catch (err) { all = {}; }
+                all[m] = buildPayrollProv(data);
+                localStorage.setItem('k_provodkalar_' + currentUser, JSON.stringify(all));
+                return all[m];
+            }
+
+            function renderPayrollProv(m, data) {
+                const prov = savePayrollProv(m, data) || buildPayrollProv(data);
+                document.getElementById('pay-prov').innerHTML = `
+                    <h3 style="font-size:1rem; margin-bottom:6px;">📒 ${m} oyi bo'yicha provodkalar</h3>
+                    <table style="width:auto; min-width:60%;">
+                        <thead><tr style="background:#f1f5f9;"><th>Dt</th><th>Kt</th><th class="num">Summa</th><th>Izoh</th></tr></thead>
+                        <tbody>${prov.map(p => `<tr><td><b>${p.dt}</b></td><td><b>${p.kt}</b></td><td class="num">${p.sum.toLocaleString()}</td><td>${p.izoh}</td></tr>`).join('')}</tbody>
+                    </table>
+                    <p style="font-size:0.85rem; color:#64748b; margin-top:6px;">Izoh: ma'muriy xodimlar ish haqi va ijtimoiy solig'i 9420 schyotiga olinadi; ishlab chiqarish xodimlari uchun 2010 (Dt 2010 - Kt 6710, Dt 2010 - Kt 6520) ishlatiladi.</p>`;
             }
 
             // --- TAX REPORT GENERATION ---
@@ -1060,11 +1107,12 @@
 
                 const tbody = document.getElementById('tax-tbody');
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">Ma\'lumot topilmadi.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center">Ma\'lumot topilmadi.</td></tr>';
+                    document.getElementById('tax-tfoot').innerHTML = '';
                     return;
                 }
 
-                let totals = { g: 0, e: 0, b: 0, t: 0, i: 0 };
+                let totals = { g: 0, e: 0, b: 0, t: 0, i: 0, s: 0 };
                 tbody.innerHTML = data.map((r, i) => {
                     const base = r.taxableIndex;
                     totals.g += r.gross;
@@ -1072,6 +1120,7 @@
                     totals.b += base;
                     totals.t += r.tax;
                     totals.i += r.inps;
+                    totals.s += socialOf(r);
 
                     return `<tr>
                     <td>${i + 1}</td>
@@ -1083,10 +1132,11 @@
                     <td class="num font-bold text-blue-800">${r.tax.toLocaleString()}</td>
                     <td class="num text-gray-500">${r.inps.toLocaleString()}</td>
                     <td class="num">${(r.tax - r.inps).toLocaleString()}</td>
+                    <td class="num" style="background:#fff7ed;">${socialOf(r).toLocaleString()}</td>
                 </tr>`;
                 }).join('');
 
-                document.getElementById('tax-tfoot').innerHTML = `
+                document.getElementById('tax-tfoot').innerHTML = `<tr>
                 <td colspan="2">JAMI:</td>
                 <td class="num">${totals.g.toLocaleString()}</td>
                 <td class="num">${totals.e.toLocaleString()}</td>
@@ -1095,7 +1145,8 @@
                 <td class="num">${totals.t.toLocaleString()}</td>
                 <td class="num">${totals.i.toLocaleString()}</td>
                 <td class="num">${(totals.t - totals.i).toLocaleString()}</td>
-            `;
+                <td class="num">${totals.s.toLocaleString()}</td>
+            </tr>`;
             }
 
             // --- QUIZ LOGIC (MINI-TRENAJYOR) ---

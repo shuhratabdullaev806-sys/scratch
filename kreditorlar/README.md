@@ -8,7 +8,9 @@ Ushbu dastur orqali siz **6010-schyot** ("Mol yetkazib beruvchilarga to'lanadiga
 
 *   **🏢 Ta'minotchilar Bazasi**: Hamkor firmalarni kiritish va boshqarish.
 *   **📉 Xarid va Qarz (Dt 1010 - Kt 6010)**: Tovar yoki xizmat sotib olganda qarzdorlikning paydo bo'lishini qayd etish.
-*   **💳 To'lov Qilish (Dt 6010 - Kt 5110)**: Pul o'tkazganda qarzdorlikning kamayishini aks ettirish.
+*   **🧾 QQS**: Kirim fakturasida summa QQSsiz kiritiladi, QQS (12% / 0%) va Jami avtomatik hisoblanadi. QQS to'lovchisi bo'lsa: Dt <schyot> Kt 6010 (QQSsiz) + Dt 4410 Kt 6010 (QQS); aks holda Dt <schyot> Kt 6010 (QQS bilan). Schyotlar: 1010, 2910, 0820, 0830, 2010, 9410, 9420.
+*   **💳 To'lov Qilish (Dt 6010 - Kt 5110/5010)**: Pul o'tkazganda qarzdorlikning kamayishini aks ettirish. Bo'nak: Dt 4310 Kt 5110/5010; bo'nakni hisobga olish: Dt 6010 Kt 4310.
+*   **📒 Provodkalar**: har bir hujjat `provodkalar: [{dt, kt, sum, izoh}]` ko'rinishida saqlanadi va ro'yxatda ko'rsatiladi.
 *   **📑 Akt Sverka (Eng muhim)**:
     *   Istalgan vaqt oralig'i uchun avtomatik solishtirma dalolatnoma tuzish.
     *   Boshlang'ich va yakuniy qoldiqni hisoblash.
@@ -19,8 +21,8 @@ Ushbu dastur orqali siz **6010-schyot** ("Mol yetkazib beruvchilarga to'lanadiga
 
 1.  `index.html` faylini brauzerda oching.
 2.  **Ta'minotchilar** bo'limida yangi firma qo'shing (Masalan: "BEST CEMENT" MCHJ).
-3.  **Operatsiyalar** bo'limida ushbu firmadan qarzga tovar oling ("Xarid" tugmasi).
-4.  Keyinroq shu firmaga pul to'lang ("To'lov" tugmasi).
+3.  **Kiruvchi Fakturalar** bo'limida ushbu firmadan qarzga tovar oling ("Xarid" tugmasi).
+4.  Keyinroq **To'lovlar** bo'limida shu firmaga pul to'lang yoki bo'nak bering.
 5.  **Akt Sverka** bo'limida ushbu firma bilan hisob-kitobni tekshiring va hujjatni chop eting.
 
 ## Muallif
