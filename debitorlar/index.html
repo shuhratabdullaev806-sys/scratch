@@ -615,7 +615,7 @@
 
         <script>
             const utils = {
-                formatMoney: (n) => new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS' }).format(n),
+                formatMoney: (n) => new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS' }).format(+n || 0), // -0 «-UZS 0» bo'lib chiqmasin
                 formatDate: (d) => new Date(d).toLocaleDateString('uz-UZ'),
                 genId: () => Date.now().toString(36) + Math.random().toString(36).substr(2)
             };

@@ -1144,8 +1144,8 @@
                     return;
                 }
 
-                // Reverse history to show chronological order
-                let materialHistory = [...history].reverse().filter(h => h.name === name);
+                // Sana bo'yicha xronologik tartib (bir kundagilar kiritilish tartibida)
+                let materialHistory = [...history].reverse().filter(h => h.name === name).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
                 if (materialHistory.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Bu material bo\'yicha harakatlar yo\'q</td></tr>';
                     return;
