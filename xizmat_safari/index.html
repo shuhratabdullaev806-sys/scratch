@@ -1215,8 +1215,8 @@
                             BUYRUQ № ${t.docNum}
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
-                            <div>${t.city} sh.</div>
-                            <div>${new Date().toLocaleDateString('uz-UZ')}</div>
+                            <div>Toshkent sh.</div>
+                            <div>${[t.start, ...(t.avanslar || []).map(a => a.date)].filter(Boolean).sort()[0] || ''}</div>
                         </div>
                         <div class="doc-header">XIZMAT SAFARIGA YUBORISH TO'G'RISIDA</div>
                         <div class="doc-body">
@@ -1226,7 +1226,7 @@
                                 quyidagi shartlar asosida xizmat safariga yuborilsin:
                             </p>
                             <ul>
-                                <li><b>Manzil:</b> ${t.city} shahri, "${t.org}" tashkiloti.</li>
+                                <li><b>Manzil:</b> ${t.city}, ${t.org}.</li>
                                 <li><b>Muddat:</b> ${t.start} dan ${t.end} gacha (${t.days} kun).</li>
                                 <li><b>Maqsad:</b> ${t.purpose}.</li>
                             </ul>
@@ -1256,7 +1256,7 @@
                             <p>Qayerga: <b>${t.city}, ${t.org}</b></p>
                             <p>Xizmat safari maqsadi: ${t.purpose}</p>
                             <p>Muddat: <b>${t.days}</b> kun (<b>${t.start}</b> dan <b>${t.end}</b> gacha)</p>
-                            <p>Pasport ma'lumotlari: ____________________</p>
+                            <p>Pasport ma'lumotlari: ${(employees.find(x => x.id == t.empId) || {}).passport || '____________________'}</p>
                         </div>
                         <div style="margin-top:40px; border-top:1px solid black; padding-top:20px;">
                             <div style="display:flex; justify-content:space-between;">
