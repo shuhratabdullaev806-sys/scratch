@@ -1068,13 +1068,15 @@
 
             // Oy bo'yicha provodkalar: [{dt, kt, sum, izoh}]
             function buildPayrollProv(data) {
-                const s = { g: 0, t: 0, i: 0, soc: 0 };
-                (data || []).forEach(r => { s.g += r.gross || 0; s.t += r.tax || 0; s.i += r.inps || 0; s.soc += socialOf(r); });
+                const s = { g: 0, t: 0, i: 0, soc: 0, a: 0, u: 0 };
+                (data || []).forEach(r => { s.g += r.gross || 0; s.t += r.tax || 0; s.i += r.inps || 0; s.soc += socialOf(r); s.a += r.aliment || 0; s.u += r.utility || 0; });
                 return [
                     { dt: '9420', kt: '6710', sum: s.g, izoh: "Ish haqi hisoblandi" },
                     { dt: '6710', kt: '6410', sum: s.t - s.i, izoh: "JShDS budjetga (11.9%)" },
                     { dt: '6710', kt: '6530', sum: s.i, izoh: "INPS (0.1%) - JShDS ichidan, shaxsiy jamg'arib boriladigan pensiya hisobi" },
-                    { dt: '9420', kt: '6520', sum: s.soc, izoh: "Ijtimoiy soliq (12%) - korxona hisobidan" }
+                    { dt: '9420', kt: '6520', sum: s.soc, izoh: "Ijtimoiy soliq (12%) - korxona hisobidan" },
+                    { dt: '6710', kt: '6990', sum: s.a, izoh: "Aliment ushlab qolindi (ijro varaqasi bo'yicha oluvchiga o'tkaziladi)" },
+                    { dt: '6710', kt: '6990', sum: s.u, izoh: "Kommunal to'lovlar uchun ushlanma" }
                 ].filter(p => p.sum > 0);
             }
 
