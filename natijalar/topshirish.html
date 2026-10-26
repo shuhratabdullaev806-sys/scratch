@@ -103,6 +103,11 @@
             <table id="jadval"></table>
             <div class="jami" id="jami"></div>
             <button class="btn" id="yuklash">⬇️ Natija faylini yuklab olish</button>
+            <div id="zaxira" style="display:none; margin-top:12px;">
+                <p class="xabar" style="display:block">Telefonda fayl ochilmasa yoki yuklanmasa: matnni nusxalab oling va o'zingizga yuboring (Telegram, e-mail, Eslatmalar).</p>
+                <textarea id="zaxira-matn" readonly style="width:100%; height:80px; font-size:12px;"></textarea>
+                <button class="btn" id="nusxala" type="button">📋 Matnni nusxalash</button>
+            </div>
         </div>
 
 
@@ -114,6 +119,9 @@
                 <li>Fayldagi ishlar shu kompyuterga yoziladi. Shu F.I.Sh bilan modullarga kirib davom eting.</li>
             </ol>
             <input type="file" id="tiklash-fayl" accept=".json,application/json">
+            <p style="margin:10px 0 4px">Yoki fayl o'rniga nusxalangan matnni shu yerga joylang:</p>
+            <textarea id="tiklash-matn" placeholder="{&quot;versiya&quot;:1,&quot;ism&quot;: ..." style="width:100%; height:80px; font-size:12px;"></textarea>
+            <button class="btn" id="tiklash-btn" type="button">📥 Matndan tiklash</button>
             <p id="tiklash-xabar" class="xabar" style="display:none"></p>
         </div>
 
@@ -166,6 +174,7 @@
         ismSelect.addEventListener('change', chiz);
         chiz();
 
+        let ohirgiMatn = '';
         document.getElementById('yuklash').addEventListener('click', () => {
             const ism = ismSelect.value;
             const guruh = guruhInput.value.trim();
@@ -181,11 +190,22 @@
             };
             natija.kod = nazoratKodi(natija);
 
-            const blob = new Blob([JSON.stringify(natija)], { type: 'application/json' });
+            const matn = JSON.stringify(natija);
+            const fayl = `${ism}_${guruh}_${natija.sana.slice(0, 10)}`.replace(/[\\/:*?"<>|\s]+/g, '_') + '.json';
+            const blob = new Blob([matn], { type: 'application/json' });
+            ohirgiMatn = matn;
+            document.getElementById('zaxira').style.display = 'block';
+            document.getElementById('zaxira-matn').value = matn;
+
+            // Telefonda (ayniqsa iPhone): ulashish oynasi orqali Telegram / Fayllarga saqlash
+            const fileObj = (typeof File === 'function') ? new File([blob], fayl, { type: 'application/json' }) : null;
+            if (fileObj && navigator.canShare && navigator.canShare({ files: [fileObj] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+                navigator.share({ files: [fileObj], title: 'Natija fayli' }).catch(() => { /* bekor qilindi */ });
+                return;
+            }
             const a = document.createElement('a');
-            const fayl = `${ism}_${guruh}_${natija.sana.slice(0, 10)}`.replace(/[\\/:*?"<>|\s]+/g, '_');
             a.href = URL.createObjectURL(blob);
-            a.download = fayl + '.json';
+            a.download = fayl;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -193,34 +213,42 @@
         });
 
         // --- Faylni shu qurilmaga tiklash ---
-        document.getElementById('tiklash-fayl').addEventListener('change', function () {
+        function tikla(matn) {
             const xabar = document.getElementById('tiklash-xabar');
             const koz = (m, ok) => { xabar.style.display = 'block'; xabar.style.color = ok ? '#166534' : '#b91c1c'; xabar.textContent = m; };
+            let n;
+            try { n = JSON.parse(matn); } catch (e) { return koz("Matn o'qilmadi: bu natija fayli emas yoki to'liq nusxalanmagan.", false); }
+            if (!n || !n.ism || !n.malumot || !n.kod) return koz('Bu portal natija fayli emas.', false);
+            const { kod, ...qolgan } = n;
+            if (kod !== nazoratKodi(qolgan)) return koz("Fayl o'zgartirilgan, tiklab bo'lmaydi.", false);
+            let yangi = 0, mavjud = 0;
+            for (const modul of Object.keys(n.malumot)) {
+                for (const [prefix, qiymat] of Object.entries(n.malumot[modul])) {
+                    const kalit = prefix + n.ism;
+                    if (!kalitniAjrat(kalit)) continue;
+                    if (localStorage.getItem(kalit) !== null) {
+                        if (!confirm(`«${n.ism}» uchun bu qurilmada «${kalit}» ma'lumoti allaqachon bor. Fayldagi bilan almashtirilsinmi?`)) { mavjud++; continue; }
+                    }
+                    localStorage.setItem(kalit, typeof qiymat === 'string' ? qiymat : JSON.stringify(qiymat));
+                    yangi++;
+                }
+            }
+            koz(`✅ ${n.ism}: ${yangi} ta ma'lumot bloki tiklandi${mavjud ? ', ' + mavjud + " ta o'tkazib yuborildi" : ''}. Modullarga «${n.ism}» ismi bilan kiring.`, true);
+            setTimeout(() => location.reload(), 3500);
+        }
+        document.getElementById('tiklash-fayl').addEventListener('change', function () {
             const f = this.files[0];
             if (!f) return;
             const r = new FileReader();
-            r.onload = () => {
-                let n;
-                try { n = JSON.parse(r.result); } catch (e) { return koz('Fayl o\'qilmadi: bu natija fayli emas.', false); }
-                if (!n || !n.ism || !n.malumot || !n.kod) return koz('Bu portal natija fayli emas.', false);
-                const { kod, ...qolgan } = n;
-                if (kod !== nazoratKodi(qolgan)) return koz('Fayl o\'zgartirilgan, tiklab bo\'lmaydi.', false);
-                let yangi = 0, mavjud = 0;
-                for (const modul of Object.keys(n.malumot)) {
-                    for (const [prefix, qiymat] of Object.entries(n.malumot[modul])) {
-                        const kalit = prefix + n.ism;
-                        if (!kalitniAjrat(kalit)) continue;
-                        if (localStorage.getItem(kalit) !== null) {
-                            if (!confirm(`«${n.ism}» uchun bu qurilmada «${kalit}» ma'lumoti allaqachon bor. Fayldagi bilan almashtirilsinmi?`)) { mavjud++; continue; }
-                        }
-                        localStorage.setItem(kalit, typeof qiymat === 'string' ? qiymat : JSON.stringify(qiymat));
-                        yangi++;
-                    }
-                }
-                koz(`✅ ${n.ism}: ${yangi} ta ma'lumot bloki tiklandi${mavjud ? ', ' + mavjud + ' ta o\'tkazib yuborildi' : ''}. Modullarga shu F.I.Sh bilan kiring.`, true);
-                setTimeout(() => location.reload(), 2500);
-            };
+            r.onload = () => tikla(r.result);
             r.readAsText(f);
+        });
+        document.getElementById('tiklash-btn').addEventListener('click', () => tikla(document.getElementById('tiklash-matn').value.trim()));
+        document.getElementById('nusxala').addEventListener('click', () => {
+            const ta = document.getElementById('zaxira-matn');
+            const ok = () => { document.getElementById('nusxala').textContent = '✅ Nusxalandi'; };
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(ta.value).then(ok, () => { ta.select(); document.execCommand('copy'); ok(); }); }
+            else { ta.removeAttribute('readonly'); ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); document.execCommand('copy'); ta.setAttribute('readonly', ''); ok(); }
         });
     </script>
 </body>
