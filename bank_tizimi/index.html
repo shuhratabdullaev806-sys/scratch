@@ -1477,7 +1477,9 @@
                 document.getElementById('stmt-out').innerText = fmtSum(st.chiqim);
                 document.getElementById('stmt-close').innerText = fmtSum(st.closing);
                 document.getElementById('stmt-note').innerText = 'Hisob raqam 5110 · Davr: ' + st.period +
-                    (term ? ' · Qidiruv faqat qatorlarni filtrlaydi, qoldiqlar butun davr bo\'yicha.' : '');
+                    (term ? ' · Qidiruv faqat qatorlarni filtrlaydi, qoldiqlar butun davr bo\'yicha.' : '') +
+                    (st.from && st.to && st.from > st.to ? ' · ⚠️ Davr boshi davr oxiridan keyin — sanalarni tekshiring.' : '');
+                document.getElementById('stmt-note').style.color = (st.from && st.to && st.from > st.to) ? '#dc2626' : '#64748b';
 
                 let html = `<tr style="background:#f8fafc;"><td colspan="7"><b>Davr boshidagi qoldiq</b></td><td class="amount-col"><b>${fmtSum(st.opening)}</b></td><td></td></tr>`;
                 filtered.forEach(({ t, run }) => {

@@ -1032,7 +1032,7 @@
             const matTotal = currentMats.reduce((sum, i) => sum + i.total, 0);
 
             const labor = parseFloat(document.getElementById('calc-labor').value) || 0;
-            const social = labor * 0.12;
+            const social = Math.round(labor * 0.12);
             document.getElementById('calc-social').value = social;
             document.getElementById('total-labor').innerText = (labor + social).toLocaleString();
 
@@ -1066,7 +1066,7 @@
             const qty = parseFloat(document.getElementById('prod-qty').value);
             const matTotal = currentMats.reduce((sum, i) => sum + i.total, 0);
             const labor = parseFloat(document.getElementById('calc-labor').value) || 0;
-            const social = labor * 0.12;
+            const social = Math.round(labor * 0.12);
             const amort = parseFloat(document.getElementById('calc-amort').value) || 0;
             const overhead = parseFloat(document.getElementById('calc-overhead').value) || 0;
             const wip = parseFloat(document.getElementById('calc-wip').value) || 0;
