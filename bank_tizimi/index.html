@@ -981,8 +981,10 @@
 
             function loadData() {
                 if (!currentUser) return;
-                balance = parseFloat(localStorage.getItem('bank_balance_' + currentUser) || '1000000000');
                 transactions = JSON.parse(localStorage.getItem('bank_transactions_' + currentUser) || '[]');
+                // Hisob raqam 0 dan ochiladi: qoldiq har doim hujjatlardan hisoblanadi (eski 1 000 000 000 boshlang'ich qoldiq ham shu bilan tuzaladi)
+                balance = transactions.reduce((b, t) => b + (t.type === 'Kirim' ? t.amount : -t.amount), 0);
+                localStorage.setItem('bank_balance_' + currentUser, balance);
                 counterparties = JSON.parse(localStorage.getItem('bank_counterparties_' + currentUser) || '[]');
 
                 document.getElementById('current-date').innerText = new Date().toLocaleDateString('uz-UZ');
