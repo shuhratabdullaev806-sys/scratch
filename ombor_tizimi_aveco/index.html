@@ -1597,7 +1597,14 @@
                         loadQuestion();
                     }, 1000);
                 } else {
-                    feedback.innerHTML = `<span style="color:var(--danger-color); font-weight:bold;">❌ Xato!</span><br>To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}`;
+                    // 1-xatoda faqat qaysi katak noto'g'ri ekani aytiladi; 2-xatodan keyin to'g'ri provodka ko'rsatiladi
+                    const n = (feedback.style.display === 'none' || feedback.dataset.q !== String(currentQIndex)) ? 1 : (+feedback.dataset.n || 1) + 1;
+                    feedback.dataset.q = currentQIndex; feedback.dataset.n = n;
+                    const xato = [dt !== target.dt ? 'Debet' : '', kt !== target.kt ? 'Kredit' : '', sum !== target.sum ? 'Summa' : ''].filter(Boolean).join(', ');
+                    feedback.innerHTML = n < 2
+                        ? `<span style="color:#dc2626; font-weight:bold;">❌ Xato!</span><br>Noto'g'ri: ${xato}. Yana bir imkoniyat bor — qayta urinib ko'ring.`
+                        : `<span style="color:#dc2626; font-weight:bold;">❌ Xato!</span><br><span style="color:#1e40af; font-weight:bold;">💡 To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}</span>`
+                        + `<br><button type="button" onclick="currentQIndex++; loadQuestion();" style="margin-top:8px; padding:8px 14px; border:none; border-radius:6px; background:#f59e0b; color:#fff; font-weight:bold; cursor:pointer;">Keyingi savol ➡️</button>`;
                     feedback.style.display = 'block';
                 }
             }
