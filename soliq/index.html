@@ -959,8 +959,8 @@
                 feedback.style.background = '#fef2f2';
                 feedback.style.border = '1px solid #fecaca';
 
-                if (quizAttempts >= 3) {
-                    // After 3 wrong attempts, show answer and let them move on
+                if (quizAttempts >= 2) {
+                    // 2-xatodan keyin to'g'ri javob ko'rsatiladi va keyingi savolga o'tiladi
                     feedback.innerHTML += `<br><br><span style="color:#1e40af; font-weight:bold;">💡 To'g'ri javob: Dt ${target.dt}, Kt ${target.kt}, Summa: ${target.sum.toLocaleString()}</span>`;
                     dtInput.disabled = true;
                     ktInput.disabled = true;
