@@ -132,29 +132,65 @@ async function matndanNatijalar(matn) {
     const natijalar = [], xatolar = [];
     const guruhlar = {};
     const re = /FMK:([a-z0-9]{4}):(\d+)\/(\d+):([ZJ]):([A-Za-z0-9+\/=]+)/g;
+    // Telegram Desktop nusxasidagi sarlavha qatorlari: «Ism, [16.11.2026 17:30]» — olib tashlanadi
+    const toza = matn.replace(/\r/g, '').split('\n')
+        .filter(q => !/^[^\n]{0,120}\[\d{1,2}[.\/-]\d{1,2}[.\/-]\d{2,4}[ ,]+\d{1,2}:\d{2}(:\d{2})?( ?[APap][Mm])?\]\s*$/.test(q))
+        .join('\n');
+    const b64 = /^[A-Za-z0-9+\/=]+$/;
     let m;
-    while ((m = re.exec(matn))) {
-        const g = guruhlar[m[1]] || (guruhlar[m[1]] = { n: +m[3], tur: m[4], q: {} });
-        g.q[+m[2]] = m[5];
+    while ((m = re.exec(toza))) {
+        // Qism Telegramda bir necha qatorga/xabarga bo'linib qolgan bo'lsa — davomini ham yig'amiz
+        const keyingi = toza.indexOf('FMK:', re.lastIndex);
+        const qolgan = toza.slice(re.lastIndex, keyingi === -1 ? undefined : keyingi);
+        let tana = m[5];
+        const tokenlar = qolgan.split(/\s+/).filter(Boolean);
+        if (/^\s/.test(qolgan) || !qolgan) {
+            for (const t of tokenlar) { if (b64.test(t)) tana += t; else break; }
+        }
+        const g = guruhlar[m[1]] || (guruhlar[m[1]] = { n: +m[3], tur: m[4], q: {}, qat: {} });
+        if (!g.q[+m[2]] || tana.length > g.q[+m[2]].length) { g.q[+m[2]] = tana; g.qat[+m[2]] = m[5]; }
     }
     for (const [id, g] of Object.entries(guruhlar)) {
         const yoq = [];
         for (let i = 1; i <= g.n; i++) if (!g.q[i]) yoq.push(i);
-        if (yoq.length) { xatolar.push(`${id} kodining ${yoq.join(', ')}-qismi yetishmayapti (jami ${g.n} qism)`); continue; }
-        try {
-            let bayt = base64danBayt(Array.from({ length: g.n }, (_, i) => g.q[i + 1]).join(''));
-            if (g.tur === 'Z') {
-                if (typeof DecompressionStream !== 'function') throw new Error('brauzer eski');
-                bayt = await oqimdanOt(bayt, new DecompressionStream('deflate-raw'));
-            }
-            natijalar.push(JSON.parse(new TextDecoder().decode(bayt)));
-        } catch (e) {
-            xatolar.push(`${id} kodi o'qilmadi (to'liq nusxalanmagan yoki brauzer eski)`);
+        if (yoq.length) {
+            xatolar.push(`${id} kodining ${yoq.join(', ')}-qismi yetishmayapti (jami ${g.n} qism). O'quvchi tugmani qayta bosgan bo'lsa, yangi kod chiqadi — hamma qismlarini bitta koddan yuborsin`);
+            continue;
         }
+        // Oxirgisidan boshqa har bir qism aynan QISM_UZUNLIGI belgidan iborat bo'ladi
+        const kalta = [];
+        const qism = [];
+        for (let i = 1; i <= g.n; i++) {
+            let t = g.q[i];
+            if (i < g.n) {
+                if (t.length < QISM_UZUNLIGI) kalta.push(`${i}-qism (${t.length}/${QISM_UZUNLIGI} belgi)`);
+                t = t.slice(0, QISM_UZUNLIGI);
+            }
+            qism.push(t);
+        }
+        if (kalta.length) { xatolar.push(`${id} kodida to'liq nusxalanmagan: ${kalta.join(', ')}`); continue; }
+        // Oxirgi qism oxiriga ortiqcha so'z yopishgan bo'lishi mumkin — qisqartirib sinaymiz
+        const oxirgi = qism.pop();
+        const variantlar = [oxirgi, g.qat[g.n]];
+        for (let k = oxirgi.length - 1; k > Math.max(0, oxirgi.length - 400); k--) if (oxirgi[k - 1] === '=' || k % 4 === 0) variantlar.push(oxirgi.slice(0, k));
+        let topildi = null, sabab = "to'liq nusxalanmagan";
+        for (const v of [...new Set(variantlar)]) {
+            try {
+                let bayt = base64danBayt(qism.join('') + v);
+                if (g.tur === 'Z') {
+                    if (typeof DecompressionStream !== 'function') { sabab = "brauzer eski — Chrome'ni yangilang"; break; }
+                    bayt = await oqimdanOt(bayt, new DecompressionStream('deflate-raw'));
+                }
+                topildi = JSON.parse(new TextDecoder().decode(bayt));
+                break;
+            } catch (e) { }
+        }
+        if (topildi) natijalar.push(topildi);
+        else xatolar.push(`${id} kodi o'qilmadi (${sabab}). O'quvchidan qismlarni qaytadan, har birini alohida xabar qilib yuborishini so'rang`);
     }
     // Kodlardan tashqari joylangan oddiy JSON matnlar ham o'qiladi
     {
-        const t = matn.replace(re, ' ').trim();
+        const t = toza.replace(re, ' ').trim();
         if (t) {
             try { natijalar.push(JSON.parse(t)); }
             catch (e) {
