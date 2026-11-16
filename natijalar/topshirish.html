@@ -78,6 +78,10 @@
         .yoriq { background: #f0f9ff; border: 1px solid #bae6fd; }
         .yoriq ol { margin: 8px 0 0; padding-left: 20px; }
         .xabar { color: #b45309; }
+        .ogoh { background: #fef2f2; border: 2px solid #f87171; color: #991b1b; }
+        .ogoh b { color: #7f1d1d; }
+        .yorqin { animation: yorqin 1.2s ease 2; border-radius: 12px; }
+        @keyframes yorqin { 0%,100% { box-shadow: 0 0 0 0 rgba(67,97,238,0); } 50% { box-shadow: 0 0 0 6px rgba(67,97,238,.45); } }
     </style>
 </head>
 
@@ -86,6 +90,13 @@
         <a class="back" href="../index.html">← Portalga qaytish</a>
         <h1>📤 Natijani Topshirish</h1>
         <p class="sub">Bajargan ishlaringizni bitta faylga yig'ib, o'qituvchiga yuboring. Internet yoki bot shart emas.</p>
+
+        <div class="card ogoh" id="ilova-ogoh" style="display:none">
+            <b>⚠️ Sahifa Telegram / Instagram ichida ochilgan.</b>
+            Bu yerda fayl yuklanmaydi va ishlaringiz saqlanmasligi mumkin.
+            Yuqori o'ngdagi <b>⋮</b> yoki <b>⋯</b> tugmasini bosib <b>«Brauzerda ochish»</b> (Chrome / Safari) ni tanlang.
+            Bo'lmasa, quyidagi <b>«📋 Matnni nusxalash»</b> usulidan foydalaning.
+        </div>
 
         <div class="card">
             <div class="row">
@@ -104,9 +115,13 @@
             <div class="jami" id="jami"></div>
             <button class="btn" id="yuklash">⬇️ Natija faylini yuklab olish</button>
             <div id="zaxira" style="display:none; margin-top:12px;">
-                <p class="xabar" style="display:block">Telefonda fayl ochilmasa yoki yuklanmasa: matnni nusxalab oling va o'zingizga yuboring (Telegram, e-mail, Eslatmalar).</p>
+                <p class="xabar" style="display:block"><b>Fayl yaratilmadimi?</b> Hechqisi yo'q — natija shu matn (kod)ning o'zi.
+                    «📋 Nusxalash» ni bosing va Telegramda o'qituvchiga (yoki o'zingizga) oddiy xabar qilib yuboring.</p>
+                <p id="qism-izoh" class="xabar" style="display:none"></p>
                 <textarea id="zaxira-matn" readonly style="width:100%; height:80px; font-size:12px;"></textarea>
                 <button class="btn" id="nusxala" type="button">📋 Matnni nusxalash</button>
+                <div id="qism-tugmalar" style="display:grid; gap:8px;"></div>
+                <button class="btn" id="ulash-matn" type="button" style="display:none; margin-top:8px; background:#0ea5e9">📤 Matnni ulashish (Telegram va b.)</button>
             </div>
         </div>
 
@@ -120,7 +135,7 @@
             </ol>
             <input type="file" id="tiklash-fayl" accept=".json,application/json">
             <p style="margin:10px 0 4px">Yoki fayl o'rniga nusxalangan matnni shu yerga joylang:</p>
-            <textarea id="tiklash-matn" placeholder="{&quot;versiya&quot;:1,&quot;ism&quot;: ..." style="width:100%; height:80px; font-size:12px;"></textarea>
+            <textarea id="tiklash-matn" placeholder="FMK:… kodi yoki {&quot;versiya&quot;:1, …} matni" style="width:100%; height:80px; font-size:12px;"></textarea>
             <button class="btn" id="tiklash-btn" type="button">📥 Matndan tiklash</button>
             <p id="tiklash-xabar" class="xabar" style="display:none"></p>
         </div>
@@ -132,6 +147,8 @@
                 <li>Faylni o'qituvchiga istalgan yo'l bilan yuboring: Telegram (oddiy xabar sifatida), e-mail,
                     Google Classroom yoki fleshka.</li>
                 <li>Faylni ochib o'zgartirmang — o'qituvchi paneli o'zgartirilgan faylni aniqlaydi.</li>
+                <li><b>Telefonda fayl chiqmadimi?</b> Sahifani Telegram ichida emas, <b>Chrome / Safari</b>da oching. Baribir chiqmasa —
+                    tugma ostida paydo bo'ladigan <b>«📋 Nusxalash»</b> kodini Telegramda oddiy xabar qilib yuboring. O'qituvchi uni panelga joylaydi.</li>
             </ol>
         </div>
     </div>
@@ -147,7 +164,8 @@
             ismSelect.innerHTML = '<option value="">— ma\'lumot topilmadi —</option>';
             const x = document.getElementById('xabar');
             x.style.display = 'block';
-            x.textContent = "Bu brauzerda hali hech qanday bajarilgan ish topilmadi. Avval modullarda vazifalarni bajaring (o'sha kompyuter va brauzerda).";
+            x.textContent = "Bu brauzerda hali hech qanday bajarilgan ish topilmadi. Avval modullarda vazifalarni bajaring.\n\nIshlagan bo'lsangiz: ishlar faqat o'sha qurilma va o'sha brauzerda saqlanadi. Vazifani qaysi brauzerda (Chrome, Safari, Telegram ichida) va qaysi havola orqali bajargan bo'lsangiz, shu sahifani ham aynan o'sha joyda oching.";
+            x.style.whiteSpace = 'pre-line';
         } else {
             ismSelect.innerHTML = ismlar.map(i => `<option value="${htmlXavfsiz(i)}">${htmlXavfsiz(i)}</option>`).join('');
         }
@@ -175,6 +193,12 @@
         chiz();
 
         let ohirgiMatn = '';
+        const UA = navigator.userAgent || '';
+        const TELEFON = /iPhone|iPad|iPod|Android/i.test(UA);
+        // Telegram, Instagram, Facebook, TikTok va boshqa ilovalar ichidagi brauzer (fayl yuklay olmaydi)
+        const ILOVA_ICHIDA = /Telegram|Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|musical_ly|; wv\)/i.test(UA)
+            || (typeof window.TelegramWebviewProxy !== 'undefined');
+        if (ILOVA_ICHIDA) document.getElementById('ilova-ogoh').style.display = 'block';
         document.getElementById('yuklash').addEventListener('click', () => {
             const ism = ismSelect.value;
             const guruh = guruhInput.value.trim();
@@ -193,31 +217,104 @@
             const matn = JSON.stringify(natija);
             const fayl = `${ism}_${guruh}_${natija.sana.slice(0, 10)}`.replace(/[\\/:*?"<>|\s]+/g, '_') + '.json';
             const blob = new Blob([matn], { type: 'application/json' });
-            ohirgiMatn = matn;
-            document.getElementById('zaxira').style.display = 'block';
-            document.getElementById('zaxira-matn').value = matn;
+            ohirgiMatn = matn; qismlar = [];
+            document.getElementById('zaxira-matn').value = 'Tayyorlanmoqda…';
+            zaxiraniKorsat();
+            kodniTayyorla(matn);
 
             // Telefonda (ayniqsa iPhone): ulashish oynasi orqali Telegram / Fayllarga saqlash
             const fileObj = (typeof File === 'function') ? new File([blob], fayl, { type: 'application/json' }) : null;
-            if (fileObj && navigator.canShare && navigator.canShare({ files: [fileObj] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
-                navigator.share({ files: [fileObj], title: 'Natija fayli' }).catch(() => { /* bekor qilindi */ });
+            let fayliUlashsaBoladi = false;
+            try { fayliUlashsaBoladi = !!(fileObj && navigator.canShare && navigator.canShare({ files: [fileObj] })); } catch (e) { }
+            if (fayliUlashsaBoladi && TELEFON) {
+                navigator.share({ files: [fileObj], title: 'Natija fayli' }).catch(err => {
+                    if (err && err.name === 'AbortError') return; // o'quvchi o'zi bekor qildi
+                    oddiyYuklash(blob, fayl); // ulashish ishlamadi — oddiy yuklashga o'tamiz
+                });
                 return;
             }
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = fayl;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            oddiyYuklash(blob, fayl);
         });
 
+        function nusxalaMatn(matn, tugma) {
+            const eski = tugma.dataset.nom || (tugma.dataset.nom = tugma.textContent);
+            const ok = () => { tugma.textContent = '✅ Nusxalandi — endi Telegramga joylang'; setTimeout(() => tugma.textContent = eski, 4000); };
+            const qolda = () => {
+                const ta = document.createElement('textarea');
+                ta.value = matn; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, matn.length);
+                let bo = false; try { bo = document.execCommand('copy'); } catch (e) { }
+                ta.remove();
+                if (bo) ok(); else alert("Nusxalab bo'lmadi. Matn maydonini bosib turing va «Hammasini tanlash» → «Nusxalash» ni tanlang.");
+            };
+            if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(matn).then(ok, qolda);
+            else qolda();
+        }
+
+        let qismlar = [];
+        async function kodniTayyorla(matn) {
+            try { qismlar = await natijaniKodla(matn); } catch (e) { qismlar = [matn]; }
+            document.getElementById('zaxira-matn').value = qismlar.join('\n\n');
+            const izoh = document.getElementById('qism-izoh');
+            const tugmalar = document.getElementById('qism-tugmalar');
+            const bitta = document.getElementById('nusxala');
+            tugmalar.innerHTML = '';
+            if (qismlar.length === 1) {
+                izoh.style.display = 'none';
+                bitta.style.display = 'block';
+                bitta.textContent = '📋 Matnni nusxalash';
+                bitta.dataset.nom = bitta.textContent;
+                return;
+            }
+            bitta.style.display = 'none';
+            izoh.style.display = 'block';
+            izoh.innerHTML = `Natija katta — <b>${qismlar.length} qism</b>. Har bir qismni alohida nusxalab, <b>alohida xabar</b> qilib yuboring (tartibi muhim emas, hammasi bo'lsa bo'ldi).`;
+            qismlar.forEach((q, i) => {
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'btn';
+                b.textContent = `📋 ${i + 1}-qismni nusxalash (${i + 1}/${qismlar.length})`;
+                b.addEventListener('click', () => nusxalaMatn(q, b));
+                tugmalar.appendChild(b);
+            });
+        }
+
+        function oddiyYuklash(blob, fayl) {
+            try {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fayl;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+            } catch (e) { /* zaxira matn baribir ko'rsatilgan */ }
+        }
+
+        function zaxiraniKorsat() {
+            const z = document.getElementById('zaxira');
+            z.style.display = 'block';
+            document.getElementById('nusxala').textContent = '📋 Matnni nusxalash';
+            if (TELEFON || ILOVA_ICHIDA) {
+                z.classList.remove('yorqin'); void z.offsetWidth; z.classList.add('yorqin');
+                setTimeout(() => z.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }
+        }
+
+        if (navigator.share) {
+            const u = document.getElementById('ulash-matn');
+            u.style.display = 'block';
+            u.addEventListener('click', () => {
+                navigator.share({ text: document.getElementById('zaxira-matn').value }).catch(() => { });
+            });
+        }
+
         // --- Faylni shu qurilmaga tiklash ---
-        function tikla(matn) {
+        async function tikla(matn) {
             const xabar = document.getElementById('tiklash-xabar');
             const koz = (m, ok) => { xabar.style.display = 'block'; xabar.style.color = ok ? '#166534' : '#b91c1c'; xabar.textContent = m; };
-            let n;
-            try { n = JSON.parse(matn); } catch (e) { return koz("Matn o'qilmadi: bu natija fayli emas yoki to'liq nusxalanmagan.", false); }
+            const { natijalar: topildi, xatolar } = await matndanNatijalar(matn);
+            if (!topildi.length) return koz("Matn o'qilmadi: " + (xatolar.join('; ') || "bu natija fayli emas yoki to'liq nusxalanmagan") + '.', false);
+            const n = topildi[0];
             if (!n || !n.ism || !n.malumot || !n.kod) return koz('Bu portal natija fayli emas.', false);
             const { kod, ...qolgan } = n;
             if (kod !== nazoratKodi(qolgan)) return koz("Fayl o'zgartirilgan, tiklab bo'lmaydi.", false);
@@ -244,12 +341,7 @@
             r.readAsText(f);
         });
         document.getElementById('tiklash-btn').addEventListener('click', () => tikla(document.getElementById('tiklash-matn').value.trim()));
-        document.getElementById('nusxala').addEventListener('click', () => {
-            const ta = document.getElementById('zaxira-matn');
-            const ok = () => { document.getElementById('nusxala').textContent = '✅ Nusxalandi'; };
-            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(ta.value).then(ok, () => { ta.select(); document.execCommand('copy'); ok(); }); }
-            else { ta.removeAttribute('readonly'); ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); document.execCommand('copy'); ta.setAttribute('readonly', ''); ok(); }
-        });
+        document.getElementById('nusxala').addEventListener('click', () => nusxalaMatn(qismlar.length ? qismlar[0] : ohirgiMatn, document.getElementById('nusxala')));
     </script>
 </body>
 

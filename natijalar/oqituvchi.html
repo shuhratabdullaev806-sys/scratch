@@ -122,6 +122,13 @@
                 <span class="bo">yoki bosib tanlang (bir vaqtda bir nechta fayl tanlash mumkin)</span>
                 <input type="file" id="fayllar" accept=".json,application/json" multiple hidden>
             </div>
+            <details id="matnBlok" style="margin-top:12px">
+                <summary style="cursor:pointer; font-weight:600">📋 Fayl o'rniga matn (kod) keldimi? Shu yerga joylang</summary>
+                <p class="bo" style="margin:6px 0">Telegramdan o'quvchi yuborgan <code>FMK:…</code> kodini (yoki JSON matnni) nusxalab joylang.
+                    Bir nechta o'quvchi va bir nechta qismni birdan joylash mumkin — sarlavha, sana kabi ortiqcha matn e'tiborga olinmaydi.</p>
+                <textarea id="matnJoy" style="width:100%; height:110px; font-size:12px; box-sizing:border-box" placeholder="FMK:ab12:1/2:Z:..."></textarea>
+                <button class="btn" id="matnQosh" type="button" style="margin-top:6px">➕ Matndan qo'shish</button>
+            </details>
             <div class="tools">
                 <button class="btn ikkinchi" id="mahalliy">💻 Shu kompyuterdagi o'quvchilarni ko'rish</button>
                 <select id="guruhFiltr"><option value="">Barcha guruhlar</option></select>
@@ -210,6 +217,21 @@
             chiz();
             holat(`${ok} ta fayl qo'shildi` + (xato.length ? `; o'qib bo'lmadi: ${xato.join(', ')}` : ''));
         }
+
+        document.getElementById('matnQosh').addEventListener('click', async () => {
+            const joy = document.getElementById('matnJoy');
+            const { natijalar: topildi, xatolar } = await matndanNatijalar(joy.value);
+            let ok = 0;
+            for (const n of topildi) {
+                if (!n || !n.ism || !n.malumot) { xatolar.push("natija emas"); continue; }
+                n.togri = n.kod ? tekshir(n) : false;
+                n.manba = 'matn (Telegram)';
+                qosh(n);
+                ok++;
+            }
+            if (ok) { saqla(); chiz(); joy.value = ''; }
+            holat(`${ok} ta natija matndan qo'shildi` + (xatolar.length ? `; muammo: ${xatolar.join('; ')}` : ''));
+        });
 
         const drop = document.getElementById('drop');
         const input = document.getElementById('fayllar');

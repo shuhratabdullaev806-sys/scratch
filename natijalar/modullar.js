@@ -89,3 +89,84 @@ function nazoratKodi(obj) {
 function htmlXavfsiz(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+
+// --- Natijani matn (kod) ko'rinishida uzatish ---
+// Telegram bitta xabarga ~4096 belgi sig'diradi, shuning uchun natija siqiladi va
+// «FMK:id:1/3:Z:....» ko'rinishidagi qismlarga bo'linadi. Qismlar orasidagi har qanday
+// boshqa matn (Telegram sarlavhalari, sana, ism) o'qishda e'tiborga olinmaydi.
+const QISM_UZUNLIGI = 3000;
+
+function baytdanBase64(b) {
+    let s = '';
+    for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+    return btoa(s);
+}
+function base64danBayt(t) {
+    const s = atob(t);
+    const b = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+    return b;
+}
+async function oqimdanOt(bayt, oqim) {
+    const res = new Response(new Blob([bayt]).stream().pipeThrough(oqim));
+    return new Uint8Array(await res.arrayBuffer());
+}
+
+async function natijaniKodla(matn) {
+    const bayt = new TextEncoder().encode(matn);
+    let tur = 'J', tana = bayt;
+    if (typeof CompressionStream === 'function') {
+        try { tana = await oqimdanOt(bayt, new CompressionStream('deflate-raw')); tur = 'Z'; } catch (e) { tana = bayt; tur = 'J'; }
+    }
+    const b64 = baytdanBase64(tana);
+    const id = Math.random().toString(36).slice(2, 6).padEnd(4, '0');
+    const n = Math.max(1, Math.ceil(b64.length / QISM_UZUNLIGI));
+    const qismlar = [];
+    for (let i = 0; i < n; i++) qismlar.push(`FMK:${id}:${i + 1}/${n}:${tur}:${b64.slice(i * QISM_UZUNLIGI, (i + 1) * QISM_UZUNLIGI)}`);
+    return qismlar;
+}
+
+// Joylangan matndan natijalarni ajratadi: FMK-kodlar va/yoki oddiy JSON matn.
+// Natija: { natijalar: [obyekt...], xatolar: ['...'] }
+async function matndanNatijalar(matn) {
+    const natijalar = [], xatolar = [];
+    const guruhlar = {};
+    const re = /FMK:([a-z0-9]{4}):(\d+)\/(\d+):([ZJ]):([A-Za-z0-9+\/=]+)/g;
+    let m;
+    while ((m = re.exec(matn))) {
+        const g = guruhlar[m[1]] || (guruhlar[m[1]] = { n: +m[3], tur: m[4], q: {} });
+        g.q[+m[2]] = m[5];
+    }
+    for (const [id, g] of Object.entries(guruhlar)) {
+        const yoq = [];
+        for (let i = 1; i <= g.n; i++) if (!g.q[i]) yoq.push(i);
+        if (yoq.length) { xatolar.push(`${id} kodining ${yoq.join(', ')}-qismi yetishmayapti (jami ${g.n} qism)`); continue; }
+        try {
+            let bayt = base64danBayt(Array.from({ length: g.n }, (_, i) => g.q[i + 1]).join(''));
+            if (g.tur === 'Z') {
+                if (typeof DecompressionStream !== 'function') throw new Error('brauzer eski');
+                bayt = await oqimdanOt(bayt, new DecompressionStream('deflate-raw'));
+            }
+            natijalar.push(JSON.parse(new TextDecoder().decode(bayt)));
+        } catch (e) {
+            xatolar.push(`${id} kodi o'qilmadi (to'liq nusxalanmagan yoki brauzer eski)`);
+        }
+    }
+    // Kodlardan tashqari joylangan oddiy JSON matnlar ham o'qiladi
+    {
+        const t = matn.replace(re, ' ').trim();
+        if (t) {
+            try { natijalar.push(JSON.parse(t)); }
+            catch (e) {
+                // Bir nechta JSON qatorma-qator joylangan bo'lishi mumkin
+                for (const qator of t.split(/\n+/)) {
+                    const q = qator.trim();
+                    if (!q.startsWith('{')) continue;
+                    try { natijalar.push(JSON.parse(q)); } catch (e2) { xatolar.push("bir matn to'liq nusxalanmagan"); }
+                }
+                if (!natijalar.length && !xatolar.length && !Object.keys(guruhlar).length) xatolar.push("matnda natija topilmadi");
+            }
+        }
+    }
+    return { natijalar, xatolar };
+}
